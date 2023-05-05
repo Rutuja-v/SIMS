@@ -17,7 +17,6 @@ import EditIcon from "@mui/icons-material/Edit";
 
 import {
   Card,
-  CardActionArea,
   CardContent,
   CardActions,
   IconButton,
@@ -25,15 +24,8 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import moment from "moment";
+import { Formik, Form } from "formik";
 import UpdateProduct from "./UpdateProduct";
-
-export const initialValues = {
-  name: "",
-  price: "",
-  stock: "",
-};
 
 export const validationSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
@@ -42,6 +34,7 @@ export const validationSchema = Yup.object().shape({
     .required("Stock  is required")
     .positive("Stock  must be positive"),
 });
+
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -51,56 +44,24 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.common.white,
     textAlign: "center",
   },
-  successButton: {
-    borderRadius: "24px",
-    padding: "12px 24px",
-    backgroundColor: "	#4169e1",
-    color: "#fff",
-
-    "&:hover": {
-      backgroundColor: " #198754",
-    },
-  },
 }));
 
-// function formatDate(date) {
-//   // Extract the year, month, and day values from the Date object
-//   const year = date.getFullYear();
-//   let month = date.getMonth() + 1;
-//   let day = date.getDate();
+function Products() {
+  const classes = useStyles();
 
-//   // Convert the month and day to double digits if necessary
-//   month = month.toString().padStart(2, "0");
-//   day = day.toString().padStart(2, "0");
-
-// Format the date string
-//   const formattedDate = `${day}/${month}/${year}`;
-
-//   return formattedDate;
-// }
-
-function Products({}) {
-  //   const [godownData, setGodownData] = useState([]);
-  //   const classes = useStyles();
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(null);
-  //   const [id, setId] = useState("");
-  //   const [location, setLocation] = useState("");
-  //   const [capacity, setCapacity] = useState("");
-  //   const [managerId, setmanagerId] = useState(" ");
-  //   const [date, setDate] = useState("");
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
 
   const [products, setProducts] = useState([]);
-  //   const [selectedFile, setSelectedFile] = useState(null);
-  const [name, setName] = useState(" ");
-  const [price, setPrice] = useState(" ");
-  const [stock, setStock] = useState(" ");
 
-  const classes = useStyles();
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalItem, setEditModalItem] = useState(null);
 
   useEffect(() => {
     getData();
   }, []);
+
   const getData = () => {
     axios
       .get("http://localhost:8080/api/products")
@@ -111,7 +72,8 @@ function Products({}) {
         console.error(error);
       });
   };
-  const handleClickAddModalOpen = () => {
+
+  const handleAddModalOpen = () => {
     setAddModalOpen(true);
   };
 
@@ -119,12 +81,11 @@ function Products({}) {
     setAddModalOpen(false);
   };
 
-  const handleClickEditModalOpen = (product) => {
-    setEditModalOpen(product);
+  const handleEditModalOpen = (product) => {
+    setEditModalItem(product);
   };
-
   const handleEditModalClose = () => {
-    setEditModalOpen(null);
+    setEditModalItem(null);
     getData();
   };
 
@@ -132,41 +93,16 @@ function Products({}) {
     axios
       .delete(`http://localhost:8080/api/products/${id}`)
       .then((response) => {
-        console.log(response);
         setProducts(products.filter((product) => product.id !== id));
       })
       .catch((error) => {
         console.error(error);
       });
   };
-  // const handleDelete = async (id) => {
-
-  //       try {
-
-  //         // Delete godown from server
-
-  //         await fetch(`http://localhost:8080/api/godowns/91/${id}`, {
-
-  //           method: 'DELETE',
-
-  //         });
-
-  //         // Delete godown from local state
-
-  //           setUsers(users.filter((user) => user.id !== id));
-
-  //       } catch (error) {
-
-  //         console.error('Error deleting godown:', error);
-
-  //       }
-
-  //     };
 
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
-
   const handlePriceChange = (event) => {
     setPrice(event.target.value);
   };
@@ -180,13 +116,13 @@ function Products({}) {
 
     formData["name"] = name;
     formData["stock"] = stock;
-
     formData["price"] = price;
+
+    console.log(formData);
 
     axios
       .post("http://localhost:8080/api/products", formData)
       .then((response) => {
-        console.log(response);
         getData();
       })
       .catch((error) => {
@@ -203,11 +139,11 @@ function Products({}) {
     <div className="App">
       <Box display="flex" mb={2} justifyContent="flex-end">
         <Button
-          variant="contained"
+          variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleClickAddModalOpen}
+          onClick={handleAddModalOpen}
         >
-          Add Product
+          Add new
         </Button>
       </Box>
 
@@ -217,11 +153,10 @@ function Products({}) {
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
-          Add New Product
+          Add a product
         </DialogTitle>
         <DialogContent>
           <Formik
-            initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -353,7 +288,7 @@ function Products({}) {
                 <IconButton
                   color="success"
                   aria-label="edit"
-                  onClick={() => handleClickEditModalOpen(product)}
+                  onClick={() => handleEditModalOpen(product)}
                 >
                   <EditIcon />
                 </IconButton>
@@ -371,7 +306,7 @@ function Products({}) {
       </Grid>
 
       <UpdateProduct
-        product={editModalOpen}
+        product={editModalItem}
         handleClose={handleEditModalClose}
       />
     </div>

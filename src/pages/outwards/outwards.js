@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import OutwardsForm from "./outwardsForm";
 import axios from "axios";
 import { useEffect } from "react";
-import Popup from "../../Components/Popup";
 import { makeStyles } from "@material-ui/core";
 import {
   Paper,
@@ -24,19 +22,18 @@ import {
   DialogActions,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
-import * as employeeService from "../../services/employeeService";
 import Controls from "../../Components/controls/Controls";
 import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
-import Notification from "../../Components/Notification";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
+import UpdateOutwards from "./UpdateOutwards";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
-    margin: theme.spacing(5),
     padding: theme.spacing(3),
   },
   searchInput: {
@@ -56,9 +53,9 @@ const headCells = [
   { id: "godown", label: "Godown" },
   { id: "product_name", label: "Product name" },
   { id: "delivered_to", label: "Delivered To" },
+  { id: "purpose", label: "Purpose" },
   { id: "supply_date", label: "Supply Date" },
   { id: "delivery_date", label: "Delivery Date" },
-  // { id: "purpose", label: "Purpose" },
   { id: "invoice_no", label: "Invoice Number" },
   { id: "receipt_no", label: "Receipt Number" },
   { id: "actions", label: "Actions", disableSorting: true },
@@ -80,13 +77,13 @@ export default function Outwards() {
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
   const [deliveredTo, setDeliveredTo] = useState("");
+  const [purpose, setPurpose] = useState("");
   const [supplyDate, setSupplyDate] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [invoiceNo, setInvoiceNo] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
-  const [purpose, setPurpose] = useState("");
   const [quantity, setQuantity] = useState("");
   const [billValue, setBillValue] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
@@ -97,24 +94,23 @@ export default function Outwards() {
   const [employees, setEmployees] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(null);
+  const [editModalItem, setEditModalItem] = useState(null);
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(outwards, headCells, filterFn);
 
-  const handleClickAddModalOpen = () => {
+  const handleAddModalOpen = () => {
     setAddModalOpen(true);
   };
   const handleAddModalClose = () => {
     setAddModalOpen(false);
   };
 
-  const handleClickEditModalOpen = (employee) => {
-    setEditModalOpen(employee);
+  const handleEditModalOpen = (outwards) => {
+    setEditModalItem(outwards);
   };
-
   const handleEditModalClose = () => {
-    setEditModalOpen(null);
+    setEditModalItem(null);
     getData();
   };
 
@@ -131,16 +127,16 @@ export default function Outwards() {
     });
   };
 
-  const handleDelete = (id) => {
-    axios
+  const handleDelete = async (id) => {
+    await axios
       .delete(`http://localhost:8080/api/outwards/${id}`)
       .then((response) => {
-        console.log(response);
         setOutwards(outwards.filter((record) => record.id !== id));
       })
       .catch((error) => {
         console.error(error);
       });
+
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
@@ -150,15 +146,14 @@ export default function Outwards() {
   const handleGodownIdChange = (event) => {
     setGodownId(event.target.value);
   };
-
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
-  const handleInvoiceIdChange = (event) => {
-    setInvoiceId(event.target.value);
-  };
   const handleDeliveredToChange = (event) => {
     setDeliveredTo(event.target.value);
+  };
+  const handlePurposeChange = (event) => {
+    setPurpose(event.target.value);
   };
   const handleSupplyDateChange = (event) => {
     setSupplyDate(event.target.value);
@@ -169,11 +164,11 @@ export default function Outwards() {
   const handleInvoiceNoChange = (event) => {
     setInvoiceNo(event.target.value);
   };
+  const handleInvoiceIdChange = (event) => {
+    setInvoiceId(event.target.value);
+  };
   const handleReceiptNoChange = (event) => {
     setReceiptNo(event.target.value);
-  };
-  const handlePurposeChange = (event) => {
-    setPurpose(event.target.value);
   };
   const handleQuantityChange = (event) => {
     setQuantity(event.target.value);
@@ -194,10 +189,8 @@ export default function Outwards() {
     formData["product"] = {
       id: productId,
     };
-    formData["invoice"] = {
-      id: invoiceId,
-    };
     formData["deliveredTo"] = deliveredTo;
+    formData["purpose"] = purpose;
 
     const supplyDateObj = new Date(supplyDate);
     const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
@@ -207,8 +200,10 @@ export default function Outwards() {
     const formattedDeliveryDate = moment(deliveryDateObj).format("DD/MM/YYYY");
     formData["deliveryDate"] = formattedDeliveryDate;
 
+    formData["invoice"] = {
+      id: invoiceId,
+    };
     formData["receiptNo"] = receiptNo;
-    formData["purpose"] = purpose;
     // formData["invoice"] = {
     //   quantity: quantity,
     //   billValue: billValue,
@@ -222,7 +217,6 @@ export default function Outwards() {
     axios
       .post("http://localhost:8080/api/outwards", formData)
       .then((response) => {
-        console.log(response);
         getData();
       })
       .catch((error) => {
@@ -231,16 +225,16 @@ export default function Outwards() {
 
     setGodownId("");
     setProductId("");
-    setInvoiceId("");
     setDeliveredTo("");
+    setPurpose("");
     setSupplyDate("");
     setDeliveryDate("");
     setInvoiceNo("");
+    setInvoiceId("");
     setReceiptNo("");
-    setPurpose("");
-    setQuantity("");
-    setBillValue("");
-    setBillCheckedById("");
+    // setQuantity("");
+    // setBillValue("");
+    // setBillCheckedById("");
     handleAddModalClose();
     setAddModalOpen(false);
   };
@@ -255,13 +249,13 @@ export default function Outwards() {
           let obj = {
             id: item.id,
             godown: item.godown,
-            product_name: item.product.name,
+            product: item.product,
             delivered_to: item.deliveredTo,
+            purpose: item.purpose,
             supply_date: item.supplyDate,
             delivery_date: item.deliveryDate,
-            invoice_no: item.invoice.id,
+            invoice_id: item.invoice.id,
             receipt_no: item.receiptNo,
-            purpose: item.purpose,
           };
           rows.push(obj);
         }
@@ -323,7 +317,7 @@ export default function Outwards() {
             variant="outlined"
             startIcon={<AddIcon />}
             className={classes.newButton}
-            onClick={handleClickAddModalOpen}
+            onClick={handleAddModalOpen}
           >
             Add new
           </Button>
@@ -343,25 +337,22 @@ export default function Outwards() {
                     {"Capacity: " + item.godown.capacityInQuintals}
                   </Typography>
                 </TableCell>
-                <TableCell>{item.product_name}</TableCell>
+                <TableCell>{item.product.name}</TableCell>
                 <TableCell>
-                  {item.purpose === "service" ? "Self" : item.delivered_to}
+                  {item.delivered_to}
                 </TableCell>
+                <TableCell>{item.purpose}</TableCell>
                 <TableCell>{item.supply_date}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
-                {/* <TableCell>{item.purpose}</TableCell> */}
-                <TableCell>{item.invoice_no}</TableCell>
+                <TableCell>{item.invoice_id}</TableCell>
                 <TableCell>{item.receipt_no}</TableCell>
                 <TableCell>
-                  {/* <Controls.ActionButton
-                    onClick={() => {
-                      openInPopup(item);
-                    }}
+                  <Controls.ActionButton
+                    onClick={() => { handleEditModalOpen(item) }}
                   >
                     <EditOutlinedIcon fontSize="small" />
-                  </Controls.ActionButton> */}
+                  </Controls.ActionButton>
                   <Controls.ActionButton
-                    //    color="secondary"
                     onClick={() => {
                       setConfirmDialog({
                         isOpen: true,
@@ -400,7 +391,7 @@ export default function Outwards() {
                     marginTop: "32px",
                     marginBottom: "16px",
                     display: "grid",
-                    gridTemplateColumns: "auto auto auto",
+                    gridTemplateColumns: "auto auto",
                     columnGap: "16px",
                     rowGap: "24px",
                   }}
@@ -437,22 +428,6 @@ export default function Outwards() {
                       ))}
                     </Select>
                   </FormControl>
-                  <FormControl>
-                    <InputLabel id="invoiceIdLabel">Invoice</InputLabel>
-                    <Select
-                      labelId="invoiceIdLabel"
-                      id="invoiceId"
-                      value={invoiceId}
-                      label="Invoice"
-                      onChange={handleInvoiceIdChange}
-                    >
-                      {invoices.map((invoice, index) => (
-                        <MenuItem key={index} value={invoice.id}>
-                          {invoice.id}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                   <TextField
                     id="deliveredTo"
                     label="Delivered to"
@@ -461,6 +436,19 @@ export default function Outwards() {
                     value={deliveredTo}
                     onChange={handleDeliveredToChange}
                   />
+                  <FormControl>
+                    <InputLabel id="purposeIdLabel">Purpose</InputLabel>
+                    <Select
+                      labelId="purposeIdLabel"
+                      id="productId"
+                      value={purpose}
+                      label="Purpose"
+                      onChange={handlePurposeChange}
+                    >
+                      <MenuItem value="sales">Sales</MenuItem>
+                      <MenuItem value="service">Service</MenuItem>
+                    </Select>
+                  </FormControl>
                   <TextField
                     id="supplyDate"
                     label="Supply date"
@@ -483,27 +471,30 @@ export default function Outwards() {
                       shrink: true,
                     }}
                   />
+                  <FormControl>
+                    <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
+                    <Select
+                      labelId="invoiceIdLabel"
+                      id="invoiceId"
+                      value={invoiceId}
+                      label="Invoice"
+                      onChange={handleInvoiceIdChange}
+                    >
+                      {invoices.map((invoice, index) => (
+                        <MenuItem key={index} value={invoice.id}>
+                          {invoice.id}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                   <TextField
                     id="receiptNo"
-                    label="Receipt No"
+                    label="Receipt number"
                     type="number"
                     variant="outlined"
                     value={receiptNo}
                     onChange={handleReceiptNoChange}
                   />
-                  <FormControl>
-                    <InputLabel id="purposeIdLabel">Purpose</InputLabel>
-                    <Select
-                      labelId="purposeIdLabel"
-                      id="productId"
-                      value={purpose}
-                      label="Purpose"
-                      onChange={handlePurposeChange}
-                    >
-                      <MenuItem value="sales">Sales</MenuItem>
-                      <MenuItem value="service">Service</MenuItem>
-                    </Select>
-                  </FormControl>
                   {/* <TextField
                     id="quantity"
                     label="Quantity"
@@ -566,6 +557,8 @@ export default function Outwards() {
         confirmDialog={confirmDialog}
         setConfirmDialog={setConfirmDialog}
       />
+
+      <UpdateOutwards outwards={editModalItem} godowns={godowns} products={products} invoices={invoices} handleClose={handleEditModalClose} />
     </>
   );
 }

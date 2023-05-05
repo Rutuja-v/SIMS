@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import InwardsForm from "./inwardsForm";
 import axios from "axios";
 import { useEffect } from "react";
-import Popup from "../../Components/Popup";
 import { makeStyles } from "@material-ui/core";
 import {
   Paper,
@@ -14,23 +12,40 @@ import {
   Typography,
   Button,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  DialogActions,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
-import * as employeeService from "../../services/employeeService";
 import Controls from "../../Components/controls/Controls";
 import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
-import Notification from "../../Components/Notification";
 import ConfirmDialog from "../../Components/ConfirmDialog";
+import { Form, Formik } from "formik";
+import moment from "moment";
+import UpdateInwards from "./UpdateInwards";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
-    margin: theme.spacing(5),
     padding: theme.spacing(3),
   },
   searchInput: {
     width: "75%",
+  },
+  customTitle: {
+    margin: 0,
+    padding: theme.spacing(2),
+    backgroundColor: "#000000",
+
+    color: theme.palette.common.white,
+    textAlign: "center",
   },
 }));
 
@@ -44,28 +59,57 @@ const headCells = [
   { id: "actions", label: "Actions", disableSorting: true },
 ];
 
-export default function Employees() {
-  const [recordForEdit, setRecordForEdit] = useState(null);
+export default function Inwards() {
   const classes = useStyles();
-  const [records, setRecords] = useState([]);
+  const [inwards, setInwards] = useState([]);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
     },
-  });
-  const [openPopup, setOpenPopup] = useState(false);
-  const [notify, setNotify] = useState({
-    isOpen: false,
-    message: "",
-    type: "",
   });
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: "",
     subTitle: "",
   });
+
+  const [godownId, setGodownId] = useState("");
+  const [productId, setProductId] = useState("");
+  const [supplierId, setSupplierId] = useState("");
+  const [supplyDate, setSupplyDate] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
+  const [receiptNo, setReceiptNo] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [billValue, setBillValue] = useState("");
+  const [billCheckedById, setBillCheckedById] = useState("");
+
+  const [godowns, setGodowns] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [employees, setEmployees] = useState([]);
+
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalItem, setEditModalItem] = useState(null);
+
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
-    useTable(records, headCells, filterFn);
+    useTable(inwards, headCells, filterFn);
+
+  const handleAddModalOpen = () => {
+    setAddModalOpen(true);
+  };
+  const handleAddModalClose = () => {
+    setAddModalOpen(false);
+  };
+
+  const handleEditModalOpen = (inwards) => {
+    setEditModalItem(inwards);
+  };
+  const handleEditModalClose = () => {
+    setEditModalItem(null);
+    getData();
+  };
 
   const handleSearch = (e) => {
     let target = e.target;
@@ -79,43 +123,109 @@ export default function Employees() {
       },
     });
   };
-  const addOrEdit = (employee, resetForm) => {
-    if (employee.id === 0) employeeService.insertEmployee(employee);
-    else employeeService.updateEmployee(employee);
-    resetForm();
-    setRecordForEdit(null);
-    setOpenPopup(false);
-    setRecords(employeeService.getAllEmployees());
-    setNotify({
-      isOpen: true,
-      message: "Submitted Successfully",
-      type: "success",
-    });
-  };
-  const openInPopup = (item) => {
-    setRecordForEdit(item);
-    setOpenPopup(true);
-  };
-  const onDelete = (id) => {
-    axios
+
+  const handleDelete = async (id) => {
+    await axios
       .delete(`http://localhost:8080/api/inwards/${id}`)
       .then((response) => {
-        console.log(response);
-        setRecords(records.filter((record) => record.id !== id));
-        setConfirmDialog({
-          isOpen: false,
-        });
+        setInwards(inwards.filter((record) => record.id !== id));
       })
       .catch((error) => {
         console.error(error);
-        setConfirmDialog({
-          isOpen: false,
-        });
       });
+
+    setConfirmDialog({
+      ...confirmDialog,
+      isOpen: false,
+    });
   };
 
-  const [data, setData] = useState([]);
-  useEffect(() => {
+  const handleGodownIdChange = (event) => {
+    setGodownId(event.target.value);
+  };
+  const handleProductIdChange = (event) => {
+    setProductId(event.target.value);
+  };
+  const handleSupplierIdChange = (event) => {
+    setSupplierId(event.target.value);
+  };
+  const handleSupplyDateChange = (event) => {
+    setSupplyDate(event.target.value);
+  };
+  const handleInvoiceNoChange = (event) => {
+    setInvoiceNo(event.target.value);
+  };
+  const handleInvoiceIdChange = (event) => {
+    setInvoiceId(event.target.value);
+  };
+  const handleReceiptNoChange = (event) => {
+    setReceiptNo(event.target.value);
+  };
+  const handleQuantityChange = (event) => {
+    setQuantity(event.target.value);
+  };
+  const handleBillValueChange = (event) => {
+    setBillValue(event.target.value);
+  };
+  const handleBillValueCheckedByIdChange = (event) => {
+    setBillCheckedById(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    let formData = {};
+    formData["godown"] = {
+      id: godownId,
+    };
+    formData["product"] = {
+      id: productId,
+    };
+    formData["supplier"] = {
+      id: supplierId
+    };
+
+    const supplyDateObj = new Date(supplyDate);
+    const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
+    formData["supplyDate"] = formattedSupplyDate;
+
+    formData["invoice"] = {
+      id: invoiceId,
+    };
+    formData["receiptNo"] = receiptNo;
+    // formData["invoice"] = {
+    //   quantity: quantity,
+    //   billValue: billValue,
+    //   billCheckedBy: {
+    //     id: billCheckedById,
+    //   },
+    // };
+
+    console.log(formData);
+
+    axios
+      .post("http://localhost:8080/api/inwards", formData)
+      .then((response) => {
+        getData();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    setGodownId("");
+    setProductId("");
+    setSupplierId("");
+    setSupplyDate("");
+    setInvoiceNo("");
+    setInvoiceId("");
+    setReceiptNo("");
+    // setQuantity("");
+    // setBillValue("");
+    // setBillCheckedById("");
+    handleAddModalClose();
+    setAddModalOpen(false);
+  };
+
+  function getData() {
     axios
       .get("http://localhost:8080/api/inwards", {})
       .then((res) => {
@@ -124,19 +234,58 @@ export default function Employees() {
           let item = res.data[i];
           console.log(item);
           let obj = {
-            godown: item.godown,
-            product_name: item.product.name,
-            invoice_no: item.invoice.id,
-            supplier_name: item.supplier.name,
-            supply_date: item.supplyDate,
-            receipt_no: item.receiptNo,
             id: item.id,
+            godown: item.godown,
+            product: item.product,
+            supplier: item.supplier,
+            supply_date: item.supplyDate,
+            invoice_id: item.invoice.id,
+            receipt_no: item.receiptNo,
           };
           rows.push(obj);
         }
-        setRecords(rows);
+        setInwards(rows);
       })
       .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/godowns")
+      .then((res) => {
+        setGodowns(res.data);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/products")
+      .then((res) => {
+        setProducts(res.data);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/suppliers")
+      .then((res) => {
+        setSuppliers(res.data);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/invoice")
+      .then((res) => {
+        setInvoices(res.data);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/employees")
+      .then((res) => {
+        setEmployees(res.data);
+      })
+      .catch((err) => console.log(err));
+  }
+
+  useEffect(() => {
+    getData();
   }, []);
 
   return (
@@ -160,10 +309,7 @@ export default function Employees() {
             variant="outlined"
             startIcon={<AddIcon />}
             className={classes.newButton}
-            onClick={() => {
-              setOpenPopup(true);
-              setRecordForEdit(null);
-            }}
+            onClick={handleAddModalOpen}
           >
             Add new
           </Button>
@@ -183,30 +329,25 @@ export default function Employees() {
                     {"Capacity: " + item.godown.capacityInQuintals}
                   </Typography>
                 </TableCell>
-                <TableCell>{item.product_name}</TableCell>
-                <TableCell>{item.supplier_name}</TableCell>
+                <TableCell>{item.product.name}</TableCell>
+                <TableCell>{item.supplier.name}</TableCell>
                 <TableCell>{item.supply_date}</TableCell>
-                {/* <TableCell>{item.delivery_date}</TableCell> */}
-                <TableCell>{item.invoice_no}</TableCell>
+                <TableCell>{item.invoice_id}</TableCell>
                 <TableCell>{item.receipt_no}</TableCell>
-                {/* <TableCell>{item.delivered_to}</TableCell> */}
                 <TableCell>
-                  {/* <Controls.ActionButton
-                    onClick={() => {
-                      openInPopup(item);
-                    }}
+                  <Controls.ActionButton
+                    onClick={() => { handleEditModalOpen(item) }}
                   >
                     <EditOutlinedIcon fontSize="small" />
-                  </Controls.ActionButton> */}
+                  </Controls.ActionButton>
                   <Controls.ActionButton
-                    //    color="secondary"
                     onClick={() => {
                       setConfirmDialog({
                         isOpen: true,
                         title: "Are you sure to delete this record?",
                         subTitle: "You can't undo this operation",
                         onConfirm: () => {
-                          onDelete(item.id);
+                          handleDelete(item.id);
                         },
                       });
                     }}
@@ -220,21 +361,176 @@ export default function Employees() {
         </TblContainer>
         <TblPagination />
       </Paper>
-      <Popup openPopup={openPopup} setOpenPopup={setOpenPopup}>
-        <InwardsForm
-          recordForEdit={recordForEdit}
-          addOrEdit={addOrEdit}
-          setRecords={setRecords}
-          records={records}
-          setNotify={setNotify}
-          setOpenPopup={setOpenPopup}
-        />
-      </Popup>
-      <Notification notify={notify} setNotify={setNotify} />
+
+      <Dialog
+        open={addModalOpen}
+        onClose={handleAddModalClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title" className={classes.customTitle}>
+          Add inwards
+        </DialogTitle>
+        <DialogContent>
+          <Formik onSubmit={handleSubmit}>
+            {(formikProps) => (
+              <Form>
+                <div
+                  style={{
+                    marginTop: "32px",
+                    marginBottom: "16px",
+                    display: "grid",
+                    gridTemplateColumns: "auto auto",
+                    columnGap: "16px",
+                    rowGap: "24px",
+                  }}
+                >
+                  <FormControl>
+                    <InputLabel id="godownIdLabel">Godown</InputLabel>
+                    <Select
+                      labelId="godownIdLabel"
+                      id="godownId"
+                      value={godownId}
+                      label="Godown"
+                      onChange={handleGodownIdChange}
+                    >
+                      {godowns.map((godown, index) => (
+                        <MenuItem key={index} value={godown.id}>
+                          {godown.location}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl>
+                    <InputLabel id="productIdLabel">Product</InputLabel>
+                    <Select
+                      labelId="productIdLabel"
+                      id="productId"
+                      value={productId}
+                      label="Product"
+                      onChange={handleProductIdChange}
+                    >
+                      {products.map((product, index) => (
+                        <MenuItem key={index} value={product.id}>
+                          {product.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    id="supplyDate"
+                    label="Supply date"
+                    type="date"
+                    variant="outlined"
+                    value={supplyDate}
+                    onChange={handleSupplyDateChange}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <FormControl>
+                    <InputLabel id="supplierIdLabel">Supplier</InputLabel>
+                    <Select
+                      labelId="supplierIdLabel"
+                      id="supplierId"
+                      value={supplierId}
+                      label="Supplier"
+                      onChange={handleSupplierIdChange}
+                    >
+                      {suppliers.map((supplier, index) => (
+                        <MenuItem key={index} value={supplier.id}>
+                          {supplier.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl>
+                    <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
+                    <Select
+                      labelId="invoiceIdLabel"
+                      id="invoiceId"
+                      value={invoiceId}
+                      label="Invoice"
+                      onChange={handleInvoiceIdChange}
+                    >
+                      {invoices.map((invoice, index) => (
+                        <MenuItem key={index} value={invoice.id}>
+                          {invoice.id}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    id="receiptNo"
+                    label="Receipt number"
+                    type="number"
+                    variant="outlined"
+                    value={receiptNo}
+                    onChange={handleReceiptNoChange}
+                  />
+                  {/* <TextField
+                    id="quantity"
+                    label="Quantity"
+                    type="number"
+                    variant="outlined"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                  />
+                  <TextField
+                    id="billValue"
+                    label="Bill Value"
+                    type="number"
+                    variant="outlined"
+                    value={billValue}
+                    onChange={handleBillValueChange}
+                  />
+                  <FormControl>
+                    <InputLabel id="billCheckedByIdLabel">
+                      Bill checked by
+                    </InputLabel>
+                    <Select
+                      labelId="billCheckedByIdLabel"
+                      id="billCheckedById"
+                      value={billCheckedById}
+                      label="Bill checked by"
+                      onChange={handleBillValueCheckedByIdChange}
+                    >
+                      {employees.map((employee, index) => (
+                        <MenuItem key={index} value={employee.id}>
+                          {employee.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl> */}
+                </div>
+
+                <DialogActions>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setAddModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    className={classes.actionButtons}
+                    onClick={handleSubmit}
+                  >
+                    Add
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+
       <ConfirmDialog
         confirmDialog={confirmDialog}
         setConfirmDialog={setConfirmDialog}
       />
+
+      <UpdateInwards inwards={editModalItem} godowns={godowns} products={products} suppliers={suppliers} invoices={invoices} handleClose={handleEditModalClose} />
     </>
   );
 }

@@ -12,6 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 import { makeStyles } from "@material-ui/core/styles";
+import moment from "moment";
 
 import axios from "axios";
 import * as Yup from "yup";
@@ -19,6 +20,7 @@ import * as Yup from "yup";
 import { Formik, Form } from "formik";
 
 export const validationSchema = Yup.object().shape({});
+
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -30,71 +32,133 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateEmployee({ employee, roles, handleClose }) {
+function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
   const classes = useStyles();
 
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [roleId, setRoleId] = useState("");
+  const [godownId, setGodownId] = useState("");
+  const [productId, setProductId] = useState("");
+  const [returnedBy, setReturnedBy] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [reason, setReason] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
+  const [receiptNo, setReceiptNo] = useState("");
 
   useEffect(() => {
-    setName(employee?.employee_name);
-    setUsername(employee?.employee_username);
-    setPassword(employee?.employee_password);
-    setRoleId(employee?.role_id);
-  }, [employee]);
+    setGodownId(returns?.godown.id);
+    setProductId(returns?.product.id);
+    setInvoiceId(returns?.invoice_id);
+    setReturnedBy(returns?.returned_by);
 
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
+    const formattedDeliveryDate = moment(returns?.delivery_date, "DD/MM/YYYY").format(
+      "YYYY-MM-DD"
+    );
+    setDeliveryDate(formattedDeliveryDate);
 
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value);
+    const formattedReturnDate = moment(returns?.return_date, "DD/MM/YYYY").format(
+      "YYYY-MM-DD"
+    );
+    setReturnDate(formattedReturnDate);
+
+    setReceiptNo(returns?.receipt_no);
+    setReason(returns?.reason);
+  }, [returns]);
+
+  const handleGodownIdChange = (event) => {
+    setGodownId(event.target.value);
   };
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
+  const handleProductIdChange = (event) => {
+    setProductId(event.target.value);
   };
-  const handleRoleIdChange = (event) => {
-    setRoleId(event.target.value);
+  const handleInvoiceIdChange = (event) => {
+    setInvoiceId(event.target.value);
+  };
+  const handleReturnedByChange = (event) => {
+    setReturnedBy(event.target.value);
+  };
+  const handleDeliveryDateChange = (event) => {
+    setDeliveryDate(event.target.value);
+  };
+  const handleReturnDateChange = (event) => {
+    setReturnDate(event.target.value);
+  };
+  const handleInvoiceNoChange = (event) => {
+    setInvoiceNo(event.target.value);
+  };
+  const handleReceiptNoChange = (event) => {
+    setReceiptNo(event.target.value);
+  };
+  const handleReasonChange = (event) => {
+    setReason(event.target.value);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     let formData = {};
-    formData["name"] = name;
-    formData["username"] = username;
-    formData["password"] = password;
-    formData["role"] = {
-      id: roleId,
+    formData["godown"] = {
+      id: godownId,
     };
+    formData["product"] = {
+      id: productId,
+    };
+    formData["returnedBy"] = returnedBy;
+    formData["reason"] = reason;
+
+    const deliveryDateObj = new Date(deliveryDate);
+    const formattedDeliveryDate = moment(deliveryDateObj).format("DD/MM/YYYY");
+    formData["deliveryDate"] = formattedDeliveryDate;
+
+    const returnDateObj = new Date(returnDate);
+    const formattedReturnDate = moment(returnDateObj).format("DD/MM/YYYY");
+    formData["returnDate"] = formattedReturnDate;
+
+    formData["invoice"] = {
+      id: invoiceId,
+    };
+    formData["receiptNo"] = receiptNo;
+    // formData["invoice"] = {
+    //   quantity: quantity,
+    //   billValue: billValue,
+    //   billCheckedBy: {
+    //     id: billCheckedById,
+    //   },
+    // };
 
     console.log(formData);
 
     await axios
-      .put(`http://localhost:8080/api/employees/${employee?.id}`, formData)
+      .put(`http://localhost:8080/api/returns/${returns?.id}`, formData)
       .then((response) => {
-        console.log(response);
+
       })
       .catch((error) => {
         console.error(error);
       });
 
-    setName("");
-    setUsername("");
-    setPassword("");
-    setRoleId("");
+    setGodownId("");
+    setProductId("");
+    setReturnedBy("");
+    setReason("");
+    setDeliveryDate("");
+    setReturnDate("");
+    // setInvoiceNo("");
+    setInvoiceId("");
+    setReceiptNo("");
+    // setQuantity("");
+    // setBillValue("");
+    // setBillCheckedById("");
     handleClose();
   };
 
   return (
     <Dialog
-      open={employee != null}
+      open={returns != null}
       onClose={handleClose}
       aria-labelledby="form-dialog-title"
     >
       <DialogTitle id="form-dialog-title" className={classes.customTitle}>
-        Edit employee
+        Edit returns
       </DialogTitle>
       <DialogContent>
         <Formik validationSchema={validationSchema} onSubmit={handleSubmit}>
@@ -110,48 +174,143 @@ function UpdateEmployee({ employee, roles, handleClose }) {
                   rowGap: "24px",
                 }}
               >
-                <TextField
-                  autoFocus
-                  id="name"
-                  label="Name"
-                  type="text"
-                  variant="outlined"
-                  value={name}
-                  onChange={handleNameChange}
-                />
-                <TextField
-                  id="username"
-                  label="Username"
-                  type="text"
-                  variant="outlined"
-                  value={username}
-                  onChange={handleUsernameChange}
-                />
-                <TextField
-                  id="password"
-                  label="Password"
-                  type="password"
-                  variant="outlined"
-                  value={password}
-                  onChange={handlePasswordChange}
-                />
                 <FormControl>
-                  <InputLabel id="roleIdLabel">Role</InputLabel>
+                  <InputLabel id="godownIdLabel">Godown</InputLabel>
                   <Select
-                    labelId="roleIdLabel"
-                    id="roleId"
-                    defaultValue={employee?.role_id}
-                    value={roleId}
-                    label="Role"
-                    onChange={handleRoleIdChange}
+                    labelId="godownIdLabel"
+                    id="godownId"
+                    defaultValue={returns?.godown.id}
+                    value={godownId}
+                    label="Godown"
+                    onChange={handleGodownIdChange}
                   >
-                    {roles.map((role, index) => (
-                      <MenuItem key={index} value={role.id}>
-                        {role.role}
+                    {godowns.map((godown, index) => (
+                      <MenuItem key={index} value={godown.id}>
+                        {godown.location}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
+                <FormControl>
+                  <InputLabel id="productIdLabel">Product</InputLabel>
+                  <Select
+                    labelId="productIdLabel"
+                    id="productId"
+                    defaultValue={returns?.product.id}
+                    value={productId}
+                    label="Product"
+                    onChange={handleProductIdChange}
+                  >
+                    {products.map((product, index) => (
+                      <MenuItem key={index} value={product.id}>
+                        {product.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  id="returnedBy"
+                  label="Returned by"
+                  type="text"
+                  variant="outlined"
+                  value={returnedBy}
+                  onChange={handleReturnedByChange}
+                />
+                <FormControl>
+                  <InputLabel id="reasonIdLabel">Reason</InputLabel>
+                  <Select
+                    labelId="reasonIdLabel"
+                    id="reasonId"
+                    defaultValue={returns?.reason}
+                    value={reason}
+                    label="Reason"
+                    onChange={handleReasonChange}
+                  >
+                    <MenuItem value="cancelled">Cancelled</MenuItem>
+                    <MenuItem value="damaged">Damaged</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  id="deliveryDate"
+                  label="Delivery date"
+                  type="date"
+                  variant="outlined"
+                  value={deliveryDate}
+                  onChange={handleDeliveryDateChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  id="returnDate"
+                  label="Return date"
+                  type="date"
+                  variant="outlined"
+                  value={returnDate}
+                  onChange={handleReturnDateChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <FormControl>
+                  <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
+                  <Select
+                    labelId="invoiceIdLabel"
+                    id="invoiceId"
+                    defaultValue={returns?.invoice_id}
+                    value={invoiceId}
+                    label="Invoice"
+                    onChange={handleInvoiceIdChange}
+                  >
+                    {invoices.map((invoice, index) => (
+                      <MenuItem key={index} value={invoice.id}>
+                        {invoice.id}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  id="receiptNo"
+                  label="Receipt number"
+                  type="number"
+                  variant="outlined"
+                  value={receiptNo}
+                  onChange={handleReceiptNoChange}
+                />
+                {/* <TextField
+                    id="quantity"
+                    label="Quantity"
+                    type="number"
+                    variant="outlined"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                  />
+                  <TextField
+                    id="billValue"
+                    label="Bill Value"
+                    type="number"
+                    variant="outlined"
+                    value={billValue}
+                    onChange={handleBillValueChange}
+                  />
+                  <FormControl>
+                    <InputLabel id="billCheckedByIdLabel">
+                      Bill checked by
+                    </InputLabel>
+                    <Select
+                      labelId="billCheckedByIdLabel"
+                      id="billCheckedById"
+                      value={billCheckedById}
+                      label="Bill checked by"
+                      onChange={handleBillValueCheckedByIdChange}
+                    >
+                      {employees.map((employee, index) => (
+                        <MenuItem key={index} value={employee.id}>
+                          {employee.name}
+                        </MenuItem>
+                      ))}
+                    </Select> */}
+                {/* </FormControl> */}
               </div>
 
               <DialogActions>
@@ -174,4 +333,4 @@ function UpdateEmployee({ employee, roles, handleClose }) {
   );
 }
 
-export default UpdateEmployee;
+export default UpdateReturns;

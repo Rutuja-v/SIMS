@@ -1,55 +1,28 @@
-import stock from "./assets/stock.jpeg";
-import signin from "./assets/signin.svg";
 import axios from "axios";
+import signin from "./assets/signin.svg";
+import stock from "./assets/stock.jpeg";
 
-import React, { useContext, useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
+import React, { useContext, useState } from "react";
 
-import Button from "@mui/material/Button";
+import { Button } from "@mui/material";
 
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
+import Typography from "@mui/material/Typography";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
 
 import Snackbar from "@mui/material/Snackbar";
 
-import MuiAlert from "@mui/material/Alert";
 import Slide from "@mui/material/Slide";
 
-import IconButton from "@mui/material/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
 
 import TextField from "@mui/material/TextField";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../context/ContextProvider";
 
-const useStyles = makeStyles({
-  container: {
-    overflow: "hidden",
-    position: "relative",
-    height: "30px",
-  },
-  scrollingText: {
-    color: "#fff",
-    position: "absolute",
-    whiteSpace: "nowrap",
-    animation: "$scroll 10s linear infinite",
-  },
-  "@keyframes scroll": {
-    "0%": { transform: "translateX(100%)" },
-    "100%": { transform: "translateX(-100%)" },
-  },
-});
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -67,42 +40,23 @@ const boxstyle = {
 export default function Login() {
   const [user, setUser] = useContext(Context);
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState();
-  const classes = useStyles();
   const [values, setValues] = useState({
     username: "",
     password: "",
-    showPassword: false,
   });
-  const handleClickShowPassword = () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword,
-    });
-  };
+
   const [open, setOpen] = useState(false);
-  const [remember, setRemember] = useState(false);
   const vertical = "top";
   const horizontal = "right";
-  //   const navigate = useNavigate();
 
-  //   const handleSubmit = async (event) => {
-  //     setOpen(true);
-  //     event.preventDefault();
-  //     const data = new FormData(event.currentTarget);
-  //   };
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //     console.log(values.username, values. password);
-    //     history("/dashboard");
-    //   };
     axios
       .post("http://localhost:8080/api/auth/login", {
         username: values.username,
         password: values.password,
       })
-
       .then((res) => {
         localStorage.setItem("token", res.data.token);
         const loginUser = {
@@ -130,25 +84,13 @@ export default function Login() {
 
   return (
     <>
-      {/* <div className={classes.container}>
-      <Typography   style={{
-          backgroundImage: `url(${stock})`,
-       
-        }}
-        variant="subtitle1"
-        className={classes.scrollingText}
-      >
-      Smart Inventory Management System 
-      </Typography>
-    </div> */}
-
       <Snackbar
         open={open}
         autoHideDuration={3000}
         onClose={handleClose}
         TransitionComponent={TransitionLeft}
-        anchorOrigin={{ vertical, horizontal }}
-      ></Snackbar>
+        anchorOrigin={{ vertical, horizontal }} />
+
       <div
         style={{
           backgroundImage: `url(${stock})`,
@@ -161,12 +103,6 @@ export default function Login() {
           alignItems: "center",
         }}
       >
-        <marquee direction="left" width="30px" height="50px">
-          {" "}
-          <div style={{ marginTop: "-500px", position: "absolute" }}>
-            welcome
-          </div>{" "}
-        </marquee>
         <Box sx={boxstyle}>
           <Grid
             container
@@ -218,7 +154,7 @@ export default function Login() {
                 >
                   <Avatar sx={{ bgcolor: "#ffffff" }}></Avatar>
                   <Typography component="h1" variant="h6">
-                    Sign In
+                    Sign in
                   </Typography>
                 </Box>
 
@@ -252,22 +188,18 @@ export default function Login() {
                     setValues({ ...values, password: e.target.value })
                   }
                 />
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    mt: 2,
-                    backgroundColor: "#1976d2",
-                    color: "#FFFFFF",
-                    borderRadius: 24,
-                  }}
-                  onClick={handleSubmit}
-                >
-                  Sign in
-                </Button>
               </ThemeProvider>
+
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  mt: 2,
+                }}
+                onClick={handleSubmit}
+              >
+                Sign in
+              </Button>
             </Grid>
           </Grid>
         </Box>

@@ -29,9 +29,9 @@ import CloseIcon from "@material-ui/icons/Close";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import UpdateEmployee from "./UpdateEmployee";
 import { Form, Formik } from "formik";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
-    margin: theme.spacing(5),
     padding: theme.spacing(3),
   },
   searchInput: {
@@ -48,12 +48,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const headCells = [
-  { id: "employee_name", label: "Employee name" },
-
-  { id: "employee_username", label: "Employee username" },
-
+  { id: "name", label: "Employee name" },
+  { id: "username", label: "Employee username" },
   { id: "role", label: "Employee role" },
-
   { id: "actions", label: "Actions", disableSorting: true },
 ];
 
@@ -77,24 +74,25 @@ export default function Employees() {
   const [roleId, setRoleId] = useState("");
 
   const [roles, setRoles] = useState([]);
+
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(null);
+  const [editModalItem, setEditModalItem] = useState(null);
+
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(employees, headCells, filterFn);
 
-  const handleClickAddModalOpen = () => {
+  const handleAddModalOpen = () => {
     setAddModalOpen(true);
   };
   const handleAddModalClose = () => {
     setAddModalOpen(false);
   };
 
-  const handleClickEditModalOpen = (employee) => {
-    setEditModalOpen(employee);
+  const handleEditModalOpen = (employee) => {
+    setEditModalItem(employee);
   };
-
   const handleEditModalClose = () => {
-    setEditModalOpen(null);
+    setEditModalItem(null);
     getData();
   };
 
@@ -115,7 +113,6 @@ export default function Employees() {
     axios
       .delete(`http://localhost:8080/api/employees/${id}`)
       .then((response) => {
-        console.log(response);
         setEmployees(employees.filter((record) => record.id !== id));
       })
       .catch((error) => {
@@ -131,7 +128,6 @@ export default function Employees() {
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
-
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
   };
@@ -157,7 +153,6 @@ export default function Employees() {
     axios
       .post("http://localhost:8080/api/employees", formData)
       .then((response) => {
-        console.log(response);
         getData();
       })
       .catch((error) => {
@@ -179,12 +174,11 @@ export default function Employees() {
         for (let i = 0; i < res.data.length; i++) {
           let item = res.data[i];
           let obj = {
-            employee_name: item.name,
-            employee_password: item.password,
-            role: item.role.role,
-            employee_username: item.username,
-            role_id: item.role.id,
             id: item.id,
+            name: item.name,
+            username: item.username,
+            password: item.password,
+            role: item.role,
           };
           rows.push(obj);
         }
@@ -225,7 +219,7 @@ export default function Employees() {
             variant="outlined"
             startIcon={<AddIcon />}
             className={classes.newButton}
-            onClick={handleClickAddModalOpen}
+            onClick={handleAddModalOpen}
           >
             Add new
           </Button>
@@ -236,12 +230,12 @@ export default function Employees() {
           <TableBody>
             {recordsAfterPagingAndSorting().map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.employee_name}</TableCell>
-                <TableCell>{item.employee_username}</TableCell>
-                <TableCell>{item.role}</TableCell>
+                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.username}</TableCell>
+                <TableCell>{item.role.role}</TableCell>
                 <TableCell>
                   <Controls.ActionButton
-                    onClick={() => handleClickEditModalOpen(item)}
+                    onClick={() => handleEditModalOpen(item)}
                   >
                     <EditOutlinedIcon fontSize="small" />
                   </Controls.ActionButton>
@@ -360,7 +354,7 @@ export default function Employees() {
       />
 
       <UpdateEmployee
-        employee={editModalOpen}
+        employee={editModalItem}
         roles={roles}
         handleClose={handleEditModalClose}
       />

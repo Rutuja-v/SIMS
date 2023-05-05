@@ -32,15 +32,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) {
+function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handleClose }) {
   const classes = useStyles();
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
-  const [deliveredTo, setDeliveredTo] = useState("");
-  const [purpose, setPurpose] = useState("");
+  const [supplierId, setSupplierId] = useState("");
   const [supplyDate, setSupplyDate] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
   const [invoiceNo, setInvoiceNo] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
@@ -49,24 +47,18 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
   const [billCheckedById, setBillCheckedById] = useState("");
 
   useEffect(() => {
-    setGodownId(outwards?.godown.id);
-    setProductId(outwards?.product.id);
-    setDeliveredTo(outwards?.delivered_to);
-    setPurpose(outwards?.purpose);
+    setGodownId(inwards?.godown.id);
+    setProductId(inwards?.product.id);
+    setSupplierId(inwards?.supplier.id);
 
-    const formattedSupplyDate = moment(outwards?.supply_date, "DD/MM/YYYY").format(
+    const formattedSupplyDate = moment(inwards?.supply_date, "DD/MM/YYYY").format(
       "YYYY-MM-DD"
     );
     setSupplyDate(formattedSupplyDate);
 
-    const formattedDeliveryDate = moment(outwards?.delivery_date, "DD/MM/YYYY").format(
-      "YYYY-MM-DD"
-    );
-    setDeliveryDate(formattedDeliveryDate);
-
-    setInvoiceId(outwards?.invoice_id);
-    setReceiptNo(outwards?.receipt_no);
-  }, [outwards]);
+    setInvoiceId(inwards?.invoice_id);
+    setReceiptNo(inwards?.receipt_no);
+  }, [inwards]);
 
   const handleGodownIdChange = (event) => {
     setGodownId(event.target.value);
@@ -74,17 +66,11 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
-  const handleDeliveredToChange = (event) => {
-    setDeliveredTo(event.target.value);
-  };
-  const handlePurposeChange = (event) => {
-    setPurpose(event.target.value);
+  const handleSupplierIdChange = (event) => {
+    setSupplierId(event.target.value);
   };
   const handleSupplyDateChange = (event) => {
     setSupplyDate(event.target.value);
-  };
-  const handleDeliveryDateChange = (event) => {
-    setDeliveryDate(event.target.value);
   };
   const handleInvoiceNoChange = (event) => {
     setInvoiceNo(event.target.value);
@@ -105,16 +91,13 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
     formData["product"] = {
       id: productId,
     };
-    formData["deliveredTo"] = deliveredTo;
-    formData["purpose"] = purpose;
+    formData["supplier"] = {
+      id: supplierId
+    };
 
     const supplyDateObj = new Date(supplyDate);
     const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
     formData["supplyDate"] = formattedSupplyDate;
-
-    const deliveryDateObj = new Date(deliveryDate);
-    const formattedDeliveryDate = moment(deliveryDateObj).format("DD/MM/YYYY");
-    formData["deliveryDate"] = formattedDeliveryDate;
 
     formData["invoice"] = {
       id: invoiceId,
@@ -131,7 +114,7 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
     console.log(formData);
 
     await axios
-      .put(`http://localhost:8080/api/outwards/${outwards?.id}`, formData)
+      .put(`http://localhost:8080/api/inwards/${inwards?.id}`, formData)
       .then((response) => {
 
       })
@@ -141,10 +124,8 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
 
     setGodownId("");
     setProductId("");
-    setDeliveredTo("");
-    setPurpose("");
+    setSupplierId("");
     setSupplyDate("");
-    setDeliveryDate("");
     // setInvoiceNo("");
     setInvoiceId("");
     setReceiptNo("");
@@ -156,12 +137,12 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
 
   return (
     <Dialog
-      open={outwards != null}
+      open={inwards != null}
       onClose={handleClose}
       aria-labelledby="form-dialog-title"
     >
       <DialogTitle id="form-dialog-title" className={classes.customTitle}>
-        Edit outwards
+        Edit inwards
       </DialogTitle>
       <DialogContent>
         <Formik validationSchema={validationSchema} onSubmit={handleSubmit}>
@@ -182,7 +163,7 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
                   <Select
                     labelId="godownIdLabel"
                     id="godownId"
-                    defaultValue={outwards?.godown.id}
+                    defaultValue={inwards?.godown.id}
                     value={godownId}
                     label="Godown"
                     onChange={handleGodownIdChange}
@@ -199,7 +180,7 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
                   <Select
                     labelId="productIdLabel"
                     id="productId"
-                    defaultValue={outwards?.product.id}
+                    defaultValue={inwards?.product.id}
                     value={productId}
                     label="Product"
                     onChange={handleProductIdChange}
@@ -209,28 +190,6 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
                         {product.name}
                       </MenuItem>
                     ))}
-                  </Select>
-                </FormControl>
-                <TextField
-                  id="deliveredTo"
-                  label="Delivered to"
-                  type="text"
-                  variant="outlined"
-                  value={deliveredTo}
-                  onChange={handleDeliveredToChange}
-                />
-                <FormControl>
-                  <InputLabel id="purposeIdLabel">Purpose</InputLabel>
-                  <Select
-                    labelId="purposeIdLabel"
-                    id="productId"
-                    defaultValue={outwards?.purpose}
-                    value={purpose}
-                    label="Purpose"
-                    onChange={handlePurposeChange}
-                  >
-                    <MenuItem value="sales">Sales</MenuItem>
-                    <MenuItem value="service">Service</MenuItem>
                   </Select>
                 </FormControl>
                 <TextField
@@ -244,23 +203,29 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
                     shrink: true,
                   }}
                 />
-                <TextField
-                  id="deliveryDate"
-                  label="Delivery date"
-                  type="date"
-                  variant="outlined"
-                  value={deliveryDate}
-                  onChange={handleDeliveryDateChange}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+                <FormControl>
+                  <InputLabel id="supplierIdLabel">Supplier</InputLabel>
+                  <Select
+                    labelId="supplierIdLabel"
+                    id="supplierId"
+                    defaultValue={inwards?.supplier.id}
+                    value={supplierId}
+                    label="Supplier"
+                    onChange={handleSupplierIdChange}
+                  >
+                    {suppliers.map((supplier, index) => (
+                      <MenuItem key={index} value={supplier.id}>
+                        {supplier.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
                 <FormControl>
                   <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
                   <Select
                     labelId="invoiceIdLabel"
                     id="invoiceId"
-                    defaultValue={outwards?.invoice_id}
+                    defaultValue={inwards?.invoice_id}
                     value={invoiceId}
                     label="Invoice"
                     onChange={handleInvoiceIdChange}
@@ -336,4 +301,4 @@ function UpdateOutwards({ outwards, godowns, products, invoices, handleClose }) 
   );
 }
 
-export default UpdateOutwards;
+export default UpdateInwards;

@@ -24,6 +24,7 @@ export const validationSchema = Yup.object().shape({
     .required("Price is required")
     .positive("Price must be positive"),
 });
+
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -71,7 +72,7 @@ function UpdateProduct({ product, handleClose }) {
     await axios
       .put(`http://localhost:8080/api/products/${product?.id}`, formData)
       .then((response) => {
-        console.log(response);
+
       })
       .catch((error) => {
         console.error(error);

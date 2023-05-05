@@ -130,7 +130,6 @@ function Godowns({ onDelete, onEdit }) {
     axios
       .delete(`http://localhost:8080/api/godowns/${id}`)
       .then((response) => {
-        console.log(response);
         setGodowns(godowns.filter((user) => user.id !== id));
       })
       .catch((error) => {
@@ -197,7 +196,6 @@ function Godowns({ onDelete, onEdit }) {
     axios
       .post("http://localhost:8080/api/godowns", formData)
       .then((response) => {
-        console.log(response);
         getData();
       })
       .catch((error) => {
@@ -215,11 +213,11 @@ function Godowns({ onDelete, onEdit }) {
     <div className="App">
       <Box display="flex" mb={2} justifyContent="flex-end">
         <Button
-          variant="contained"
+          variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleClickAddModalOpen}
         >
-          Add Godown
+          Add new
         </Button>
       </Box>
 
