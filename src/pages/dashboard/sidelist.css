@@ -1,4 +1,4 @@
-.sidebar {
+/* .sidebar {
     flex: 1;
     border-right: 0.5px solid rgb(230, 227, 227);
     min-height: 100vh;
@@ -52,21 +52,21 @@
   
           .icon {
            /* font-size: 10px; */
-            color: #441ade;
-          }
+            /* color: #441ade;
+          } */
         
   
-          span{
+          /* span{
               font-size: 17px;
               font-weight: 600;
               color: #888;
               margin-left: 10px;
           }
-        
+         */
       
     
   
-    .bottom{
+    /* .bottom{
         display: flex;
         align-items: center;
         margin: 10px;
@@ -83,4 +83,4 @@
             
         }
     
-  
+   */ 

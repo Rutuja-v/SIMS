@@ -1,223 +1,369 @@
-
-
-import React, { useState } from 'react'
-import EmployeesForm from './EmployeeForm';
-import axios from 'axios'
-import { useEffect } from 'react';
-import Popup from '../../Components/Popup';
-import { Paper, makeStyles, TableBody, TableRow, TableCell, Toolbar, InputAdornment } from '@material-ui/core';
-import useTable from '../../Components/useTable';
-import * as employeeService from "../../services/employeeService";
-import Controls from '../../Components/controls/Controls';
+import React, { useState } from "react";
+import axios from "axios";
+import { useEffect } from "react";
+import { makeStyles } from "@material-ui/core";
+import {
+  Paper,
+  TableBody,
+  TableRow,
+  TableCell,
+  Toolbar,
+  InputAdornment,
+  Button,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  DialogActions,
+} from "@mui/material";
+import useTable from "../../Components/useTable";
+import Controls from "../../Components/controls/Controls";
 import { Search } from "@material-ui/icons";
-import AddIcon from '@material-ui/icons/Add';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import CloseIcon from '@material-ui/icons/Close';
-import Notification from '../../Components/Notification';
-import ConfirmDialog from '../../Components/ConfirmDialog';
-const useStyles = makeStyles(theme => ({
-    pageContent: {
-        margin: theme.spacing(5),
-        padding: theme.spacing(3)
-    },
-    searchInput: {
-        width: '75%'
-    },
-    newButton: {
-        position: 'absolute',
-        right: '10px'
-    }
-}))
+import AddIcon from "@material-ui/icons/Add";
+import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
+import CloseIcon from "@material-ui/icons/Close";
+import ConfirmDialog from "../../Components/ConfirmDialog";
+import UpdateEmployee from "./UpdateEmployee";
+import { Form, Formik } from "formik";
+const useStyles = makeStyles((theme) => ({
+  pageContent: {
+    margin: theme.spacing(5),
+    padding: theme.spacing(3),
+  },
+  searchInput: {
+    width: "75%",
+  },
+  customTitle: {
+    margin: 0,
+    padding: theme.spacing(2),
+    backgroundColor: "#000000",
 
+    color: theme.palette.common.white,
+    textAlign: "center",
+  },
+}));
 
 const headCells = [
-    // { id: 'product_id', label: 'Product ID' },
-  
-    { id: 'employee_name', label: 'Employee Name' },
-   
-    { id: 'employee_username', label: 'Employee Username' },
-    { id: 'role_id', label: 'Employee Role ID' },
-    
-    { id: 'role', label: 'Employee Role' },
-    // {id:'employee_password',label:'password'},
-   
-    { id: 'actions', label: 'Actions', disableSorting: true }
-]
+  { id: "employee_name", label: "Employee name" },
+
+  { id: "employee_username", label: "Employee username" },
+
+  { id: "role", label: "Employee role" },
+
+  { id: "actions", label: "Actions", disableSorting: true },
+];
 
 export default function Employees() {
-    const [recordForEdit, setRecordForEdit] = useState(null)
-    const classes = useStyles();
-    const [records, setRecords] = useState([])
-    const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
-    const [openPopup, setOpenPopup] = useState(false)
-    const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
-    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
-    const {
-        TblContainer,
-        TblHead,
-        TblPagination,
-        recordsAfterPagingAndSorting
-    } = useTable(records, headCells, filterFn);
-
-
-
-    const handleSearch = e => {
-        let target = e.target;
-        setFilterFn({
-            fn: items => {
-                if (target.value === "")
-                    return items;
-                else
-                    return items.filter(x => x.product_id.toLowerCase().includes(target.value))
-            }
-        })
-    }
-    const addOrEdit = (employee, resetForm) => {
-        if (employee.id === 0)
-            employeeService.insertEmployee(employee)
-        else
-            employeeService.updateEmployee(employee)
-        resetForm()
-        setRecordForEdit(null)
-        setOpenPopup(false)
-        setRecords(employeeService.getAllEmployees())
-        setNotify({
-            isOpen: true,
-            message: 'Submitted Successfully',
-            type: 'success'
-        })
-    }
-    const openInPopup = item => {
-        setRecordForEdit(item)
-        setOpenPopup(true)
-    }
-    const onDelete = id => {
-        if (('Are you sure to delete this record'))
-            employeeService.deleteEmployee(id);
-        setRecords(employeeService.getAllEmployees())
-        setNotify({
-            isOpen: true,
-            message: 'Deleted Successfully',
-            type: 'error'
-        })
-    }
-
-
-    const [data, setData] = useState([])
-    useEffect(() => {
-
-        axios.get('http://localhost:8080/api/employees', {
-
-        })
-            .then(res => {
-
-                let rows = [];
-                for (let i = 0; i < res.data.length; i++) {
-                    let item = res.data[i];
-                    let obj = {
-                        employee_name: item.name,
-                        employee_password:item.password,
-                        role: item.role.role,
-                        employee_username: item.username,
-                        role_id: item.role.id,
-                        id: item.id
-                    }
-                    rows.push(obj)
-
-                }
-                setRecords(rows)
-            }
-            )
-            .catch(err => console.log(err))
+  const classes = useStyles();
+  const [employees, setEmployees] = useState([]);
+  const [filterFn, setFilterFn] = useState({
+    fn: (items) => {
+      return items;
     },
-        [])
+  });
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: "",
+    subTitle: "",
+  });
 
-    return (
-        <>
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [roleId, setRoleId] = useState("");
 
-            <Paper className={classes.pageContent}>
+  const [roles, setRoles] = useState([]);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(null);
+  const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
+    useTable(employees, headCells, filterFn);
 
-                <Toolbar>
-                    <Controls.Input
-                        label="Search Employees"
-                        className={classes.searchInput}
-                        InputProps={{
-                            startAdornment: (<InputAdornment position="start">
-                                <Search />
-                            </InputAdornment>)
-                        }}
-                        onChange={handleSearch}
+  const handleClickAddModalOpen = () => {
+    setAddModalOpen(true);
+  };
+  const handleAddModalClose = () => {
+    setAddModalOpen(false);
+  };
 
-                    />
-                    <Controls.Button
-                        text="Add New"
-                        variant="outlined"
-                        startIcon={<AddIcon />}
-                        className={classes.newButton}
-                        onClick={() => { setOpenPopup(true); setRecordForEdit(null); }}
-                    />
-                </Toolbar>
-                <TblContainer>
-                    <TblHead />
-                    <TableBody>
-                        {
-                            recordsAfterPagingAndSorting().map(item =>
-                            (<TableRow key={item.id}>
+  const handleClickEditModalOpen = (employee) => {
+    setEditModalOpen(employee);
+  };
 
-                                <TableCell>{item.employee_name}</TableCell>
-                                <TableCell>{item.employee_username}</TableCell>
-                                <TableCell>{item.role_id}</TableCell>
-                                <TableCell>{item.role}</TableCell>
-                                {/* <TableCell>{item.password}</TableCell> */}
+  const handleEditModalClose = () => {
+    setEditModalOpen(null);
+    getData();
+  };
 
-                                <TableCell>
-                                    <Controls.ActionButton
-                                        onClick={() => { openInPopup(item) }}>
-                                        <EditOutlinedIcon fontSize="small" />
-                                    </Controls.ActionButton>
-                                    <Controls.ActionButton
-                                        //    color="secondary"
-                                        onClick={() => {
-                                            setConfirmDialog({
-                                                isOpen: true,
-                                                title: 'Are you sure to delete this record?',
-                                                subTitle: "You can't undo this operation",
-                                                onConfirm: () => { onDelete(item.id) }
-                                            })
-                                        }}>
-                                        <CloseIcon fontSize="small" />
-                                    </Controls.ActionButton>
-                                </TableCell>
-                            </TableRow>)
-                            )
-                        }
-                    </TableBody>
-                </TblContainer>
-                <TblPagination />
-            </Paper>
-            <Popup openPopup={openPopup}
-                setOpenPopup={setOpenPopup}>
-                <EmployeesForm
-                    recordForEdit={recordForEdit}
-                    addOrEdit={addOrEdit}
-                    setRecords={setRecords}
-                    records={records}
-                    setNotify={setNotify}
-                    setOpenPopup={setOpenPopup}
-                />
+  const handleSearch = (e) => {
+    let target = e.target;
+    setFilterFn({
+      fn: (items) => {
+        if (target.value === "") return items;
+        else
+          return items.filter((x) =>
+            x.employee_name.toLowerCase().includes(target.value)
+          );
+      },
+    });
+  };
 
+  const handleDelete = (id) => {
+    axios
+      .delete(`http://localhost:8080/api/employees/${id}`)
+      .then((response) => {
+        console.log(response);
+        setEmployees(employees.filter((record) => record.id !== id));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
-            </Popup>
-            <Notification
-                notify={notify}
-                setNotify={setNotify}
+    setConfirmDialog({
+      ...confirmDialog,
+      isOpen: false,
+    });
+  };
 
-            />
-            <ConfirmDialog
-                confirmDialog={confirmDialog}
-                setConfirmDialog={setConfirmDialog}
-            />
-        </>
-    )
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const handleUsernameChange = (event) => {
+    setUsername(event.target.value);
+  };
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+  const handleRoleIdChange = (event) => {
+    setRoleId(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    let formData = {};
+    formData["name"] = name;
+    formData["username"] = username;
+    formData["password"] = password;
+    formData["role"] = {
+      id: Number(roleId),
+    };
+
+    console.log(formData);
+
+    axios
+      .post("http://localhost:8080/api/employees", formData)
+      .then((response) => {
+        console.log(response);
+        getData();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    setName("");
+    setUsername("");
+    setPassword("");
+    setRoleId("");
+    setAddModalOpen(false);
+  };
+
+  function getData() {
+    axios
+      .get("http://localhost:8080/api/employees", {})
+      .then((res) => {
+        let rows = [];
+        for (let i = 0; i < res.data.length; i++) {
+          let item = res.data[i];
+          let obj = {
+            employee_name: item.name,
+            employee_password: item.password,
+            role: item.role.role,
+            employee_username: item.username,
+            role_id: item.role.id,
+            id: item.id,
+          };
+          rows.push(obj);
+        }
+        setEmployees(rows);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/employeeRoles")
+      .then((res) => {
+        setRoles(res.data);
+      })
+      .catch((err) => console.log(err));
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  return (
+    <>
+      <Paper className={classes.pageContent}>
+        <Toolbar>
+          <TextField
+            label="Search Employees"
+            className={classes.searchInput}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+            onChange={handleSearch}
+          />
+          <Button
+            style={{ position: "absolute", right: "10px" }}
+            variant="outlined"
+            startIcon={<AddIcon />}
+            className={classes.newButton}
+            onClick={handleClickAddModalOpen}
+          >
+            Add new
+          </Button>
+        </Toolbar>
+
+        <TblContainer>
+          <TblHead />
+          <TableBody>
+            {recordsAfterPagingAndSorting().map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.employee_name}</TableCell>
+                <TableCell>{item.employee_username}</TableCell>
+                <TableCell>{item.role}</TableCell>
+                <TableCell>
+                  <Controls.ActionButton
+                    onClick={() => handleClickEditModalOpen(item)}
+                  >
+                    <EditOutlinedIcon fontSize="small" />
+                  </Controls.ActionButton>
+                  <Controls.ActionButton
+                    onClick={() => {
+                      setConfirmDialog({
+                        isOpen: true,
+                        title: "Are you sure to delete this record?",
+                        subTitle: "You can't undo this operation",
+                        onConfirm: () => {
+                          handleDelete(item.id);
+                        },
+                      });
+                    }}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </Controls.ActionButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </TblContainer>
+        <TblPagination />
+      </Paper>
+
+      <Dialog
+        open={addModalOpen}
+        onClose={handleAddModalClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title" className={classes.customTitle}>
+          Add an employee
+        </DialogTitle>
+        <DialogContent>
+          <Formik onSubmit={handleSubmit}>
+            {(formikProps) => (
+              <Form>
+                <div
+                  style={{
+                    marginTop: "32px",
+                    marginBottom: "16px",
+                    display: "grid",
+                    gridTemplateColumns: "auto auto",
+                    columnGap: "16px",
+                    rowGap: "24px",
+                  }}
+                >
+                  <TextField
+                    autoFocus
+                    id="name"
+                    label="Name"
+                    type="text"
+                    variant="outlined"
+                    value={name}
+                    onChange={handleNameChange}
+                  />
+                  <TextField
+                    id="username"
+                    label="Username"
+                    type="text"
+                    variant="outlined"
+                    value={username}
+                    onChange={handleUsernameChange}
+                  />
+                  <TextField
+                    id="password"
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    value={password}
+                    onChange={handlePasswordChange}
+                  />
+                  <FormControl>
+                    <InputLabel id="roleIdLabel">Role</InputLabel>
+                    <Select
+                      labelId="roleIdLabel"
+                      id="roleId"
+                      value={roleId}
+                      label="Role"
+                      onChange={handleRoleIdChange}
+                    >
+                      {roles.map((role, index) => (
+                        <MenuItem key={index} value={role.id}>
+                          {role.role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                <DialogActions>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setAddModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    className={classes.actionButtons}
+                    onClick={handleSubmit}
+                  >
+                    Add
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog
+        confirmDialog={confirmDialog}
+        setConfirmDialog={setConfirmDialog}
+      />
+
+      <UpdateEmployee
+        employee={editModalOpen}
+        roles={roles}
+        handleClose={handleEditModalClose}
+      />
+    </>
+  );
 }
-

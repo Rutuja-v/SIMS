@@ -17,7 +17,7 @@ import { createTheme } from '@mui/material/styles';
 import { Tooltip } from '@mui/material';
 import { useNavigate , Navigate} from 'react-router-dom';
 import { Brightness2, Brightness4, Home } from '@mui/icons-material';
-import SideList2 from './SideList2';
+import SideList from './SideList';
 
  const drawerWidth = 240;
 

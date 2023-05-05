@@ -1,13 +1,13 @@
 import React from 'react';
 import { Outlet } from "react-router-dom";
-import SideList2 from './dashboard/SideList2';
+import SideList from './dashboard/SideList';
 
 const DashboardLayout = () => {
     return (
         <div>
-            <SideList2>
+            <SideList>
                 <Outlet />
-            </SideList2>
+            </SideList>
         </div>
     );
 }

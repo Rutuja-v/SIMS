@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import OutwardsForm from "./outwardsForm";
 import axios from "axios";
 import { useEffect } from "react";
-import Popup from "../../Components/Popup";
 import { makeStyles } from "@material-ui/core";
 import {
   Paper,
@@ -24,13 +22,10 @@ import {
   DialogActions,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
-import * as employeeService from "../../services/employeeService";
 import Controls from "../../Components/controls/Controls";
 import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
-import Notification from "../../Components/Notification";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
@@ -55,18 +50,18 @@ const useStyles = makeStyles((theme) => ({
 const headCells = [
   { id: "godown", label: "Godown" },
   { id: "product_name", label: "Product name" },
-  { id: "delivered_to", label: "Delivered To" },
-  { id: "supply_date", label: "Supply Date" },
-  { id: "delivery_date", label: "Delivery Date" },
-  // { id: "purpose", label: "Purpose" },
-  { id: "invoice_no", label: "Invoice Number" },
-  { id: "receipt_no", label: "Receipt Number" },
+  { id: "returned_by", label: "Returned by" },
+  { id: "delivery_date", label: "Delivery date" },
+  { id: "return_date", label: "Return date" },
+  { id: "reason", label: "Reason" },
+  { id: "invoice_no", label: "Invoice number" },
+  { id: "receipt_no", label: "Receipt number" },
   { id: "actions", label: "Actions", disableSorting: true },
 ];
 
-export default function Outwards() {
+export default function Returns() {
   const classes = useStyles();
-  const [outwards, setOutwards] = useState([]);
+  const [returns, setOutwards] = useState([]);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
@@ -80,16 +75,13 @@ export default function Outwards() {
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
+  const [returnedBy, setReturnedBy] = useState("");
   const [invoiceId, setInvoiceId] = useState("");
-  const [deliveredTo, setDeliveredTo] = useState("");
-  const [supplyDate, setSupplyDate] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [reason, setReason] = useState("");
   const [invoiceNo, setInvoiceNo] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [billValue, setBillValue] = useState("");
-  const [billCheckedById, setBillCheckedById] = useState("");
 
   const [godowns, setGodowns] = useState([]);
   const [products, setProducts] = useState([]);
@@ -100,7 +92,7 @@ export default function Outwards() {
   const [editModalOpen, setEditModalOpen] = useState(null);
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
-    useTable(outwards, headCells, filterFn);
+    useTable(returns, headCells, filterFn);
 
   const handleClickAddModalOpen = () => {
     setAddModalOpen(true);
@@ -125,7 +117,7 @@ export default function Outwards() {
         if (target.value === "") return items;
         else
           return items.filter((x) =>
-            x.delivered_to.toLowerCase().includes(target.value)
+            x.returned_by.toLowerCase().includes(target.value)
           );
       },
     });
@@ -133,10 +125,10 @@ export default function Outwards() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/outwards/${id}`)
+      .delete(`http://localhost:8080/api/returns/${id}`)
       .then((response) => {
         console.log(response);
-        setOutwards(outwards.filter((record) => record.id !== id));
+        setEmployees(returns.filter((record) => record.id !== id));
       })
       .catch((error) => {
         console.error(error);
@@ -157,14 +149,14 @@ export default function Outwards() {
   const handleInvoiceIdChange = (event) => {
     setInvoiceId(event.target.value);
   };
-  const handleDeliveredToChange = (event) => {
-    setDeliveredTo(event.target.value);
-  };
-  const handleSupplyDateChange = (event) => {
-    setSupplyDate(event.target.value);
+  const handleReturnedByChange = (event) => {
+    setReturnedBy(event.target.value);
   };
   const handleDeliveryDateChange = (event) => {
     setDeliveryDate(event.target.value);
+  };
+  const handleReturnDateChange = (event) => {
+    setReturnDate(event.target.value);
   };
   const handleInvoiceNoChange = (event) => {
     setInvoiceNo(event.target.value);
@@ -172,18 +164,18 @@ export default function Outwards() {
   const handleReceiptNoChange = (event) => {
     setReceiptNo(event.target.value);
   };
-  const handlePurposeChange = (event) => {
-    setPurpose(event.target.value);
+  const handleReasonChange = (event) => {
+    setReason(event.target.value);
   };
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
-  };
-  const handleBillValueChange = (event) => {
-    setBillValue(event.target.value);
-  };
-  const handleBillValueCheckedByIdChange = (event) => {
-    setBillCheckedById(event.target.value);
-  };
+  // const handleQuantityChange = (event) => {
+  //   setQuantity(event.target.value);
+  // };
+  // const handleBillValueChange = (event) => {
+  //   setBillValue(event.target.value);
+  // };
+  // const handleBillValueCheckedByIdChange = (event) => {
+  //   setBillCheckedById(event.target.value);
+  // };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -197,18 +189,18 @@ export default function Outwards() {
     formData["invoice"] = {
       id: invoiceId,
     };
-    formData["deliveredTo"] = deliveredTo;
+    formData["returnedBy"] = returnedBy;
 
-    const supplyDateObj = new Date(supplyDate);
+    const supplyDateObj = new Date(deliveryDate);
     const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
     formData["supplyDate"] = formattedSupplyDate;
 
-    const deliveryDateObj = new Date(deliveryDate);
+    const deliveryDateObj = new Date(returnDate);
     const formattedDeliveryDate = moment(deliveryDateObj).format("DD/MM/YYYY");
     formData["deliveryDate"] = formattedDeliveryDate;
 
     formData["receiptNo"] = receiptNo;
-    formData["purpose"] = purpose;
+    formData["purpose"] = reason;
     // formData["invoice"] = {
     //   quantity: quantity,
     //   billValue: billValue,
@@ -220,7 +212,7 @@ export default function Outwards() {
     console.log(formData);
 
     axios
-      .post("http://localhost:8080/api/outwards", formData)
+      .post("http://localhost:8080/api/returns", formData)
       .then((response) => {
         console.log(response);
         getData();
@@ -232,22 +224,22 @@ export default function Outwards() {
     setGodownId("");
     setProductId("");
     setInvoiceId("");
-    setDeliveredTo("");
-    setSupplyDate("");
+    setReturnedBy("");
     setDeliveryDate("");
+    setReturnDate("");
     setInvoiceNo("");
     setReceiptNo("");
-    setPurpose("");
-    setQuantity("");
-    setBillValue("");
-    setBillCheckedById("");
+    setReason("");
+    // setQuantity("");
+    // setBillValue("");
+    // setBillCheckedById("");
     handleAddModalClose();
     setAddModalOpen(false);
   };
 
   function getData() {
     axios
-      .get("http://localhost:8080/api/outwards", {})
+      .get("http://localhost:8080/api/returns", {})
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {
@@ -307,7 +299,7 @@ export default function Outwards() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
-            label="Search Outwards"
+            label="Search Returns"
             className={classes.searchInput}
             InputProps={{
               startAdornment: (
@@ -458,16 +450,16 @@ export default function Outwards() {
                     label="Delivered to"
                     type="text"
                     variant="outlined"
-                    value={deliveredTo}
-                    onChange={handleDeliveredToChange}
+                    value={returnedBy}
+                    onChange={handleReturnedByChange}
                   />
                   <TextField
                     id="supplyDate"
                     label="Supply date"
                     type="date"
                     variant="outlined"
-                    value={supplyDate}
-                    onChange={handleSupplyDateChange}
+                    value={deliveryDate}
+                    onChange={handleDeliveryDateChange}
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -477,8 +469,8 @@ export default function Outwards() {
                     label="Delivery date"
                     type="date"
                     variant="outlined"
-                    value={deliveryDate}
-                    onChange={handleDeliveryDateChange}
+                    value={returnDate}
+                    onChange={handleReturnDateChange}
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -496,9 +488,9 @@ export default function Outwards() {
                     <Select
                       labelId="purposeIdLabel"
                       id="productId"
-                      value={purpose}
+                      value={reason}
                       label="Purpose"
-                      onChange={handlePurposeChange}
+                      onChange={handleReasonChange}
                     >
                       <MenuItem value="sales">Sales</MenuItem>
                       <MenuItem value="service">Service</MenuItem>
@@ -536,8 +528,8 @@ export default function Outwards() {
                           {employee.name}
                         </MenuItem>
                       ))}
-                    </Select>
-                  </FormControl> */}
+                    </Select> */}
+                  {/* </FormControl> */}
                 </div>
 
                 <DialogActions>

@@ -1,48 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import AddIcon from "@material-ui/icons/Add";
-import axios from "axios";
-import * as Yup from "yup";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import moment from "moment";
-import UpdateGodown from "./UpdateGodown";
 import {
-  Box,
   Button,
-  Card,
-  CardContent,
-  CardActions,
-  IconButton,
-  Grid,
-  Typography,
-  TextField,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
+  TextField,
 } from "@mui/material";
+import { makeStyles } from "@material-ui/core/styles";
+import AddIcon from "@material-ui/icons/Add";
+import axios from "axios";
+import Box from "@material-ui/core/Box";
+import * as Yup from "yup";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  CardActions,
+  IconButton,
+  Grid,
+  CardMedia,
+  Typography,
+} from "@mui/material";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import moment from "moment";
+import UpdateProduct from "./UpdateProduct";
 
 export const initialValues = {
-  id: "",
-  location: "",
-  managerId: "",
-  capacity: "",
-  date: "",
+  name: "",
+  price: "",
+  stock: "",
 };
 
 export const validationSchema = Yup.object().shape({
-  location: Yup.string().required("Location is required"),
-  id: Yup.number().required("ID is required").positive("ID must be positive"),
-  managerId: Yup.number()
-    .required("Manager ID is required")
-    .positive("Manager ID must be positive"),
+  name: Yup.string().required("name is required"),
+  price: Yup.number().required("Price is required"),
+  stock: Yup.number()
+    .required("Stock  is required")
+    .positive("Stock  must be positive"),
 });
 const useStyles = makeStyles((theme) => ({
   customTitle: {
@@ -53,60 +51,64 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.common.white,
     textAlign: "center",
   },
+  successButton: {
+    borderRadius: "24px",
+    padding: "12px 24px",
+    backgroundColor: "	#4169e1",
+    color: "#fff",
+
+    "&:hover": {
+      backgroundColor: " #198754",
+    },
+  },
 }));
 
-function formatDate(date) {
-  // Extract the year, month, and day values from the Date object
-  const year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
+// function formatDate(date) {
+//   // Extract the year, month, and day values from the Date object
+//   const year = date.getFullYear();
+//   let month = date.getMonth() + 1;
+//   let day = date.getDate();
 
-  // Convert the month and day to double digits if necessary
-  month = month.toString().padStart(2, "0");
-  day = day.toString().padStart(2, "0");
+//   // Convert the month and day to double digits if necessary
+//   month = month.toString().padStart(2, "0");
+//   day = day.toString().padStart(2, "0");
 
-  // Format the date string
-  const formattedDate = `${day}/${month}/${year}`;
+// Format the date string
+//   const formattedDate = `${day}/${month}/${year}`;
 
-  return formattedDate;
-}
+//   return formattedDate;
+// }
 
-function Godowns({ onDelete, onEdit }) {
-  const [editing, setEditing] = useState(false);
-  const [godownData, setGodownData] = useState([]);
-  const classes = useStyles();
+function Products({}) {
+  //   const [godownData, setGodownData] = useState([]);
+  //   const classes = useStyles();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(null);
-  const [location, setLocation] = useState("");
-  const [capacity, setCapacity] = useState("");
-  const [managerId, setmanagerId] = useState("");
-  const [date, setDate] = useState("");
+  //   const [id, setId] = useState("");
+  //   const [location, setLocation] = useState("");
+  //   const [capacity, setCapacity] = useState("");
+  //   const [managerId, setmanagerId] = useState(" ");
+  //   const [date, setDate] = useState("");
 
-  const [godowns, setGodowns] = useState([]);
-  const [managers, setManagers] = useState([]);
+  const [products, setProducts] = useState([]);
+  //   const [selectedFile, setSelectedFile] = useState(null);
+  const [name, setName] = useState(" ");
+  const [price, setPrice] = useState(" ");
+  const [stock, setStock] = useState(" ");
+
+  const classes = useStyles();
 
   useEffect(() => {
     getData();
   }, []);
   const getData = () => {
     axios
-      .get("http://localhost:8080/api/godowns")
+      .get("http://localhost:8080/api/products")
       .then((response) => {
-        setGodowns(response.data);
+        setProducts(response.data);
       })
       .catch((error) => {
         console.error(error);
-      });
-
-    axios
-      .get("http://localhost:8080/api/employees")
-      .then((response) => {
-        setManagers(
-          response.data.filter((employee) => employee.role.role === "manager")
-        );
-      })
-      .catch((error) => {
-        console.log(error);
       });
   };
   const handleClickAddModalOpen = () => {
@@ -117,8 +119,8 @@ function Godowns({ onDelete, onEdit }) {
     setAddModalOpen(false);
   };
 
-  const handleClickEditModalOpen = (godown) => {
-    setEditModalOpen(godown);
+  const handleClickEditModalOpen = (product) => {
+    setEditModalOpen(product);
   };
 
   const handleEditModalClose = () => {
@@ -128,10 +130,10 @@ function Godowns({ onDelete, onEdit }) {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/godowns/${id}`)
+      .delete(`http://localhost:8080/api/products/${id}`)
       .then((response) => {
         console.log(response);
-        setGodowns(godowns.filter((user) => user.id !== id));
+        setProducts(products.filter((product) => product.id !== id));
       })
       .catch((error) => {
         console.error(error);
@@ -161,41 +163,28 @@ function Godowns({ onDelete, onEdit }) {
 
   //     };
 
-  // const handleEdit = () => {
-  //   setEditing(true);
-  // };
-
-  const handleLocationChange = (event) => {
-    setLocation(event.target.value);
+  const handleNameChange = (event) => {
+    setName(event.target.value);
   };
 
-  const handleCapacityChange = (event) => {
-    setCapacity(event.target.value);
+  const handlePriceChange = (event) => {
+    setPrice(event.target.value);
   };
-  const handleManagerIdChange = (event) => {
-    setmanagerId(event.target.value);
-  };
-  const handleDateChange = (event) => {
-    setDate(event.target.value);
+  const handleStockChange = (event) => {
+    setStock(event.target.value);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     let formData = {};
-    formData["location"] = location;
-    formData["capacityInQuintals"] = capacity;
-    formData["manager"] = {
-      id: Number(managerId),
-    };
 
-    const dateObj = new Date(date);
-    const formattedDate = moment(dateObj).format("DD/MM/YYYY");
-    formData["startDate"] = formattedDate;
+    formData["name"] = name;
+    formData["stock"] = stock;
 
-    console.log(formData);
+    formData["price"] = price;
 
     axios
-      .post("http://localhost:8080/api/godowns", formData)
+      .post("http://localhost:8080/api/products", formData)
       .then((response) => {
         console.log(response);
         getData();
@@ -204,11 +193,10 @@ function Godowns({ onDelete, onEdit }) {
         console.error(error);
       });
 
-    setLocation("");
-    setCapacity("");
-    setmanagerId("");
-    setDate("");
-    setAddModalOpen(false);
+    setName("");
+    setPrice("");
+    setStock("");
+    handleAddModalClose();
   };
 
   return (
@@ -219,7 +207,7 @@ function Godowns({ onDelete, onEdit }) {
           startIcon={<AddIcon />}
           onClick={handleClickAddModalOpen}
         >
-          Add Godown
+          Add Product
         </Button>
       </Box>
 
@@ -229,7 +217,7 @@ function Godowns({ onDelete, onEdit }) {
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
-          Add a godown
+          Add New Product
         </DialogTitle>
         <DialogContent>
           <Formik
@@ -251,47 +239,28 @@ function Godowns({ onDelete, onEdit }) {
                 >
                   <TextField
                     autoFocus
-                    id="location"
-                    label="Location"
+                    id="name"
+                    label="Name"
                     type="text"
                     variant="outlined"
-                    value={location}
-                    onChange={handleLocationChange}
+                    value={name}
+                    onChange={handleNameChange}
                   />
                   <TextField
-                    id="capacity"
-                    label="Capacity"
+                    id="stock"
+                    label="Stock"
                     type="number"
                     variant="outlined"
-                    value={capacity}
-                    onChange={handleCapacityChange}
+                    value={stock}
+                    onChange={handleStockChange}
                   />
-                  <FormControl>
-                    <InputLabel id="managerIdLabel">Manager</InputLabel>
-                    <Select
-                      labelId="managerIdLabel"
-                      id="managerId"
-                      value={managerId}
-                      label="Manager"
-                      onChange={handleManagerIdChange}
-                    >
-                      {managers.map((manager, index) => (
-                        <MenuItem key={index} value={manager.id}>
-                          {manager.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                   <TextField
-                    id="date"
-                    label="Date"
-                    type="date"
+                    id="price"
+                    label="Price"
+                    type="number"
                     variant="outlined"
-                    value={date}
-                    onChange={handleDateChange}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
+                    value={price}
+                    onChange={handlePriceChange}
                   />
                 </div>
 
@@ -305,7 +274,6 @@ function Godowns({ onDelete, onEdit }) {
                   <Button
                     type="submit"
                     variant="contained"
-                    className={classes.actionButtons}
                     onClick={handleSubmit}
                   >
                     Add
@@ -318,16 +286,18 @@ function Godowns({ onDelete, onEdit }) {
       </Dialog>
 
       <Grid container spacing={6}>
-        {godowns.map((godown) => (
-          <Grid item xs={12} sm={6} md={4} key={godown.id}>
-            <Card
-              style={{
-                padding: "16px 24px",
-              }}
-            >
+        {products.map((product) => (
+          <Grid item xs={12} sm={6} md={4} key={product.id}>
+            <Card>
+              <CardMedia
+                style={{ height: "180px" }}
+                component="img"
+                image="https://www.cassidybros.ie/wp-content/uploads/2020/11/product-placeholder.jpg"
+                title="product image"
+              />
               <CardContent
                 style={{
-                  padding: "0px",
+                  padding: "16px 24px",
                 }}
               >
                 <Typography
@@ -336,7 +306,7 @@ function Godowns({ onDelete, onEdit }) {
                   variant="h6"
                   component="h4"
                 >
-                  {godown.location}
+                  {product.name}
                 </Typography>
 
                 <div
@@ -354,10 +324,10 @@ function Godowns({ onDelete, onEdit }) {
                       color="textSecondary"
                       component="p"
                     >
-                      {"Manager name:"}
+                      {"Stock:"}
                     </Typography>
                     <Typography variant="body2" component="p">
-                      {godown.manager.name}
+                      {product.stock}
                     </Typography>
                   </div>
 
@@ -367,43 +337,30 @@ function Godowns({ onDelete, onEdit }) {
                       color="textSecondary"
                       component="p"
                     >
-                      {"Start date:"}
+                      {"Price:"}
                     </Typography>
                     <Typography variant="body2" component="p">
-                      {godown.startDate}
-                    </Typography>
-                  </div>
-
-                  <div>
-                    <Typography
-                      variant="caption"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {"Capacity (in quintals):"}
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                      {godown.capacityInQuintals}
+                      {product.price}
                     </Typography>
                   </div>
                 </div>
               </CardContent>
               <CardActions
                 style={{
-                  padding: "0px",
+                  padding: "16px 24px",
                 }}
               >
                 <IconButton
                   color="success"
                   aria-label="edit"
-                  onClick={() => handleClickEditModalOpen(godown)}
+                  onClick={() => handleClickEditModalOpen(product)}
                 >
                   <EditIcon />
                 </IconButton>
                 <IconButton
                   color="error"
                   aria-label="delete"
-                  onClick={() => handleDelete(godown.id)}
+                  onClick={() => handleDelete(product.id)}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -413,13 +370,12 @@ function Godowns({ onDelete, onEdit }) {
         ))}
       </Grid>
 
-      <UpdateGodown
-        godown={editModalOpen}
-        managers={managers}
+      <UpdateProduct
+        product={editModalOpen}
         handleClose={handleEditModalClose}
       />
     </div>
   );
 }
 
-export default Godowns;
+export default Products;

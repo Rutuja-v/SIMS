@@ -1,8 +1,8 @@
-import stock from "./New folder/stock.jpeg";
-import signin from "./New folder/signin.svg";
+import stock from "./assets/stock.jpeg";
+import signin from "./assets/signin.svg";
 import axios from "axios";
 
-import React from "react";
+import React, { useContext, useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 
@@ -15,14 +15,14 @@ import Avatar from "@mui/material/Avatar";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { useState, forwardRef } from "react";
+
 import Snackbar from "@mui/material/Snackbar";
-import Stack from "@mui/material/Stack";
+
 import MuiAlert from "@mui/material/Alert";
 import Slide from "@mui/material/Slide";
 
 import IconButton from "@mui/material/IconButton";
-
+import { makeStyles } from "@material-ui/core/styles";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -31,12 +31,25 @@ import TextField from "@mui/material/TextField";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
+import { Context } from "../context/ContextProvider";
 
-const Alert = forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+const useStyles = makeStyles({
+  container: {
+    overflow: "hidden",
+    position: "relative",
+    height: "30px",
+  },
+  scrollingText: {
+    color: "#fff",
+    position: "absolute",
+    whiteSpace: "nowrap",
+    animation: "$scroll 10s linear infinite",
+  },
+  "@keyframes scroll": {
+    "0%": { transform: "translateX(100%)" },
+    "100%": { transform: "translateX(-100%)" },
+  },
 });
-
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -44,31 +57,23 @@ const darkTheme = createTheme({
 });
 
 const boxstyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  mt: 4,
+  mb: 4,
   width: "75%",
-  height: "70%",
-  bgcolor: "background.paper",
+  backgroundColor: "background.paper",
   boxShadow: 24,
 };
 
-const center = {
-  position: "relative",
-  top: "50%",
-  left: "37%",
-};
-
 export default function Login() {
+  const [user, setUser] = useContext(Context);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState();
+  const classes = useStyles();
   const [values, setValues] = useState({
     username: "",
     password: "",
     showPassword: false,
   });
-  console.log(values);
   const handleClickShowPassword = () => {
     setValues({
       ...values,
@@ -93,14 +98,21 @@ export default function Login() {
     //     history("/dashboard");
     //   };
     axios
-      .post("https:reqres.in/api/login", {
+      .post("http://localhost:8080/api/auth/login", {
         username: values.username,
         password: values.password,
       })
+
       .then((res) => {
         localStorage.setItem("token", res.data.token);
-        //    console.log(res))
-        navigate("/dashboard");
+        const loginUser = {
+          name: res.data.name,
+          email: res.data.username,
+          role: res.data.role.role,
+        };
+        setUser(loginUser);
+        localStorage.setItem("user", JSON.stringify(loginUser));
+        navigate("/");
       })
       .catch((err) => console.log(err));
   };
@@ -118,154 +130,144 @@ export default function Login() {
 
   return (
     <>
+      {/* <div className={classes.container}>
+      <Typography   style={{
+          backgroundImage: `url(${stock})`,
+       
+        }}
+        variant="subtitle1"
+        className={classes.scrollingText}
+      >
+      Smart Inventory Management System 
+      </Typography>
+    </div> */}
+
       <Snackbar
         open={open}
         autoHideDuration={3000}
         onClose={handleClose}
         TransitionComponent={TransitionLeft}
         anchorOrigin={{ vertical, horizontal }}
-      >
-        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
-          Failed! Enter correct username and password.
-        </Alert>
-      </Snackbar>
+      ></Snackbar>
       <div
         style={{
           backgroundImage: `url(${stock})`,
           backgroundSize: "cover",
-          height: "100vh",
+          height: "100%",
+          minHeight: "100vh",
           color: "#f5f5f5",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
+        <marquee direction="left" width="30px" height="50px">
+          {" "}
+          <div style={{ marginTop: "-500px", position: "absolute" }}>
+            welcome
+          </div>{" "}
+        </marquee>
         <Box sx={boxstyle}>
-          <Grid container>
-            <Grid item xs={12} sm={12} lg={6}>
-              <Box
-                style={{
-                  backgroundImage: `url(${signin})`,
-                  backgroundSize: "cover",
-                  marginTop: "40px",
-                  marginLeft: "15px",
-                  marginRight: "15px",
-                  height: "63vh",
-                  color: "#f5f5f5",
-                }}
-              ></Box>
-            </Grid>
-            <Grid item xs={12} sm={12} lg={6}>
-              <Box
-                style={{
-                  backgroundSize: "cover",
-                  height: "70vh",
-                  minHeight: "500px",
-                  backgroundColor: "#339999",
-                }}
-              >
-                <ThemeProvider theme={darkTheme}>
-                  <Container>
-                    <Box height={35} />
-                    <Box sx={center}>
-                      <Avatar
-                        sx={{ ml: "35px", mb: "4px", bgcolor: "#ffffff" }}
-                      ></Avatar>
-                      <Typography component="h1" variant="h4">
-                        Sign In
-                      </Typography>
-                    </Box>
-                    <Box
-                      component="form"
-                      onSubmit={handleSubmit}
-                      sx={{ mt: 2 }}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
-                          <TextField
-                            required
-                            fullWidth
-                            id="email"
-                            label="Username"
-                            name="email"
-                            autoComplete="email"
-                            onChange={(e) =>
-                              setValues({ ...values, username: e.target.value })
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
-                          <InputLabel htmlFor="outlined-adornment-password">
-                            Password
-                          </InputLabel>
-                          <OutlinedInput
-                            id="outlined-adornment-password"
-                            type={showPassword ? "text" : "password"}
-                            endAdornment={
-                              <InputAdornment position="end">
-                                <IconButton
-                                  aria-label="toggle password visibility"
-                                  onClick={handleClickShowPassword}
-                                  //   onMouseDown={handleMouseDownPassword}
-                                  edge="end"
-                                >
-                                  {showPassword ? (
-                                    <VisibilityOff />
-                                  ) : (
-                                    <Visibility />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            }
-                            required
-                            fullWidth
-                            label="Password"
-                            onChange={(e) =>
-                              setValues({ ...values, password: e.target.value })
-                            }
-                          />
-                        </Grid>
+          <Grid
+            container
+            style={{
+              display: "flex",
+              alignItems: "stretch",
+            }}
+          >
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              lg={6}
+              style={{
+                backgroundImage: `url(${signin})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                color: "#f5f5f5",
+              }}
+            ></Grid>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              lg={6}
+              style={{
+                backgroundSize: "cover",
+                backgroundColor: "#339999",
+                padding: "48px 48px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ThemeProvider theme={darkTheme}>
+                <Typography style={{ textAlign: "center" }} variant="h5">
+                  Smart Inventory Management System
+                </Typography>
 
-                        <Grid item xs={12} sx={{ ml: "5em", mr: "5em" }}>
-                          <Button
-                            type="submit"
-                            variant="contained"
-                            fullWidth="true"
-                            size="large"
-                            sx={{
-                              mt: "10px",
-                              mr: "20px",
-                              borderRadius: 28,
-                              color: "#ffffff",
-                              minWidth: "170px",
-                               backgroundColor: "#FF9A01",
-                              // backgroundColor: "#ffffff",
-                            }}
-                          >
-                            Sign in
-                          </Button>
-                        </Grid>
-                        {/* <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
-                          <Stack direction="row" spacing={2}>
-                            <Typography
-                              variant="body1"
-                              component="span"
-                              style={{ marginTop: "10px" }}
-                            >
-                              Not registered yet?{" "}
-                              <span
-                                style={{ color: "#beb4fb", cursor: "pointer" }}
-                                onClick={() => {
-                                  navigate("/register");
-                                }}
-                              >
-                                Create an Account
-                              </span>
-                            </Typography>
-                          </Stack>
-                        </Grid> */}
-                      </Grid>
-                    </Box>
-                  </Container>
-                </ThemeProvider>
-              </Box>
+                <Box
+                  style={{
+                    marginTop: "32px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <Avatar sx={{ bgcolor: "#ffffff" }}></Avatar>
+                  <Typography component="h1" variant="h6">
+                    Sign In
+                  </Typography>
+                </Box>
+
+                <TextField
+                  sx={{
+                    mt: 2,
+                    width: "75%",
+                  }}
+                  required
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                  onChange={(e) =>
+                    setValues({ ...values, username: e.target.value })
+                  }
+                />
+
+                <TextField
+                  sx={{
+                    mt: 2,
+                    width: "75%",
+                  }}
+                  required
+                  id="password"
+                  label="Password"
+                  type="password"
+                  name="password"
+                  autoComplete="password"
+                  onChange={(e) =>
+                    setValues({ ...values, password: e.target.value })
+                  }
+                />
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    mt: 2,
+                    backgroundColor: "#1976d2",
+                    color: "#FFFFFF",
+                    borderRadius: 24,
+                  }}
+                  onClick={handleSubmit}
+                >
+                  Sign in
+                </Button>
+              </ThemeProvider>
             </Grid>
           </Grid>
         </Box>
