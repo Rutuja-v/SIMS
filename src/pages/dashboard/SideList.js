@@ -178,7 +178,7 @@ export default function SideList({ children }) {
             />
           )}
           <Typography variant="h6" noWrap component="div">
-            Welcome To App
+            Smart Inventory Management System
           </Typography>
         </Toolbar>
       </AppBar>

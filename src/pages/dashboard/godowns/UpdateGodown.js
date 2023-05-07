@@ -22,6 +22,7 @@ export const validationSchema = Yup.object().shape({
     .required("Manager ID is required")
     .positive("Manager ID must be positive"),
 });
+
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -102,7 +103,7 @@ function UpdateGodown({ godown, managers, handleClose }) {
     await axios
       .put(`http://localhost:8080/api/godowns/${godown?.id}`, formData)
       .then((response) => {
-        console.log(response);
+
       })
       .catch((error) => {
         console.error(error);

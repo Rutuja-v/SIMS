@@ -19,6 +19,7 @@ import * as Yup from "yup";
 import { Formik, Form } from "formik";
 
 export const validationSchema = Yup.object().shape({});
+
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -37,23 +38,17 @@ function UpdateEmployee({ employee, roles, handleClose }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [roleId, setRoleId] = useState("");
-  const [inputValue, setInputValue] = useState('');
-  const [inputError, setInputError] = useState(false);
+
   useEffect(() => {
-    validateInput();
-  }, [inputValue]);
-  
-  useEffect(() => {
-    setName(employee?.employee_name);
-    setUsername(employee?.employee_username);
-    setPassword(employee?.employee_password);
-    setRoleId(employee?.role_id);
+    setName(employee?.name);
+    setUsername(employee?.username);
+    setPassword(employee?.password);
+    setRoleId(employee?.role.id);
   }, [employee]);
 
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
-
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
   };
@@ -63,13 +58,7 @@ function UpdateEmployee({ employee, roles, handleClose }) {
   const handleRoleIdChange = (event) => {
     setRoleId(event.target.value);
   };
-  const validateInput = () => {
-    if (inputValue === '') {
-      setInputError(true);
-    } else {
-      setInputError(false);
-    }
-  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     let formData = {};
@@ -85,7 +74,7 @@ function UpdateEmployee({ employee, roles, handleClose }) {
     await axios
       .put(`http://localhost:8080/api/employees/${employee?.id}`, formData)
       .then((response) => {
-        console.log(response);
+
       })
       .catch((error) => {
         console.error(error);
@@ -128,9 +117,7 @@ function UpdateEmployee({ employee, roles, handleClose }) {
                   type="text"
                   variant="outlined"
                   value={name}
-                  onChange={(event) => setInputValue(event.target.value)}
-                  error={inputError}
-                  helperText={inputError ? 'Input is invalid' : ''}
+                  onChange={handleNameChange}
                 />
                 <TextField
                   id="username"
@@ -153,7 +140,7 @@ function UpdateEmployee({ employee, roles, handleClose }) {
                   <Select
                     labelId="roleIdLabel"
                     id="roleId"
-                    defaultValue={employee?.role_id}
+                    defaultValue={employee?.role.id}
                     value={roleId}
                     label="Role"
                     onChange={handleRoleIdChange}

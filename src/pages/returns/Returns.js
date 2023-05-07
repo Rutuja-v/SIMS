@@ -25,13 +25,15 @@ import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
 import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
+import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
+import UpdateReturns from "./UpdateReturns";
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
-    margin: theme.spacing(5),
     padding: theme.spacing(3),
   },
   searchInput: {
@@ -51,9 +53,9 @@ const headCells = [
   { id: "godown", label: "Godown" },
   { id: "product_name", label: "Product name" },
   { id: "returned_by", label: "Returned by" },
+  { id: "reason", label: "Reason" },
   { id: "delivery_date", label: "Delivery date" },
   { id: "return_date", label: "Return date" },
-  { id: "reason", label: "Reason" },
   { id: "invoice_no", label: "Invoice number" },
   { id: "receipt_no", label: "Receipt number" },
   { id: "actions", label: "Actions", disableSorting: true },
@@ -61,7 +63,7 @@ const headCells = [
 
 export default function Returns() {
   const classes = useStyles();
-  const [returns, setOutwards] = useState([]);
+  const [returns, setReturns] = useState([]);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
@@ -76,11 +78,11 @@ export default function Returns() {
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
   const [returnedBy, setReturnedBy] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
+  const [reason, setReason] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [reason, setReason] = useState("");
   const [invoiceNo, setInvoiceNo] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
 
   const [godowns, setGodowns] = useState([]);
@@ -89,24 +91,23 @@ export default function Returns() {
   const [employees, setEmployees] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(null);
+  const [editModalItem, setEditModalItem] = useState(null);
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(returns, headCells, filterFn);
 
-  const handleClickAddModalOpen = () => {
+  const handleAddModalOpen = () => {
     setAddModalOpen(true);
   };
   const handleAddModalClose = () => {
     setAddModalOpen(false);
   };
 
-  const handleClickEditModalOpen = (employee) => {
-    setEditModalOpen(employee);
+  const handleEditModalOpen = (returns) => {
+    setEditModalItem(returns);
   };
-
   const handleEditModalClose = () => {
-    setEditModalOpen(null);
+    setEditModalItem(null);
     getData();
   };
 
@@ -123,16 +124,16 @@ export default function Returns() {
     });
   };
 
-  const handleDelete = (id) => {
-    axios
+  const handleDelete = async (id) => {
+    await axios
       .delete(`http://localhost:8080/api/returns/${id}`)
       .then((response) => {
-        console.log(response);
-        setEmployees(returns.filter((record) => record.id !== id));
+        setReturns(returns.filter((record) => record.id !== id));
       })
       .catch((error) => {
         console.error(error);
       });
+
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
@@ -142,15 +143,14 @@ export default function Returns() {
   const handleGodownIdChange = (event) => {
     setGodownId(event.target.value);
   };
-
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
-  const handleInvoiceIdChange = (event) => {
-    setInvoiceId(event.target.value);
-  };
   const handleReturnedByChange = (event) => {
     setReturnedBy(event.target.value);
+  };
+  const handleReasonChange = (event) => {
+    setReason(event.target.value);
   };
   const handleDeliveryDateChange = (event) => {
     setDeliveryDate(event.target.value);
@@ -161,11 +161,11 @@ export default function Returns() {
   const handleInvoiceNoChange = (event) => {
     setInvoiceNo(event.target.value);
   };
+  const handleInvoiceIdChange = (event) => {
+    setInvoiceId(event.target.value);
+  };
   const handleReceiptNoChange = (event) => {
     setReceiptNo(event.target.value);
-  };
-  const handleReasonChange = (event) => {
-    setReason(event.target.value);
   };
   // const handleQuantityChange = (event) => {
   //   setQuantity(event.target.value);
@@ -186,21 +186,21 @@ export default function Returns() {
     formData["product"] = {
       id: productId,
     };
-    formData["invoice"] = {
-      id: invoiceId,
-    };
     formData["returnedBy"] = returnedBy;
+    formData["reason"] = reason;
 
-    const supplyDateObj = new Date(deliveryDate);
-    const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
-    formData["supplyDate"] = formattedSupplyDate;
-
-    const deliveryDateObj = new Date(returnDate);
+    const deliveryDateObj = new Date(deliveryDate);
     const formattedDeliveryDate = moment(deliveryDateObj).format("DD/MM/YYYY");
     formData["deliveryDate"] = formattedDeliveryDate;
 
+    const returnDateObj = new Date(returnDate);
+    const formattedReturnDate = moment(returnDateObj).format("DD/MM/YYYY");
+    formData["returnDate"] = formattedReturnDate;
+
+    formData["invoice"] = {
+      id: invoiceId,
+    };
     formData["receiptNo"] = receiptNo;
-    formData["purpose"] = reason;
     // formData["invoice"] = {
     //   quantity: quantity,
     //   billValue: billValue,
@@ -214,7 +214,6 @@ export default function Returns() {
     axios
       .post("http://localhost:8080/api/returns", formData)
       .then((response) => {
-        console.log(response);
         getData();
       })
       .catch((error) => {
@@ -223,13 +222,13 @@ export default function Returns() {
 
     setGodownId("");
     setProductId("");
-    setInvoiceId("");
     setReturnedBy("");
+    setReason("");
     setDeliveryDate("");
     setReturnDate("");
     setInvoiceNo("");
+    setInvoiceId("");
     setReceiptNo("");
-    setReason("");
     // setQuantity("");
     // setBillValue("");
     // setBillCheckedById("");
@@ -247,17 +246,17 @@ export default function Returns() {
           let obj = {
             id: item.id,
             godown: item.godown,
-            product_name: item.product.name,
-            delivered_to: item.deliveredTo,
-            supply_date: item.supplyDate,
+            product: item.product,
+            returned_by: item.returnedBy,
+            reason: item.reason,
             delivery_date: item.deliveryDate,
-            invoice_no: item.invoice.id,
+            return_date: item.returnDate,
+            invoice_id: item.invoice.id,
             receipt_no: item.receiptNo,
-            purpose: item.purpose,
           };
           rows.push(obj);
         }
-        setOutwards(rows);
+        setReturns(rows);
       })
       .catch((err) => console.log(err));
 
@@ -315,7 +314,7 @@ export default function Returns() {
             variant="outlined"
             startIcon={<AddIcon />}
             className={classes.newButton}
-            onClick={handleClickAddModalOpen}
+            onClick={handleAddModalOpen}
           >
             Add new
           </Button>
@@ -335,25 +334,20 @@ export default function Returns() {
                     {"Capacity: " + item.godown.capacityInQuintals}
                   </Typography>
                 </TableCell>
-                <TableCell>{item.product_name}</TableCell>
-                <TableCell>
-                  {item.purpose === "service" ? "Self" : item.delivered_to}
-                </TableCell>
-                <TableCell>{item.supply_date}</TableCell>
+                <TableCell>{item.product.name}</TableCell>
+                <TableCell>{item.returned_by}</TableCell>
+                <TableCell>{item.reason}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
-                {/* <TableCell>{item.purpose}</TableCell> */}
-                <TableCell>{item.invoice_no}</TableCell>
+                <TableCell>{item.return_date}</TableCell>
+                <TableCell>{item.invoice_id}</TableCell>
                 <TableCell>{item.receipt_no}</TableCell>
                 <TableCell>
-                  {/* <Controls.ActionButton
-                    onClick={() => {
-                      openInPopup(item);
-                    }}
+                  <Controls.ActionButton
+                    onClick={() => handleEditModalOpen(item)}
                   >
                     <EditOutlinedIcon fontSize="small" />
-                  </Controls.ActionButton> */}
+                  </Controls.ActionButton>
                   <Controls.ActionButton
-                    //    color="secondary"
                     onClick={() => {
                       setConfirmDialog({
                         isOpen: true,
@@ -381,7 +375,7 @@ export default function Returns() {
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
-          Add outwards
+          Add returns
         </DialogTitle>
         <DialogContent>
           <Formik onSubmit={handleSubmit}>
@@ -392,7 +386,7 @@ export default function Returns() {
                     marginTop: "32px",
                     marginBottom: "16px",
                     display: "grid",
-                    gridTemplateColumns: "auto auto auto",
+                    gridTemplateColumns: "auto auto",
                     columnGap: "16px",
                     rowGap: "24px",
                   }}
@@ -429,8 +423,51 @@ export default function Returns() {
                       ))}
                     </Select>
                   </FormControl>
+                  <TextField
+                    id="returnedBy"
+                    label="Returned by"
+                    type="text"
+                    variant="outlined"
+                    value={returnedBy}
+                    onChange={handleReturnedByChange}
+                  />
                   <FormControl>
-                    <InputLabel id="invoiceIdLabel">Invoice</InputLabel>
+                    <InputLabel id="reasonIdLabel">Reason</InputLabel>
+                    <Select
+                      labelId="reasonIdLabel"
+                      id="reasonId"
+                      value={reason}
+                      label="Reason"
+                      onChange={handleReasonChange}
+                    >
+                      <MenuItem value="cancelled">Cancelled</MenuItem>
+                      <MenuItem value="damaged">Damaged</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    id="deliveryDate"
+                    label="Delivery date"
+                    type="date"
+                    variant="outlined"
+                    value={deliveryDate}
+                    onChange={handleDeliveryDateChange}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <TextField
+                    id="returnDate"
+                    label="Return date"
+                    type="date"
+                    variant="outlined"
+                    value={returnDate}
+                    onChange={handleReturnDateChange}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <FormControl>
+                    <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
                     <Select
                       labelId="invoiceIdLabel"
                       id="invoiceId"
@@ -446,56 +483,13 @@ export default function Returns() {
                     </Select>
                   </FormControl>
                   <TextField
-                    id="deliveredTo"
-                    label="Delivered to"
-                    type="text"
-                    variant="outlined"
-                    value={returnedBy}
-                    onChange={handleReturnedByChange}
-                  />
-                  <TextField
-                    id="supplyDate"
-                    label="Supply date"
-                    type="date"
-                    variant="outlined"
-                    value={deliveryDate}
-                    onChange={handleDeliveryDateChange}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                  <TextField
-                    id="deliveryDate"
-                    label="Delivery date"
-                    type="date"
-                    variant="outlined"
-                    value={returnDate}
-                    onChange={handleReturnDateChange}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                  <TextField
                     id="receiptNo"
-                    label="Receipt No"
+                    label="Receipt number"
                     type="number"
                     variant="outlined"
                     value={receiptNo}
                     onChange={handleReceiptNoChange}
                   />
-                  <FormControl>
-                    <InputLabel id="purposeIdLabel">Purpose</InputLabel>
-                    <Select
-                      labelId="purposeIdLabel"
-                      id="productId"
-                      value={reason}
-                      label="Purpose"
-                      onChange={handleReasonChange}
-                    >
-                      <MenuItem value="sales">Sales</MenuItem>
-                      <MenuItem value="service">Service</MenuItem>
-                    </Select>
-                  </FormControl>
                   {/* <TextField
                     id="quantity"
                     label="Quantity"
@@ -558,6 +552,8 @@ export default function Returns() {
         confirmDialog={confirmDialog}
         setConfirmDialog={setConfirmDialog}
       />
+
+      <UpdateReturns returns={editModalItem} godowns={godowns} products={products} invoices={invoices} handleClose={handleEditModalClose} />
     </>
   );
 }
