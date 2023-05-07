@@ -245,20 +245,22 @@ export default function Employees() {
                   >
                     <EditOutlinedIcon fontSize="small" />
                   </Controls.ActionButton>
-                  <Controls.ActionButton
-                    onClick={() => {
-                      setConfirmDialog({
-                        isOpen: true,
-                        title: "Are you sure to delete this record?",
-                        subTitle: "You can't undo this operation",
-                        onConfirm: () => {
-                          handleDelete(item.id);
-                        },
-                      });
-                    }}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </Controls.ActionButton>
+                  {(item.role_id == 72 || item.role == 'user') &&
+                    <Controls.ActionButton
+                      onClick={() => {
+                        setConfirmDialog({
+                          isOpen: true,
+                          title: "Are you sure to delete this record?",
+                          subTitle: "You can't undo this operation",
+                          onConfirm: () => {
+                            handleDelete(item.id);
+                          },
+                        });
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </Controls.ActionButton>
+                  }
                 </TableCell>
               </TableRow>
             ))}
