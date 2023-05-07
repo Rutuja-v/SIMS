@@ -29,6 +29,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import UpdateEmployee from "./UpdateEmployee";
 import { Form, Formik } from "formik";
+import Notification from '../../Components/Notification';
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -68,15 +69,18 @@ export default function Employees() {
     subTitle: "",
   });
 
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [roleId, setRoleId] = useState("");
+  const [name, setName] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [roleId, setRoleId] = useState(null);
 
   const [roles, setRoles] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
+  
+  
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(employees, headCells, filterFn);
@@ -94,7 +98,7 @@ export default function Employees() {
   const handleEditModalClose = () => {
     setEditModalItem(null);
     getData();
-  };
+  }
 
   const handleSearch = (e) => {
     let target = e.target;
@@ -114,6 +118,11 @@ export default function Employees() {
       .delete(`http://localhost:8080/api/employees/${id}`)
       .then((response) => {
         setEmployees(employees.filter((record) => record.id !== id));
+        setNotify({
+          isOpen: true,
+          message: 'Record Deleted Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -140,6 +149,55 @@ export default function Employees() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (name == null || name == "") {
+      setNotify({
+        isOpen: true,
+        message: 'Name is required.',
+        type: 'error'
+      })
+      return;
+    }
+    if (username == null || username == "") {
+      setNotify({
+        isOpen: true,
+        message: 'Username is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (password == null || password == "") {
+      setNotify({
+        isOpen: true,
+        message: 'Password is required.',
+        type: 'error'
+      })
+
+      return;
+    }
+
+    
+    if (password != null && password.length < 8 ) {
+      setNotify({
+        isOpen: true,
+        message: 'Minimum password length required is 8 characters.',
+        type: 'error',
+        time: 3000
+      })
+      return;
+    }
+
+    if (roleId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Role ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+
+
     let formData = {};
     formData["name"] = name;
     formData["username"] = username;
@@ -154,6 +212,11 @@ export default function Employees() {
       .post("http://localhost:8080/api/employees", formData)
       .then((response) => {
         getData();
+        setNotify({
+          isOpen: true,
+          message: 'Record Added Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -198,6 +261,17 @@ export default function Employees() {
     getData();
   }, []);
 
+
+  function handleCancelAddNewRecord()
+  {
+    setAddModalOpen(false);
+    setName(null);
+    setUsername(null);
+    setPassword(null);
+    setRoleId(null);
+  
+  }
+
   return (
     <>
       <Paper className={classes.pageContent}>
@@ -239,7 +313,7 @@ export default function Employees() {
                   >
                     <EditOutlinedIcon fontSize="small" />
                   </Controls.ActionButton>
-                  {(item.role_id == 72 || item.role == 'user') &&
+                  {(item.role.id == 72 || item.role.name == 'user') &&
                     <Controls.ActionButton
                       onClick={() => {
                         setConfirmDialog({
@@ -263,9 +337,15 @@ export default function Employees() {
         <TblPagination />
       </Paper>
 
+      <Notification
+        notify={notify}
+        setNotify={setNotify}
+
+      />
+
       <Dialog
         open={addModalOpen}
-        onClose={handleAddModalClose}
+        onClose={handleCancelAddNewRecord}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
@@ -331,7 +411,7 @@ export default function Employees() {
                 <DialogActions>
                   <Button
                     variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
+                    onClick={handleCancelAddNewRecord}
                   >
                     Cancel
                   </Button>

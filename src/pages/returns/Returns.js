@@ -31,6 +31,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
 import UpdateReturns from "./UpdateReturns";
+import Notification from '../../Components/Notification';
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -75,15 +76,15 @@ export default function Returns() {
     subTitle: "",
   });
 
-  const [godownId, setGodownId] = useState("");
-  const [productId, setProductId] = useState("");
-  const [returnedBy, setReturnedBy] = useState("");
-  const [reason, setReason] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
-  const [receiptNo, setReceiptNo] = useState("");
+  const [godownId, setGodownId] = useState(null);
+  const [productId, setProductId] = useState(null);
+  const [returnedBy, setReturnedBy] = useState(null);
+  const [reason, setReason] = useState(null);
+  const [deliveryDate, setDeliveryDate] = useState(null);
+  const [returnDate, setReturnDate] = useState(null);
+  const [invoiceNo, setInvoiceNo] = useState(null);
+  const [invoiceId, setInvoiceId] = useState(null);
+  const [receiptNo, setReceiptNo] = useState(null);
 
   const [godowns, setGodowns] = useState([]);
   const [products, setProducts] = useState([]);
@@ -92,6 +93,7 @@ export default function Returns() {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(returns, headCells, filterFn);
@@ -129,6 +131,11 @@ export default function Returns() {
       .delete(`http://localhost:8080/api/returns/${id}`)
       .then((response) => {
         setReturns(returns.filter((record) => record.id !== id));
+        setNotify({
+          isOpen: true,
+          message: 'Record Deleted Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -179,6 +186,78 @@ export default function Returns() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (godownId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Godown ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+    if (productId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Product ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (returnedBy == null || returnedBy == "") {
+      setNotify({
+        isOpen: true,
+        message: 'Returned By is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (reason == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Reason is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (deliveryDate == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Delivery date is required.',
+        type: 'error'
+      })
+      return;
+    }
+    
+    if (returnDate== null) {
+      setNotify({
+        isOpen: true,
+        message: 'Return Date is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (invoiceId == null ){
+      setNotify({
+        isOpen: true,
+        message: 'Invoice No is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (receiptNo == null || receiptNo == ""){
+      setNotify({
+        isOpen: true,
+        message: 'Receipt No is required.',
+        type: 'error'
+      })
+      return;
+    }
+
     let formData = {};
     formData["godown"] = {
       id: godownId,
@@ -215,6 +294,11 @@ export default function Returns() {
       .post("http://localhost:8080/api/returns", formData)
       .then((response) => {
         getData();
+        setNotify({
+          isOpen: true,
+          message: 'Record Added Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -293,6 +377,20 @@ export default function Returns() {
     getData();
   }, []);
 
+
+  
+  function handleCancelAddNewRecord()
+  {
+    setAddModalOpen(false);
+    setGodownId(null);
+    setReturnedBy(null);
+    setReason(null);
+    setDeliveryDate(null);
+    setReturnDate(null);
+    setInvoiceNo(null);
+    setReceiptNo(null);
+  }
+
   return (
     <>
       <Paper className={classes.pageContent}>
@@ -368,10 +466,15 @@ export default function Returns() {
         </TblContainer>
         <TblPagination />
       </Paper>
+      <Notification
+        notify={notify}
+        setNotify={setNotify}
+
+      />
 
       <Dialog
         open={addModalOpen}
-        onClose={handleAddModalClose}
+        onClose={handleCancelAddNewRecord}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
@@ -529,7 +632,7 @@ export default function Returns() {
                 <DialogActions>
                   <Button
                     variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
+                    onClick={handleCancelAddNewRecord}
                   >
                     Cancel
                   </Button>

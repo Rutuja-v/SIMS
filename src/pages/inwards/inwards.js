@@ -31,6 +31,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
 import UpdateInwards from "./UpdateInwards";
+import Notification from '../../Components/Notification';
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -73,13 +74,13 @@ export default function Inwards() {
     subTitle: "",
   });
 
-  const [godownId, setGodownId] = useState("");
-  const [productId, setProductId] = useState("");
-  const [supplierId, setSupplierId] = useState("");
-  const [supplyDate, setSupplyDate] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
-  const [receiptNo, setReceiptNo] = useState("");
+  const [godownId, setGodownId] = useState(null);
+  const [productId, setProductId] = useState(null);
+  const [supplierId, setSupplierId] = useState(null);
+  const [supplyDate, setSupplyDate] = useState(null);
+  const [invoiceNo, setInvoiceNo] = useState(null);
+  const [invoiceId, setInvoiceId] = useState(null);
+  const [receiptNo, setReceiptNo] = useState(null);
   const [quantity, setQuantity] = useState("");
   const [billValue, setBillValue] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
@@ -92,6 +93,7 @@ export default function Inwards() {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(inwards, headCells, filterFn);
@@ -129,6 +131,11 @@ export default function Inwards() {
       .delete(`http://localhost:8080/api/inwards/${id}`)
       .then((response) => {
         setInwards(inwards.filter((record) => record.id !== id));
+        setNotify({
+          isOpen: true,
+          message: 'Record Deleted Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -173,6 +180,60 @@ export default function Inwards() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (godownId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Godown ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+    if (productId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Product ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (supplyDate == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Supply Date is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (supplierId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Supplier ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (invoiceId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Invoice No is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+
+    if (receiptNo == null || receiptNo == ""){
+      setNotify({
+        isOpen: true,
+        message: 'Receipt No is required.',
+        type: 'error'
+      })
+      return;
+    }
     let formData = {};
     formData["godown"] = {
       id: godownId,
@@ -206,6 +267,11 @@ export default function Inwards() {
       .post("http://localhost:8080/api/inwards", formData)
       .then((response) => {
         getData();
+        setNotify({
+          isOpen: true,
+          message: 'Record Added Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -288,6 +354,17 @@ export default function Inwards() {
     getData();
   }, []);
 
+  function handleCancelAddNewRecord()
+  {
+    setAddModalOpen(false);
+    setGodownId(null);
+    setProductId(null);
+    setInvoiceId(null);
+    setSupplierId(null);
+    setSupplyDate(null);
+    setReceiptNo(null);
+  }
+
   return (
     <>
       <Paper className={classes.pageContent}>
@@ -361,17 +438,21 @@ export default function Inwards() {
         </TblContainer>
         <TblPagination />
       </Paper>
+      <Notification
+        notify={notify}
+        setNotify={setNotify}
 
+      />
       <Dialog
         open={addModalOpen}
-        onClose={handleAddModalClose}
+        onClose={handleCancelAddNewRecord}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
           Add inwards
         </DialogTitle>
         <DialogContent>
-          <Formik onSubmit={handleSubmit}>
+          <Formik onSubmit={handleSubmit} >
             {(formikProps) => (
               <Form>
                 <div
@@ -503,10 +584,10 @@ export default function Inwards() {
                   </FormControl> */}
                 </div>
 
-                <DialogActions>
+                <DialogActions >
                   <Button
                     variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
+                    onClick={handleCancelAddNewRecord}
                   >
                     Cancel
                   </Button>

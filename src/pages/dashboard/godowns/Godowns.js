@@ -5,7 +5,7 @@ import axios from "axios";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-
+import Notification from '../../../Components/Notification';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import moment from "moment";
 import UpdateGodown from "./UpdateGodown";
@@ -84,6 +84,7 @@ function Godowns({ onDelete, onEdit }) {
 
   const [godowns, setGodowns] = useState([]);
   const [managers, setManagers] = useState([]);
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
 
   useEffect(() => {
     getData();
@@ -113,10 +114,6 @@ function Godowns({ onDelete, onEdit }) {
     setAddModalOpen(true);
   };
 
-  const handleAddModalClose = () => {
-    setAddModalOpen(false);
-  };
-
   const handleClickEditModalOpen = (godown) => {
     setEditModalOpen(godown);
   };
@@ -131,6 +128,11 @@ function Godowns({ onDelete, onEdit }) {
       .delete(`http://localhost:8080/api/godowns/${id}`)
       .then((response) => {
         setGodowns(godowns.filter((user) => user.id !== id));
+        setNotify({
+          isOpen: true,
+          message: 'Record Deleted Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -180,6 +182,43 @@ function Godowns({ onDelete, onEdit }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (location == null || location == ""){
+      setNotify({
+        isOpen: true,
+        message: 'Location is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (capacity == null || capacity == ""){
+      setNotify({
+        isOpen: true,
+        message: 'Capacity is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (managerId == null){
+      setNotify({
+        isOpen: true,
+        message: 'Manager is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (date == null){
+      setNotify({
+        isOpen: true,
+        message: 'Date is required.',
+        type: 'error'
+      })
+      return;
+    }
+
     let formData = {};
     formData["location"] = location;
     formData["capacityInQuintals"] = capacity;
@@ -197,6 +236,11 @@ function Godowns({ onDelete, onEdit }) {
       .post("http://localhost:8080/api/godowns", formData)
       .then((response) => {
         getData();
+        setNotify({
+          isOpen: true,
+          message: 'Record Added Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -208,6 +252,15 @@ function Godowns({ onDelete, onEdit }) {
     setDate("");
     setAddModalOpen(false);
   };
+
+  function handleCancelAddNewRecord()
+  {
+    setAddModalOpen(false);
+    setLocation(null);
+    setCapacity(null);
+    setmanagerId(null);
+    setDate(null);
+  }
 
   return (
     <div className="App">
@@ -223,7 +276,7 @@ function Godowns({ onDelete, onEdit }) {
 
       <Dialog
         open={addModalOpen}
-        onClose={handleAddModalClose}
+        onClose={handleCancelAddNewRecord}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
@@ -296,7 +349,7 @@ function Godowns({ onDelete, onEdit }) {
                 <DialogActions>
                   <Button
                     variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
+                    onClick={handleCancelAddNewRecord }
                   >
                     Cancel
                   </Button>
@@ -410,7 +463,10 @@ function Godowns({ onDelete, onEdit }) {
           </Grid>
         ))}
       </Grid>
-
+      <Notification
+        notify={notify}
+        setNotify={setNotify}
+      />
       <UpdateGodown
         godown={editModalOpen}
         managers={managers}

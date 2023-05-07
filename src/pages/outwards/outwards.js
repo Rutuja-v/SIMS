@@ -31,6 +31,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
 import UpdateOutwards from "./UpdateOutwards";
+import Notification from '../../Components/Notification';
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -75,16 +76,16 @@ export default function Outwards() {
     subTitle: "",
   });
 
-  const [godownId, setGodownId] = useState("");
-  const [productId, setProductId] = useState("");
-  const [deliveredTo, setDeliveredTo] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [supplyDate, setSupplyDate] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
-  const [receiptNo, setReceiptNo] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [godownId, setGodownId] = useState(null);
+  const [productId, setProductId] = useState(null);
+  const [deliveredTo, setDeliveredTo] = useState(null);
+  const [purpose, setPurpose] = useState(null);
+  const [supplyDate, setSupplyDate] = useState(null);
+  const [deliveryDate, setDeliveryDate] = useState(null);
+  const [invoiceNo, setInvoiceNo] = useState(null);
+  const [invoiceId, setInvoiceId] = useState(null);
+  const [receiptNo, setReceiptNo] = useState(null);
+  const [quantity, setQuantity] = useState(null);
   const [billValue, setBillValue] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
 
@@ -95,6 +96,7 @@ export default function Outwards() {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(outwards, headCells, filterFn);
@@ -132,6 +134,11 @@ export default function Outwards() {
       .delete(`http://localhost:8080/api/outwards/${id}`)
       .then((response) => {
         setOutwards(outwards.filter((record) => record.id !== id));
+        setNotify({
+          isOpen: true,
+          message: 'Record Deleted Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -182,6 +189,81 @@ export default function Outwards() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    
+    if (godownId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Godown ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+    if (productId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Product ID is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (deliveredTo == null || deliveredTo == "" ) {
+      setNotify({
+        isOpen: true,
+        message: 'Delivered To is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (purpose == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Purpose is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (supplyDate == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Supply Date is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (deliveryDate == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Delivery Date is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (invoiceId == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Invoice No is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+
+    if (receiptNo == null || receiptNo == "") {
+      setNotify({
+        isOpen: true,
+        message: 'Receipt No is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+
     let formData = {};
     formData["godown"] = {
       id: godownId,
@@ -218,6 +300,11 @@ export default function Outwards() {
       .post("http://localhost:8080/api/outwards", formData)
       .then((response) => {
         getData();
+        setNotify({
+          isOpen: true,
+          message: 'Record Added Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -295,6 +382,21 @@ export default function Outwards() {
   useEffect(() => {
     getData();
   }, []);
+
+  function handleCancelAddNewRecord()
+  {
+    setAddModalOpen(false);
+    setGodownId(null);
+    setProductId(null);
+    setDeliveredTo(null);
+    setPurpose(null);
+    setSupplyDate(null);
+    setDeliveryDate(null);
+    setInvoiceId(null);
+    // setSupplierId(null);
+    setSupplyDate(null);
+    setReceiptNo(null);
+  }
 
   return (
     <>
@@ -374,9 +476,15 @@ export default function Outwards() {
         <TblPagination />
       </Paper>
 
+      <Notification
+        notify={notify}
+        setNotify={setNotify}
+
+      />
+
       <Dialog
         open={addModalOpen}
-        onClose={handleAddModalClose}
+        onClose={handleCancelAddNewRecord}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
@@ -534,7 +642,7 @@ export default function Outwards() {
                 <DialogActions>
                   <Button
                     variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
+                    onClick={handleCancelAddNewRecord}
                   >
                     Cancel
                   </Button>

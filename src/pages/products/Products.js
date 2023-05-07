@@ -14,6 +14,7 @@ import Box from "@material-ui/core/Box";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import Notification from '../../Components/Notification';
 
 import {
   Card,
@@ -49,9 +50,10 @@ const useStyles = makeStyles((theme) => ({
 function Products() {
   const classes = useStyles();
 
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
+  const [name, setName] = useState(null);
+  const [price, setPrice] = useState(null);
+  const [stock, setStock] = useState(null);
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
 
   const [products, setProducts] = useState([]);
 
@@ -94,6 +96,11 @@ function Products() {
       .delete(`http://localhost:8080/api/products/${id}`)
       .then((response) => {
         setProducts(products.filter((product) => product.id !== id));
+        setNotify({
+          isOpen: true,
+          message: 'Record Deleted Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -112,6 +119,34 @@ function Products() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (name == null || name == "") {
+      setNotify({
+        isOpen: true,
+        message: 'Name is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (stock == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Stock is required.',
+        type: 'error'
+      })
+      return;
+    }
+
+    if (price == null) {
+      setNotify({
+        isOpen: true,
+        message: 'Price is required.',
+        type: 'error'
+      })
+      return;
+    }
+
     let formData = {};
 
     formData["name"] = name;
@@ -124,6 +159,11 @@ function Products() {
       .post("http://localhost:8080/api/products", formData)
       .then((response) => {
         getData();
+        setNotify({
+          isOpen: true,
+          message: 'Record Added Successfully.',
+          type: 'success'
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -134,6 +174,14 @@ function Products() {
     setStock("");
     handleAddModalClose();
   };
+
+  function handleCancelAddNewRecord()
+  {
+    setAddModalOpen(false);
+    setName(null);
+    setStock(null);
+    setPrice(null);
+  }
 
   return (
     <div className="App">
@@ -149,7 +197,7 @@ function Products() {
 
       <Dialog
         open={addModalOpen}
-        onClose={handleAddModalClose}
+        onClose={handleCancelAddNewRecord}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
@@ -202,7 +250,7 @@ function Products() {
                 <DialogActions>
                   <Button
                     variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
+                    onClick={handleCancelAddNewRecord}
                   >
                     Cancel
                   </Button>
@@ -304,6 +352,12 @@ function Products() {
           </Grid>
         ))}
       </Grid>
+
+      <Notification
+        notify={notify}
+        setNotify={setNotify}
+
+      />
 
       <UpdateProduct
         product={editModalItem}
