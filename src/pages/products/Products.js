@@ -24,16 +24,8 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import { Formik, Form } from "formik";
+import { useFormik } from "formik";
 import UpdateProduct from "./UpdateProduct";
-
-export const validationSchema = Yup.object().shape({
-  name: Yup.string().required("name is required"),
-  price: Yup.number().required("Price is required"),
-  stock: Yup.number()
-    .required("Stock  is required")
-    .positive("Stock  must be positive"),
-});
 
 const useStyles = makeStyles((theme) => ({
   customTitle: {
@@ -48,10 +40,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Products() {
   const classes = useStyles();
-
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
 
   const [products, setProducts] = useState([]);
 
@@ -76,7 +64,6 @@ function Products() {
   const handleAddModalOpen = () => {
     setAddModalOpen(true);
   };
-
   const handleAddModalClose = () => {
     setAddModalOpen(false);
   };
@@ -100,40 +87,40 @@ function Products() {
       });
   };
 
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
-  const handlePriceChange = (event) => {
-    setPrice(event.target.value);
-  };
-  const handleStockChange = (event) => {
-    setStock(event.target.value);
-  };
+  const formik = useFormik({
+    initialValues: {
+      name: null,
+      price: null,
+      stock: null
+    },
+    validationSchema: Yup.object().shape({
+      name: Yup.string().required("Name is required"),
+      stock: Yup.number().required("Stock is required")
+        .min(0, "Stock must be positive"),
+      price: Yup.number().required("Price is required")
+        .min(0, "Price must be positive"),
+    }),
+    onSubmit: values => {
+      let formData = {};
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    let formData = {};
+      formData["name"] = values.name;
+      formData["stock"] = values.stock;
+      formData["price"] = values.price;
 
-    formData["name"] = name;
-    formData["stock"] = stock;
-    formData["price"] = price;
+      console.log(formData);
 
-    console.log(formData);
+      axios
+        .post("http://localhost:8080/api/products", formData)
+        .then((response) => {
+          getData();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
 
-    axios
-      .post("http://localhost:8080/api/products", formData)
-      .then((response) => {
-        getData();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-    setName("");
-    setPrice("");
-    setStock("");
-    handleAddModalClose();
-  };
+      handleAddModalClose();
+    },
+  });
 
   return (
     <div className="App">
@@ -156,67 +143,62 @@ function Products() {
           Add a product
         </DialogTitle>
         <DialogContent>
-          <Formik
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-          >
-            {(formikProps) => (
-              <Form>
-                <div
-                  style={{
-                    marginTop: "32px",
-                    marginBottom: "16px",
-                    display: "grid",
-                    gridTemplateColumns: "auto auto",
-                    columnGap: "16px",
-                    rowGap: "24px",
-                  }}
-                >
-                  <TextField
-                    autoFocus
-                    id="name"
-                    label="Name"
-                    type="text"
-                    variant="outlined"
-                    value={name}
-                    onChange={handleNameChange}
-                  />
-                  <TextField
-                    id="stock"
-                    label="Stock"
-                    type="number"
-                    variant="outlined"
-                    value={stock}
-                    onChange={handleStockChange}
-                  />
-                  <TextField
-                    id="price"
-                    label="Price"
-                    type="number"
-                    variant="outlined"
-                    value={price}
-                    onChange={handlePriceChange}
-                  />
-                </div>
+          <form onSubmit={formik.handleSubmit}>
+            <div
+              style={{
+                marginTop: "32px",
+                marginBottom: "16px",
+                display: "grid",
+                gridTemplateColumns: "auto auto",
+                columnGap: "16px",
+                rowGap: "24px",
+              }}
+            >
+              <TextField
+                autoFocus
+                id="name"
+                label="Name"
+                type="text"
+                variant="outlined"
+                {...formik.getFieldProps('name')}
+                error={formik.touched.name && formik.errors.name ? true : false}
+                helperText={formik.touched.name && formik.errors.name}
+              />
+              <TextField
+                id="stock"
+                label="Stock"
+                type="number"
+                variant="outlined"
+                {...formik.getFieldProps('stock')}
+                error={formik.touched.stock && formik.errors.stock ? true : false}
+                helperText={formik.touched.stock && formik.errors.stock}
+              />
+              <TextField
+                id="price"
+                label="Price"
+                type="number"
+                variant="outlined"
+                {...formik.getFieldProps('price')}
+                error={formik.touched.price && formik.errors.price ? true : false}
+                helperText={formik.touched.price && formik.errors.price}
+              />
+            </div>
 
-                <DialogActions>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    onClick={handleSubmit}
-                  >
-                    Add
-                  </Button>
-                </DialogActions>
-              </Form>
-            )}
-          </Formik>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={() => setAddModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+              >
+                Add
+              </Button>
+            </DialogActions>
+          </form>
         </DialogContent>
       </Dialog>
 
