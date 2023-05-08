@@ -32,23 +32,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handleClose }) {
+function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employees, handleClose }) {
   const classes = useStyles();
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [supplierId, setSupplierId] = useState("");
   const [supplyDate, setSupplyDate] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [billValue, setBillValue] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
 
   useEffect(() => {
     setGodownId(inwards?.godown.id);
     setProductId(inwards?.product.id);
+    setQuantity(inwards?.quantity);
     setSupplierId(inwards?.supplier.id);
 
     const formattedSupplyDate = moment(inwards?.supply_date, "DD/MM/YYYY").format(
@@ -56,7 +56,7 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
     );
     setSupplyDate(formattedSupplyDate);
 
-    setInvoiceId(inwards?.invoice_id);
+    setInvoiceId(inwards?.invoice.id);
     setReceiptNo(inwards?.receipt_no);
   }, [inwards]);
 
@@ -66,20 +66,26 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
+  const handleQuantityChange = (event) => {
+    setQuantity(event.target.value);
+  };
   const handleSupplierIdChange = (event) => {
     setSupplierId(event.target.value);
   };
   const handleSupplyDateChange = (event) => {
     setSupplyDate(event.target.value);
   };
-  const handleInvoiceNoChange = (event) => {
-    setInvoiceNo(event.target.value);
+  const handleReceiptNoChange = (event) => {
+    setReceiptNo(event.target.value);
   };
   const handleInvoiceIdChange = (event) => {
     setInvoiceId(event.target.value);
   };
-  const handleReceiptNoChange = (event) => {
-    setReceiptNo(event.target.value);
+  const handleInvoiceNoChange = (event) => {
+    setInvoiceNo(event.target.value);
+  };
+  const handleBillCheckedByIdChange = (event) => {
+    setBillCheckedById(event.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -91,6 +97,7 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
     formData["product"] = {
       id: productId,
     };
+    formData["quantity"] = quantity;
     formData["supplier"] = {
       id: supplierId
     };
@@ -99,17 +106,20 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
     const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
     formData["supplyDate"] = formattedSupplyDate;
 
-    formData["invoice"] = {
-      id: invoiceId,
-    };
     formData["receiptNo"] = receiptNo;
-    // formData["invoice"] = {
-    //   quantity: quantity,
-    //   billValue: billValue,
-    //   billCheckedBy: {
-    //     id: billCheckedById,
-    //   },
-    // };
+    if (invoiceId == -1) {
+      formData["invoice"] = {
+        invoiceNo: invoiceNo,
+        billCheckedBy: {
+          id: billCheckedById,
+        },
+      };
+    }
+    else {
+      formData["invoice"] = {
+        id: invoiceId
+      }
+    }
 
     console.log(formData);
 
@@ -124,14 +134,13 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
 
     setGodownId("");
     setProductId("");
+    setQuantity("");
     setSupplierId("");
     setSupplyDate("");
-    // setInvoiceNo("");
-    setInvoiceId("");
     setReceiptNo("");
-    // setQuantity("");
-    // setBillValue("");
-    // setBillCheckedById("");
+    setInvoiceId("");
+    setInvoiceNo("");
+    setBillCheckedById("");
     handleClose();
   };
 
@@ -193,6 +202,14 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
                   </Select>
                 </FormControl>
                 <TextField
+                  id="quantity"
+                  label="Quantity"
+                  type="number"
+                  variant="outlined"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                />
+                <TextField
                   id="supplyDate"
                   label="Supply date"
                   type="date"
@@ -220,23 +237,6 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl>
-                  <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
-                  <Select
-                    labelId="invoiceIdLabel"
-                    id="invoiceId"
-                    defaultValue={inwards?.invoice_id}
-                    value={invoiceId}
-                    label="Invoice"
-                    onChange={handleInvoiceIdChange}
-                  >
-                    {invoices.map((invoice, index) => (
-                      <MenuItem key={index} value={invoice.id}>
-                        {invoice.id}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
                 <TextField
                   id="receiptNo"
                   label="Receipt number"
@@ -245,40 +245,54 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, handle
                   value={receiptNo}
                   onChange={handleReceiptNoChange}
                 />
-                {/* <TextField
-                    id="quantity"
-                    label="Quantity"
-                    type="number"
-                    variant="outlined"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                  />
-                  <TextField
-                    id="billValue"
-                    label="Bill Value"
-                    type="number"
-                    variant="outlined"
-                    value={billValue}
-                    onChange={handleBillValueChange}
-                  />
-                  <FormControl>
-                    <InputLabel id="billCheckedByIdLabel">
-                      Bill checked by
-                    </InputLabel>
-                    <Select
-                      labelId="billCheckedByIdLabel"
-                      id="billCheckedById"
-                      value={billCheckedById}
-                      label="Bill checked by"
-                      onChange={handleBillValueCheckedByIdChange}
-                    >
-                      {employees.map((employee, index) => (
-                        <MenuItem key={index} value={employee.id}>
-                          {employee.name}
-                        </MenuItem>
-                      ))}
-                    </Select> */}
-                {/* </FormControl> */}
+                <FormControl>
+                  <InputLabel id="invoiceIdLabel">Invoice</InputLabel>
+                  <Select
+                    labelId="invoiceIdLabel"
+                    id="invoiceId"
+                    defaultValue={inwards?.invoice.id}
+                    value={invoiceId}
+                    label="Invoice"
+                    onChange={handleInvoiceIdChange}
+                  >
+                    <MenuItem value={-1}>
+                      Add new invoice
+                    </MenuItem>
+                    <MenuItem value={inwards?.invoice.id}>
+                      {inwards?.invoice.invoiceNo}
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+                {invoiceId === -1 && (
+                  <>
+                    <TextField
+                      id="invoiceNo"
+                      label="Invoice number"
+                      type="text"
+                      variant="outlined"
+                      value={invoiceNo}
+                      onChange={handleInvoiceNoChange}
+                    />
+                    <FormControl>
+                      <InputLabel id="billCheckedByIdLabel">
+                        Bill checked by
+                      </InputLabel>
+                      <Select
+                        labelId="billCheckedByIdLabel"
+                        id="billCheckedById"
+                        value={billCheckedById}
+                        label="Bill checked by"
+                        onChange={handleBillCheckedByIdChange}
+                      >
+                        {employees.map((employee, index) => (
+                          <MenuItem key={index} value={employee.id}>
+                            {employee.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
               </div>
 
               <DialogActions>

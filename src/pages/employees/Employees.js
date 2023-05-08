@@ -51,6 +51,7 @@ const headCells = [
   { id: "name", label: "Employee name" },
   { id: "username", label: "Employee username" },
   { id: "role", label: "Employee role" },
+  { id: "godown", label: "Godown" },
   { id: "actions", label: "Actions", disableSorting: true },
 ];
 
@@ -72,8 +73,10 @@ export default function Employees() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [roleId, setRoleId] = useState("");
+  const [godownId, setGodownId] = useState("");
 
   const [roles, setRoles] = useState([]);
+  const [godowns, setGodowns] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
@@ -137,6 +140,9 @@ export default function Employees() {
   const handleRoleIdChange = (event) => {
     setRoleId(event.target.value);
   };
+  const handleGodownIdChange = (event) => {
+    setGodownId(event.target.value);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -147,6 +153,11 @@ export default function Employees() {
     formData["role"] = {
       id: Number(roleId),
     };
+    if (godownId != -1) {
+      formData["godown"] = {
+        id: Number(godownId),
+      }
+    }
 
     console.log(formData);
 
@@ -163,6 +174,7 @@ export default function Employees() {
     setUsername("");
     setPassword("");
     setRoleId("");
+    setGodownId("");
     setAddModalOpen(false);
   };
 
@@ -179,6 +191,7 @@ export default function Employees() {
             username: item.username,
             password: item.password,
             role: item.role,
+            godown: item.godown,
           };
           rows.push(obj);
         }
@@ -190,6 +203,13 @@ export default function Employees() {
       .get("http://localhost:8080/api/employeeRoles")
       .then((res) => {
         setRoles(res.data);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/godowns")
+      .then((res) => {
+        setGodowns(res.data);
       })
       .catch((err) => console.log(err));
   }
@@ -233,6 +253,7 @@ export default function Employees() {
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.username}</TableCell>
                 <TableCell>{item.role.role}</TableCell>
+                <TableCell>{item.godown === null ? "None" : item.godown.location}</TableCell>
                 <TableCell>
                   <Controls.ActionButton
                     onClick={() => handleEditModalOpen(item)}
@@ -317,9 +338,28 @@ export default function Employees() {
                       label="Role"
                       onChange={handleRoleIdChange}
                     >
-                      {roles.map((role, index) => (
+                      {roles.filter(role => role.role !== "manager").map((role, index) => (
                         <MenuItem key={index} value={role.id}>
                           {role.role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl>
+                    <InputLabel id="godownIdLabel">Godown</InputLabel>
+                    <Select
+                      labelId="godownIdLabel"
+                      id="godownId"
+                      value={godownId}
+                      label="Godown"
+                      onChange={handleGodownIdChange}
+                    >
+                      <MenuItem key={0} value={-1}>
+                        None
+                      </MenuItem>
+                      {godowns.map((godown, index) => (
+                        <MenuItem key={index + 1} value={godown.id}>
+                          {godown.location}
                         </MenuItem>
                       ))}
                     </Select>
@@ -356,6 +396,7 @@ export default function Employees() {
       <UpdateEmployee
         employee={editModalItem}
         roles={roles}
+        godowns={godowns}
         handleClose={handleEditModalClose}
       />
     </>

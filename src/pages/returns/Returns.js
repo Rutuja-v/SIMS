@@ -77,17 +77,17 @@ export default function Returns() {
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [returnedBy, setReturnedBy] = useState("");
   const [reason, setReason] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
+  const [billCheckedById, setBillCheckedById] = useState("");
 
   const [godowns, setGodowns] = useState([]);
   const [products, setProducts] = useState([]);
-  const [invoices, setInvoices] = useState([]);
   const [employees, setEmployees] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -146,6 +146,9 @@ export default function Returns() {
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
+  const handleQuantityChange = (event) => {
+    setQuantity(event.target.value);
+  };
   const handleReturnedByChange = (event) => {
     setReturnedBy(event.target.value);
   };
@@ -158,24 +161,15 @@ export default function Returns() {
   const handleReturnDateChange = (event) => {
     setReturnDate(event.target.value);
   };
-  const handleInvoiceNoChange = (event) => {
-    setInvoiceNo(event.target.value);
-  };
-  const handleInvoiceIdChange = (event) => {
-    setInvoiceId(event.target.value);
-  };
   const handleReceiptNoChange = (event) => {
     setReceiptNo(event.target.value);
   };
-  // const handleQuantityChange = (event) => {
-  //   setQuantity(event.target.value);
-  // };
-  // const handleBillValueChange = (event) => {
-  //   setBillValue(event.target.value);
-  // };
-  // const handleBillValueCheckedByIdChange = (event) => {
-  //   setBillCheckedById(event.target.value);
-  // };
+  const handleInvoiceNoChange = (event) => {
+    setInvoiceNo(event.target.value);
+  };
+  const handleBillValueCheckedByIdChange = (event) => {
+    setBillCheckedById(event.target.value);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -186,6 +180,7 @@ export default function Returns() {
     formData["product"] = {
       id: productId,
     };
+    formData["quantity"] = quantity;
     formData["returnedBy"] = returnedBy;
     formData["reason"] = reason;
 
@@ -197,17 +192,13 @@ export default function Returns() {
     const formattedReturnDate = moment(returnDateObj).format("DD/MM/YYYY");
     formData["returnDate"] = formattedReturnDate;
 
-    formData["invoice"] = {
-      id: invoiceId,
-    };
     formData["receiptNo"] = receiptNo;
-    // formData["invoice"] = {
-    //   quantity: quantity,
-    //   billValue: billValue,
-    //   billCheckedBy: {
-    //     id: billCheckedById,
-    //   },
-    // };
+    formData["invoice"] = {
+      invoiceNo: invoiceNo,
+      billCheckedBy: {
+        id: billCheckedById,
+      },
+    };
 
     console.log(formData);
 
@@ -222,16 +213,14 @@ export default function Returns() {
 
     setGodownId("");
     setProductId("");
+    setQuantity("");
     setReturnedBy("");
     setReason("");
     setDeliveryDate("");
     setReturnDate("");
-    setInvoiceNo("");
-    setInvoiceId("");
     setReceiptNo("");
-    // setQuantity("");
-    // setBillValue("");
-    // setBillCheckedById("");
+    setInvoiceNo("");
+    setBillCheckedById("");
     handleAddModalClose();
     setAddModalOpen(false);
   };
@@ -247,11 +236,12 @@ export default function Returns() {
             id: item.id,
             godown: item.godown,
             product: item.product,
+            quantity: item.quantity,
             returned_by: item.returnedBy,
             reason: item.reason,
             delivery_date: item.deliveryDate,
             return_date: item.returnDate,
-            invoice_id: item.invoice.id,
+            invoice: item.invoice,
             receipt_no: item.receiptNo,
           };
           rows.push(obj);
@@ -275,13 +265,6 @@ export default function Returns() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/invoice")
-      .then((res) => {
-        setInvoices(res.data);
-      })
-      .catch((err) => console.log(err));
-
-    axios
       .get("http://localhost:8080/api/employees")
       .then((res) => {
         setEmployees(res.data);
@@ -298,7 +281,7 @@ export default function Returns() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
-            label="Search Returns"
+            label="Search by customer (returned by)"
             className={classes.searchInput}
             InputProps={{
               startAdornment: (
@@ -334,12 +317,37 @@ export default function Returns() {
                     {"Capacity: " + item.godown.capacityInQuintals}
                   </Typography>
                 </TableCell>
-                <TableCell>{item.product.name}</TableCell>
+                <TableCell>
+                  {item.product.name}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Price: " + item.product.price}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Quantity: " + item.quantity}
+                  </Typography>
+                </TableCell>
                 <TableCell>{item.returned_by}</TableCell>
                 <TableCell>{item.reason}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
                 <TableCell>{item.return_date}</TableCell>
-                <TableCell>{item.invoice_id}</TableCell>
+                <TableCell>
+                  {item.invoice.invoiceNo}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Bill value: " + item.invoice.billValue}
+                  </Typography>
+                </TableCell>
                 <TableCell>{item.receipt_no}</TableCell>
                 <TableCell>
                   <Controls.ActionButton
@@ -424,6 +432,14 @@ export default function Returns() {
                     </Select>
                   </FormControl>
                   <TextField
+                    id="quantity"
+                    label="Quantity"
+                    type="number"
+                    variant="outlined"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                  />
+                  <TextField
                     id="returnedBy"
                     label="Returned by"
                     type="text"
@@ -466,22 +482,6 @@ export default function Returns() {
                       shrink: true,
                     }}
                   />
-                  <FormControl>
-                    <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
-                    <Select
-                      labelId="invoiceIdLabel"
-                      id="invoiceId"
-                      value={invoiceId}
-                      label="Invoice"
-                      onChange={handleInvoiceIdChange}
-                    >
-                      {invoices.map((invoice, index) => (
-                        <MenuItem key={index} value={invoice.id}>
-                          {invoice.id}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                   <TextField
                     id="receiptNo"
                     label="Receipt number"
@@ -490,21 +490,14 @@ export default function Returns() {
                     value={receiptNo}
                     onChange={handleReceiptNoChange}
                   />
-                  {/* <TextField
-                    id="quantity"
-                    label="Quantity"
-                    type="number"
-                    variant="outlined"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                  />
                   <TextField
-                    id="billValue"
-                    label="Bill Value"
-                    type="number"
+                    id="invoiceNo"
+                    label="Invoice number"
+                    type="text"
                     variant="outlined"
-                    value={billValue}
-                    onChange={handleBillValueChange}
+                    value={invoiceNo}
+                    onChange={handleInvoiceNoChange}
+                    inputProps={{ maxLength: 12 }}
                   />
                   <FormControl>
                     <InputLabel id="billCheckedByIdLabel">
@@ -522,8 +515,8 @@ export default function Returns() {
                           {employee.name}
                         </MenuItem>
                       ))}
-                    </Select> */}
-                  {/* </FormControl> */}
+                    </Select>
+                  </FormControl>
                 </div>
 
                 <DialogActions>
@@ -553,7 +546,7 @@ export default function Returns() {
         setConfirmDialog={setConfirmDialog}
       />
 
-      <UpdateReturns returns={editModalItem} godowns={godowns} products={products} invoices={invoices} handleClose={handleEditModalClose} />
+      <UpdateReturns returns={editModalItem} godowns={godowns} products={products} employees={employees} handleClose={handleEditModalClose} />
     </>
   );
 }

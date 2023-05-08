@@ -52,13 +52,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateGodown({ godown, managers, handleClose }) {
+function UpdateGodown({ godown, managers, roles, handleClose }) {
   const classes = useStyles();
 
   const [location, setLocation] = useState("");
   const [capacity, setCapacity] = useState("");
-  const [managerId, setManagerId] = useState("");
   const [date, setDate] = useState("");
+  const [managerId, setManagerId] = useState("");
+  const [managerName, setManagerName] = useState("");
+  const [managerUsername, setManagerUsername] = useState("");
+  const [managerPassword, setManagerPassword] = useState("");
+  const [managerRoleId, setManagerRoleId] = useState("");
 
   useEffect(() => {
     setLocation(godown?.location);
@@ -78,11 +82,23 @@ function UpdateGodown({ godown, managers, handleClose }) {
   const handleCapacityChange = (event) => {
     setCapacity(event.target.value);
   };
+  const handleDateChange = (event) => {
+    setDate(event.target.value);
+  };
   const handleManagerIdChange = (event) => {
     setManagerId(event.target.value);
   };
-  const handleDateChange = (event) => {
-    setDate(event.target.value);
+  const handleManagerNameChange = (event) => {
+    setManagerName(event.target.value);
+  };
+  const handleManagerUsernameChange = (event) => {
+    setManagerUsername(event.target.value);
+  };
+  const handleManagerPasswordChange = (event) => {
+    setManagerPassword(event.target.value);
+  };
+  const handleManagerRoleIdChange = (event) => {
+    setManagerRoleId(event.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -90,9 +106,21 @@ function UpdateGodown({ godown, managers, handleClose }) {
     let formData = {};
     formData["location"] = location;
     formData["capacityInQuintals"] = capacity;
-    formData["manager"] = {
-      id: Number(managerId),
-    };
+    if (managerId != -1) {
+      formData["manager"] = {
+        id: Number(managerId),
+      };
+    }
+    else {
+      formData["manager"] = {
+        name: managerName,
+        username: managerUsername,
+        password: managerPassword,
+        role: {
+          id: Number(managerRoleId)
+        },
+      };
+    }
 
     const dateObj = new Date(date);
     const formattedDate = moment(dateObj).format("DD/MM/YYYY");
@@ -111,8 +139,12 @@ function UpdateGodown({ godown, managers, handleClose }) {
 
     setLocation("");
     setCapacity("");
-    setManagerId("");
     setDate("");
+    setManagerId("");
+    setManagerName("");
+    setManagerUsername("");
+    setManagerPassword("");
+    setManagerRoleId("");
     handleClose();
   };
 
@@ -160,23 +192,6 @@ function UpdateGodown({ godown, managers, handleClose }) {
                   value={capacity}
                   onChange={handleCapacityChange}
                 />
-                <FormControl>
-                  <InputLabel id="managerIdLabel">Manager</InputLabel>
-                  <Select
-                    labelId="managerIdLabel"
-                    id="managerId"
-                    defaultValue={godown?.manager.id}
-                    value={managerId}
-                    label="Manager"
-                    onChange={handleManagerIdChange}
-                  >
-                    {managers.map((manager, index) => (
-                      <MenuItem key={index} value={manager.id}>
-                        {manager.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
                 <TextField
                   id="date"
                   label="Date"
@@ -188,6 +203,71 @@ function UpdateGodown({ godown, managers, handleClose }) {
                     shrink: true,
                   }}
                 />
+                <FormControl>
+                  <InputLabel id="managerIdLabel">Manager</InputLabel>
+                  <Select
+                    labelId="managerIdLabel"
+                    id="managerId"
+                    defaultValue={godown?.manager.id}
+                    value={managerId}
+                    label="Manager"
+                    onChange={handleManagerIdChange}
+                  >
+                    <MenuItem key={0} value={-1}>
+                      Add new manager
+                    </MenuItem>
+                    {managers.map((manager, index) => (
+                      <MenuItem key={index + 1} value={manager.id}>
+                        {manager.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {managerId == -1 && (
+                  <>
+                    <TextField
+                      id="managerName"
+                      label="Manager name"
+                      type="text"
+                      variant="outlined"
+                      value={managerName}
+                      onChange={handleManagerNameChange}
+                    />
+                    <TextField
+                      id="managerUsername"
+                      label="Manager username"
+                      type="text"
+                      variant="outlined"
+                      value={managerUsername}
+                      onChange={handleManagerUsernameChange}
+                    />
+                    <TextField
+                      id="managerPassword"
+                      label="Manager Password"
+                      type="text"
+                      variant="outlined"
+                      value={managerPassword}
+                      onChange={handleManagerPasswordChange}
+                    />
+                    <FormControl>
+                      <InputLabel id="managerRoleIdLabel">Manager role</InputLabel>
+                      <Select
+                        labelId="managerRoleIdLabel"
+                        id="managerRoleId"
+                        defaultValue={godown?.manager.role.id}
+                        value={managerRoleId}
+                        label="Manager role"
+                        onChange={handleManagerRoleIdChange}
+                      >
+                        {roles.map((role, index) => (
+                          <MenuItem key={index} value={role.id}>
+                            {role.role}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
               </div>
 
               <DialogActions>

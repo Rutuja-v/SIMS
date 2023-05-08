@@ -17,12 +17,12 @@ import { Formik, Form } from "formik";
 
 export const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
-  stock: Yup.number()
-    .required("Stock is required")
-    .positive("Stock must be positive"),
   price: Yup.number()
     .required("Price is required")
     .positive("Price must be positive"),
+  weight: Yup.number()
+    .required("Weight is required")
+    .positive("Weight must be positive"),
 });
 
 const useStyles = makeStyles((theme) => ({
@@ -40,32 +40,31 @@ function UpdateProduct({ product, handleClose }) {
   const classes = useStyles();
 
   const [name, setName] = useState("");
-  const [stock, setStock] = useState("");
   const [price, setPrice] = useState("");
+  const [weight, setWeight] = useState("");
 
   useEffect(() => {
     setName(product?.name);
-    setStock(product?.stock);
     setPrice(product?.price);
+    setWeight(product?.weight);
   }, [product]);
 
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
-
-  const handleStockChange = (event) => {
-    setStock(event.target.value);
-  };
   const handlePriceChange = (event) => {
     setPrice(event.target.value);
+  };
+  const handleWeightChange = (event) => {
+    setWeight(event.target.value);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     let formData = {};
     formData["name"] = name;
-    formData["stock"] = stock;
     formData["price"] = price;
+    formData["weight"] = weight;
 
     console.log(formData);
 
@@ -79,8 +78,8 @@ function UpdateProduct({ product, handleClose }) {
       });
 
     setName("");
-    setStock("");
     setPrice("");
+    setWeight("");
     handleClose();
   };
 
@@ -117,20 +116,20 @@ function UpdateProduct({ product, handleClose }) {
                   onChange={handleNameChange}
                 />
                 <TextField
-                  id="stock"
-                  label="Stock"
-                  type="number"
-                  variant="outlined"
-                  value={stock}
-                  onChange={handleStockChange}
-                />
-                <TextField
                   id="price"
                   label="Price"
                   type="number"
                   variant="outlined"
                   value={price}
                   onChange={handlePriceChange}
+                />
+                <TextField
+                  id="weight"
+                  label="Weight"
+                  type="number"
+                  variant="outlined"
+                  value={weight}
+                  onChange={handleWeightChange}
                 />
               </div>
 

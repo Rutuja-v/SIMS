@@ -77,20 +77,16 @@ export default function Outwards() {
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [deliveredTo, setDeliveredTo] = useState("");
   const [purpose, setPurpose] = useState("");
   const [supplyDate, setSupplyDate] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [billValue, setBillValue] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
 
   const [godowns, setGodowns] = useState([]);
   const [products, setProducts] = useState([]);
-  const [invoices, setInvoices] = useState([]);
   const [employees, setEmployees] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -149,6 +145,9 @@ export default function Outwards() {
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
+  const handleQuantityChange = (event) => {
+    setQuantity(event.target.value);
+  };
   const handleDeliveredToChange = (event) => {
     setDeliveredTo(event.target.value);
   };
@@ -161,20 +160,8 @@ export default function Outwards() {
   const handleDeliveryDateChange = (event) => {
     setDeliveryDate(event.target.value);
   };
-  const handleInvoiceNoChange = (event) => {
-    setInvoiceNo(event.target.value);
-  };
-  const handleInvoiceIdChange = (event) => {
-    setInvoiceId(event.target.value);
-  };
   const handleReceiptNoChange = (event) => {
     setReceiptNo(event.target.value);
-  };
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
-  };
-  const handleBillValueChange = (event) => {
-    setBillValue(event.target.value);
   };
   const handleBillValueCheckedByIdChange = (event) => {
     setBillCheckedById(event.target.value);
@@ -189,6 +176,7 @@ export default function Outwards() {
     formData["product"] = {
       id: productId,
     };
+    formData["quantity"] = quantity;
     formData["deliveredTo"] = deliveredTo;
     formData["purpose"] = purpose;
 
@@ -200,17 +188,12 @@ export default function Outwards() {
     const formattedDeliveryDate = moment(deliveryDateObj).format("DD/MM/YYYY");
     formData["deliveryDate"] = formattedDeliveryDate;
 
-    formData["invoice"] = {
-      id: invoiceId,
-    };
     formData["receiptNo"] = receiptNo;
-    // formData["invoice"] = {
-    //   quantity: quantity,
-    //   billValue: billValue,
-    //   billCheckedBy: {
-    //     id: billCheckedById,
-    //   },
-    // };
+    formData["invoice"] = {
+      billCheckedBy: {
+        id: billCheckedById,
+      },
+    };
 
     console.log(formData);
 
@@ -225,16 +208,13 @@ export default function Outwards() {
 
     setGodownId("");
     setProductId("");
+    setQuantity("");
     setDeliveredTo("");
     setPurpose("");
     setSupplyDate("");
     setDeliveryDate("");
-    setInvoiceNo("");
-    setInvoiceId("");
     setReceiptNo("");
-    // setQuantity("");
-    // setBillValue("");
-    // setBillCheckedById("");
+    setBillCheckedById("");
     handleAddModalClose();
     setAddModalOpen(false);
   };
@@ -250,11 +230,12 @@ export default function Outwards() {
             id: item.id,
             godown: item.godown,
             product: item.product,
+            quantity: item.quantity,
             delivered_to: item.deliveredTo,
             purpose: item.purpose,
             supply_date: item.supplyDate,
             delivery_date: item.deliveryDate,
-            invoice_id: item.invoice.id,
+            invoice: item.invoice,
             receipt_no: item.receiptNo,
           };
           rows.push(obj);
@@ -278,13 +259,6 @@ export default function Outwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/invoice")
-      .then((res) => {
-        setInvoices(res.data);
-      })
-      .catch((err) => console.log(err));
-
-    axios
       .get("http://localhost:8080/api/employees")
       .then((res) => {
         setEmployees(res.data);
@@ -301,7 +275,7 @@ export default function Outwards() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
-            label="Search Outwards"
+            label="Search by customer (delivered to)"
             className={classes.searchInput}
             InputProps={{
               startAdornment: (
@@ -337,14 +311,39 @@ export default function Outwards() {
                     {"Capacity: " + item.godown.capacityInQuintals}
                   </Typography>
                 </TableCell>
-                <TableCell>{item.product.name}</TableCell>
+                <TableCell>
+                  {item.product.name}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Price: " + item.product.price}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Quantity: " + item.quantity}
+                  </Typography>
+                </TableCell>
                 <TableCell>
                   {item.delivered_to}
                 </TableCell>
                 <TableCell>{item.purpose}</TableCell>
                 <TableCell>{item.supply_date}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
-                <TableCell>{item.invoice_id}</TableCell>
+                <TableCell>
+                  {item.invoice.invoiceNo}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Bill value: " + item.invoice.billValue}
+                  </Typography>
+                </TableCell>
                 <TableCell>{item.receipt_no}</TableCell>
                 <TableCell>
                   <Controls.ActionButton
@@ -429,6 +428,14 @@ export default function Outwards() {
                     </Select>
                   </FormControl>
                   <TextField
+                    id="quantity"
+                    label="Quantity"
+                    type="number"
+                    variant="outlined"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                  />
+                  <TextField
                     id="deliveredTo"
                     label="Delivered to"
                     type="text"
@@ -471,22 +478,6 @@ export default function Outwards() {
                       shrink: true,
                     }}
                   />
-                  <FormControl>
-                    <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
-                    <Select
-                      labelId="invoiceIdLabel"
-                      id="invoiceId"
-                      value={invoiceId}
-                      label="Invoice"
-                      onChange={handleInvoiceIdChange}
-                    >
-                      {invoices.map((invoice, index) => (
-                        <MenuItem key={index} value={invoice.id}>
-                          {invoice.id}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                   <TextField
                     id="receiptNo"
                     label="Receipt number"
@@ -494,22 +485,6 @@ export default function Outwards() {
                     variant="outlined"
                     value={receiptNo}
                     onChange={handleReceiptNoChange}
-                  />
-                  {/* <TextField
-                    id="quantity"
-                    label="Quantity"
-                    type="number"
-                    variant="outlined"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                  />
-                  <TextField
-                    id="billValue"
-                    label="Bill Value"
-                    type="number"
-                    variant="outlined"
-                    value={billValue}
-                    onChange={handleBillValueChange}
                   />
                   <FormControl>
                     <InputLabel id="billCheckedByIdLabel">
@@ -528,7 +503,7 @@ export default function Outwards() {
                         </MenuItem>
                       ))}
                     </Select>
-                  </FormControl> */}
+                  </FormControl>
                 </div>
 
                 <DialogActions>
@@ -558,7 +533,7 @@ export default function Outwards() {
         setConfirmDialog={setConfirmDialog}
       />
 
-      <UpdateOutwards outwards={editModalItem} godowns={godowns} products={products} invoices={invoices} handleClose={handleEditModalClose} />
+      <UpdateOutwards outwards={editModalItem} godowns={godowns} products={products} employees={employees} handleClose={handleEditModalClose} />
     </>
   );
 }

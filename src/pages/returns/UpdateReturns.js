@@ -32,23 +32,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
+function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
   const classes = useStyles();
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [returnedBy, setReturnedBy] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [reason, setReason] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
+  const [billCheckedById, setBillCheckedById] = useState("");
 
   useEffect(() => {
     setGodownId(returns?.godown.id);
     setProductId(returns?.product.id);
-    setInvoiceId(returns?.invoice_id);
+    setQuantity(returns?.quantity);
     setReturnedBy(returns?.returned_by);
 
     const formattedDeliveryDate = moment(returns?.delivery_date, "DD/MM/YYYY").format(
@@ -61,6 +63,7 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
     );
     setReturnDate(formattedReturnDate);
 
+    setInvoiceId(returns?.invoice.id);
     setReceiptNo(returns?.receipt_no);
     setReason(returns?.reason);
   }, [returns]);
@@ -71,8 +74,8 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
-  const handleInvoiceIdChange = (event) => {
-    setInvoiceId(event.target.value);
+  const handleQuantityChange = (event) => {
+    setQuantity(event.target.value);
   };
   const handleReturnedByChange = (event) => {
     setReturnedBy(event.target.value);
@@ -83,6 +86,9 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
   const handleReturnDateChange = (event) => {
     setReturnDate(event.target.value);
   };
+  const handleInvoiceIdChange = (event) => {
+    setInvoiceId(event.target.value);
+  };
   const handleInvoiceNoChange = (event) => {
     setInvoiceNo(event.target.value);
   };
@@ -91,6 +97,9 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
   };
   const handleReasonChange = (event) => {
     setReason(event.target.value);
+  };
+  const handleBillCheckedByIdChange = (event) => {
+    setBillCheckedById(event.target.value);
   };
 
   const handleSubmit = async (event) => {
@@ -102,6 +111,7 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
     formData["product"] = {
       id: productId,
     };
+    formData["quantity"] = quantity;
     formData["returnedBy"] = returnedBy;
     formData["reason"] = reason;
 
@@ -113,17 +123,20 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
     const formattedReturnDate = moment(returnDateObj).format("DD/MM/YYYY");
     formData["returnDate"] = formattedReturnDate;
 
-    formData["invoice"] = {
-      id: invoiceId,
-    };
     formData["receiptNo"] = receiptNo;
-    // formData["invoice"] = {
-    //   quantity: quantity,
-    //   billValue: billValue,
-    //   billCheckedBy: {
-    //     id: billCheckedById,
-    //   },
-    // };
+    if (invoiceId == -1) {
+      formData["invoice"] = {
+        invoiceNo: invoiceNo,
+        billCheckedBy: {
+          id: billCheckedById,
+        },
+      };
+    }
+    else {
+      formData["invoice"] = {
+        id: invoiceId
+      }
+    }
 
     console.log(formData);
 
@@ -138,16 +151,15 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
 
     setGodownId("");
     setProductId("");
+    setQuantity("");
     setReturnedBy("");
     setReason("");
     setDeliveryDate("");
     setReturnDate("");
-    // setInvoiceNo("");
-    setInvoiceId("");
     setReceiptNo("");
-    // setQuantity("");
-    // setBillValue("");
-    // setBillCheckedById("");
+    setInvoiceId("");
+    setInvoiceNo("");
+    setBillCheckedById("");
     handleClose();
   };
 
@@ -209,6 +221,14 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
                   </Select>
                 </FormControl>
                 <TextField
+                  id="quantity"
+                  label="Quantity"
+                  type="number"
+                  variant="outlined"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                />
+                <TextField
                   id="returnedBy"
                   label="Returned by"
                   type="text"
@@ -252,23 +272,6 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
                     shrink: true,
                   }}
                 />
-                <FormControl>
-                  <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
-                  <Select
-                    labelId="invoiceIdLabel"
-                    id="invoiceId"
-                    defaultValue={returns?.invoice_id}
-                    value={invoiceId}
-                    label="Invoice"
-                    onChange={handleInvoiceIdChange}
-                  >
-                    {invoices.map((invoice, index) => (
-                      <MenuItem key={index} value={invoice.id}>
-                        {invoice.id}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
                 <TextField
                   id="receiptNo"
                   label="Receipt number"
@@ -277,40 +280,54 @@ function UpdateReturns({ returns, godowns, products, invoices, handleClose }) {
                   value={receiptNo}
                   onChange={handleReceiptNoChange}
                 />
-                {/* <TextField
-                    id="quantity"
-                    label="Quantity"
-                    type="number"
-                    variant="outlined"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                  />
-                  <TextField
-                    id="billValue"
-                    label="Bill Value"
-                    type="number"
-                    variant="outlined"
-                    value={billValue}
-                    onChange={handleBillValueChange}
-                  />
-                  <FormControl>
-                    <InputLabel id="billCheckedByIdLabel">
-                      Bill checked by
-                    </InputLabel>
-                    <Select
-                      labelId="billCheckedByIdLabel"
-                      id="billCheckedById"
-                      value={billCheckedById}
-                      label="Bill checked by"
-                      onChange={handleBillValueCheckedByIdChange}
-                    >
-                      {employees.map((employee, index) => (
-                        <MenuItem key={index} value={employee.id}>
-                          {employee.name}
-                        </MenuItem>
-                      ))}
-                    </Select> */}
-                {/* </FormControl> */}
+                <FormControl>
+                  <InputLabel id="invoiceIdLabel">Invoice</InputLabel>
+                  <Select
+                    labelId="invoiceIdLabel"
+                    id="invoiceId"
+                    defaultValue={returns?.invoice.id}
+                    value={invoiceId}
+                    label="Invoice"
+                    onChange={handleInvoiceIdChange}
+                  >
+                    <MenuItem value={-1}>
+                      Add new invoice
+                    </MenuItem>
+                    <MenuItem value={returns?.invoice.id}>
+                      {returns?.invoice.invoiceNo}
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+                {invoiceId === -1 && (
+                  <>
+                    <TextField
+                      id="invoiceNo"
+                      label="Invoice number"
+                      type="text"
+                      variant="outlined"
+                      value={invoiceNo}
+                      onChange={handleInvoiceNoChange}
+                    />
+                    <FormControl>
+                      <InputLabel id="billCheckedByIdLabel">
+                        Bill checked by
+                      </InputLabel>
+                      <Select
+                        labelId="billCheckedByIdLabel"
+                        id="billCheckedById"
+                        value={billCheckedById}
+                        label="Bill checked by"
+                        onChange={handleBillCheckedByIdChange}
+                      >
+                        {employees.map((employee, index) => (
+                          <MenuItem key={index} value={employee.id}>
+                            {employee.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                )}
               </div>
 
               <DialogActions>

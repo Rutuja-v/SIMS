@@ -31,19 +31,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateEmployee({ employee, roles, handleClose }) {
+function UpdateEmployee({ employee, roles, godowns, handleClose }) {
   const classes = useStyles();
 
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [roleId, setRoleId] = useState("");
+  const [name, setName] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [roleId, setRoleId] = useState(null);
+  const [godownId, setGodownId] = useState(null);
 
   useEffect(() => {
     setName(employee?.name);
     setUsername(employee?.username);
-    setPassword(employee?.password);
     setRoleId(employee?.role.id);
+    setGodownId(employee?.godown === null ? -1 : employee?.godown?.id);
   }, [employee]);
 
   const handleNameChange = (event) => {
@@ -58,16 +59,26 @@ function UpdateEmployee({ employee, roles, handleClose }) {
   const handleRoleIdChange = (event) => {
     setRoleId(event.target.value);
   };
+  const handleGodownIdChange = (event) => {
+    setGodownId(event.target.value);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     let formData = {};
     formData["name"] = name;
     formData["username"] = username;
-    formData["password"] = password;
+    if (password != null) {
+      formData["password"] = password;
+    }
     formData["role"] = {
       id: roleId,
     };
+    if (godownId != -1) {
+      formData["godown"] = {
+        id: Number(godownId),
+      }
+    }
 
     console.log(formData);
 
@@ -84,6 +95,7 @@ function UpdateEmployee({ employee, roles, handleClose }) {
     setUsername("");
     setPassword("");
     setRoleId("");
+    setGodownId("");
     handleClose();
   };
 
@@ -129,7 +141,7 @@ function UpdateEmployee({ employee, roles, handleClose }) {
                 />
                 <TextField
                   id="password"
-                  label="Password"
+                  label="Password (optional)"
                   type="password"
                   variant="outlined"
                   value={password}
@@ -148,6 +160,26 @@ function UpdateEmployee({ employee, roles, handleClose }) {
                     {roles.map((role, index) => (
                       <MenuItem key={index} value={role.id}>
                         {role.role}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl>
+                  <InputLabel id="godownIdLabel">Godown</InputLabel>
+                  <Select
+                    labelId="godownIdLabel"
+                    id="godownId"
+                    defaultValue={employee?.godown == null ? -1 : employee?.godown.id}
+                    value={godownId}
+                    label="Godown"
+                    onChange={handleGodownIdChange}
+                  >
+                    <MenuItem key={0} value={-1}>
+                      None
+                    </MenuItem>
+                    {godowns.map((godown, index) => (
+                      <MenuItem key={index + 1} value={godown.id}>
+                        {godown.location}
                       </MenuItem>
                     ))}
                   </Select>

@@ -79,11 +79,15 @@ function Godowns({ onDelete, onEdit }) {
   const [editModalOpen, setEditModalOpen] = useState(null);
   const [location, setLocation] = useState("");
   const [capacity, setCapacity] = useState("");
-  const [managerId, setmanagerId] = useState("");
   const [date, setDate] = useState("");
+  const [managerName, setManagerName] = useState("");
+  const [managerUsername, setManagerUsername] = useState("");
+  const [managerPassword, setManagerPassword] = useState("");
+  const [managerRoleId, setManagerRoleId] = useState("");
 
   const [godowns, setGodowns] = useState([]);
   const [managers, setManagers] = useState([]);
+  const [roles, setRoles] = useState([]);
 
   useEffect(() => {
     getData();
@@ -104,6 +108,15 @@ function Godowns({ onDelete, onEdit }) {
         setManagers(
           response.data.filter((employee) => employee.role.role === "manager")
         );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    axios
+      .get("http://localhost:8080/api/employeeRoles")
+      .then((response) => {
+        setRoles(response.data.filter((role) => role.role === "manager"));
       })
       .catch((error) => {
         console.log(error);
@@ -171,11 +184,20 @@ function Godowns({ onDelete, onEdit }) {
   const handleCapacityChange = (event) => {
     setCapacity(event.target.value);
   };
-  const handleManagerIdChange = (event) => {
-    setmanagerId(event.target.value);
-  };
   const handleDateChange = (event) => {
     setDate(event.target.value);
+  };
+  const handleManagerNameChange = (event) => {
+    setManagerName(event.target.value);
+  };
+  const handleManagerUsernameChange = (event) => {
+    setManagerUsername(event.target.value);
+  };
+  const handleManagerPasswordChange = (event) => {
+    setManagerPassword(event.target.value);
+  };
+  const handleManagerRoleIdChange = (event) => {
+    setManagerRoleId(event.target.value);
   };
 
   const handleSubmit = (event) => {
@@ -184,7 +206,12 @@ function Godowns({ onDelete, onEdit }) {
     formData["location"] = location;
     formData["capacityInQuintals"] = capacity;
     formData["manager"] = {
-      id: Number(managerId),
+      name: managerName,
+      username: managerUsername,
+      password: managerPassword,
+      role: {
+        id: Number(managerRoleId)
+      },
     };
 
     const dateObj = new Date(date);
@@ -204,8 +231,11 @@ function Godowns({ onDelete, onEdit }) {
 
     setLocation("");
     setCapacity("");
-    setmanagerId("");
     setDate("");
+    setManagerName("");
+    setManagerUsername("");
+    setManagerPassword("");
+    setManagerRoleId("");
     setAddModalOpen(false);
   };
 
@@ -264,22 +294,6 @@ function Godowns({ onDelete, onEdit }) {
                     value={capacity}
                     onChange={handleCapacityChange}
                   />
-                  <FormControl>
-                    <InputLabel id="managerIdLabel">Manager</InputLabel>
-                    <Select
-                      labelId="managerIdLabel"
-                      id="managerId"
-                      value={managerId}
-                      label="Manager"
-                      onChange={handleManagerIdChange}
-                    >
-                      {managers.map((manager, index) => (
-                        <MenuItem key={index} value={manager.id}>
-                          {manager.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                   <TextField
                     id="date"
                     label="Date"
@@ -291,6 +305,46 @@ function Godowns({ onDelete, onEdit }) {
                       shrink: true,
                     }}
                   />
+                  <TextField
+                    id="managerName"
+                    label="Manager name"
+                    type="text"
+                    variant="outlined"
+                    value={managerName}
+                    onChange={handleManagerNameChange}
+                  />
+                  <TextField
+                    id="managerUsername"
+                    label="Manager username"
+                    type="text"
+                    variant="outlined"
+                    value={managerUsername}
+                    onChange={handleManagerUsernameChange}
+                  />
+                  <TextField
+                    id="managerPassword"
+                    label="Manager Password"
+                    type="text"
+                    variant="outlined"
+                    value={managerPassword}
+                    onChange={handleManagerPasswordChange}
+                  />
+                  <FormControl>
+                    <InputLabel id="roleIdLabel">Manager role</InputLabel>
+                    <Select
+                      labelId="roleIdLabel"
+                      id="roleId"
+                      value={managerRoleId}
+                      label="Manager role"
+                      onChange={handleManagerRoleIdChange}
+                    >
+                      {roles.map((role, index) => (
+                        <MenuItem key={index} value={role.id}>
+                          {role.role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </div>
 
                 <DialogActions>
@@ -414,6 +468,7 @@ function Godowns({ onDelete, onEdit }) {
       <UpdateGodown
         godown={editModalOpen}
         managers={managers}
+        roles={roles}
         handleClose={handleEditModalClose}
       />
     </div>

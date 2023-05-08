@@ -75,19 +75,16 @@ export default function Inwards() {
 
   const [godownId, setGodownId] = useState("");
   const [productId, setProductId] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [supplierId, setSupplierId] = useState("");
   const [supplyDate, setSupplyDate] = useState("");
-  const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
   const [receiptNo, setReceiptNo] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [billValue, setBillValue] = useState("");
+  const [invoiceNo, setInvoiceNo] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
 
   const [godowns, setGodowns] = useState([]);
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
-  const [invoices, setInvoices] = useState([]);
   const [employees, setEmployees] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -146,26 +143,20 @@ export default function Inwards() {
   const handleProductIdChange = (event) => {
     setProductId(event.target.value);
   };
+  const handleQuantityChange = (event) => {
+    setQuantity(event.target.value);
+  };
   const handleSupplierIdChange = (event) => {
     setSupplierId(event.target.value);
   };
   const handleSupplyDateChange = (event) => {
     setSupplyDate(event.target.value);
   };
-  const handleInvoiceNoChange = (event) => {
-    setInvoiceNo(event.target.value);
-  };
-  const handleInvoiceIdChange = (event) => {
-    setInvoiceId(event.target.value);
-  };
   const handleReceiptNoChange = (event) => {
     setReceiptNo(event.target.value);
   };
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
-  };
-  const handleBillValueChange = (event) => {
-    setBillValue(event.target.value);
+  const handleInvoiceNoChange = (event) => {
+    setInvoiceNo(event.target.value);
   };
   const handleBillValueCheckedByIdChange = (event) => {
     setBillCheckedById(event.target.value);
@@ -180,6 +171,7 @@ export default function Inwards() {
     formData["product"] = {
       id: productId,
     };
+    formData["quantity"] = quantity;
     formData["supplier"] = {
       id: supplierId
     };
@@ -188,17 +180,13 @@ export default function Inwards() {
     const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
     formData["supplyDate"] = formattedSupplyDate;
 
-    formData["invoice"] = {
-      id: invoiceId,
-    };
     formData["receiptNo"] = receiptNo;
-    // formData["invoice"] = {
-    //   quantity: quantity,
-    //   billValue: billValue,
-    //   billCheckedBy: {
-    //     id: billCheckedById,
-    //   },
-    // };
+    formData["invoice"] = {
+      invoiceNo: invoiceNo,
+      billCheckedBy: {
+        id: billCheckedById,
+      },
+    };
 
     console.log(formData);
 
@@ -213,14 +201,12 @@ export default function Inwards() {
 
     setGodownId("");
     setProductId("");
+    setQuantity("");
     setSupplierId("");
     setSupplyDate("");
-    setInvoiceNo("");
-    setInvoiceId("");
     setReceiptNo("");
-    // setQuantity("");
-    // setBillValue("");
-    // setBillCheckedById("");
+    setInvoiceNo("");
+    setBillCheckedById("");
     handleAddModalClose();
     setAddModalOpen(false);
   };
@@ -237,9 +223,10 @@ export default function Inwards() {
             id: item.id,
             godown: item.godown,
             product: item.product,
+            quantity: item.quantity,
             supplier: item.supplier,
             supply_date: item.supplyDate,
-            invoice_id: item.invoice.id,
+            invoice: item.invoice,
             receipt_no: item.receiptNo,
           };
           rows.push(obj);
@@ -270,13 +257,6 @@ export default function Inwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/invoice")
-      .then((res) => {
-        setInvoices(res.data);
-      })
-      .catch((err) => console.log(err));
-
-    axios
       .get("http://localhost:8080/api/employees")
       .then((res) => {
         setEmployees(res.data);
@@ -293,7 +273,7 @@ export default function Inwards() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
-            label="Search Inwards"
+            label="Search by supplier name"
             className={classes.searchInput}
             InputProps={{
               startAdornment: (
@@ -329,10 +309,35 @@ export default function Inwards() {
                     {"Capacity: " + item.godown.capacityInQuintals}
                   </Typography>
                 </TableCell>
-                <TableCell>{item.product.name}</TableCell>
+                <TableCell>
+                  {item.product.name}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Price: " + item.product.price}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Quantity: " + item.quantity}
+                  </Typography>
+                </TableCell>
                 <TableCell>{item.supplier.name}</TableCell>
                 <TableCell>{item.supply_date}</TableCell>
-                <TableCell>{item.invoice_id}</TableCell>
+                <TableCell>
+                  {item.invoice.invoiceNo}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Bill value: " + item.invoice.billValue}
+                  </Typography>
+                </TableCell>
                 <TableCell>{item.receipt_no}</TableCell>
                 <TableCell>
                   <Controls.ActionButton
@@ -417,6 +422,14 @@ export default function Inwards() {
                     </Select>
                   </FormControl>
                   <TextField
+                    id="quantity"
+                    label="Quantity"
+                    type="number"
+                    variant="outlined"
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                  />
+                  <TextField
                     id="supplyDate"
                     label="Supply date"
                     type="date"
@@ -443,22 +456,6 @@ export default function Inwards() {
                       ))}
                     </Select>
                   </FormControl>
-                  <FormControl>
-                    <InputLabel id="invoiceIdLabel">Invoice number</InputLabel>
-                    <Select
-                      labelId="invoiceIdLabel"
-                      id="invoiceId"
-                      value={invoiceId}
-                      label="Invoice"
-                      onChange={handleInvoiceIdChange}
-                    >
-                      {invoices.map((invoice, index) => (
-                        <MenuItem key={index} value={invoice.id}>
-                          {invoice.id}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                   <TextField
                     id="receiptNo"
                     label="Receipt number"
@@ -467,21 +464,13 @@ export default function Inwards() {
                     value={receiptNo}
                     onChange={handleReceiptNoChange}
                   />
-                  {/* <TextField
-                    id="quantity"
-                    label="Quantity"
-                    type="number"
-                    variant="outlined"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                  />
                   <TextField
-                    id="billValue"
-                    label="Bill Value"
-                    type="number"
+                    id="invoiceNo"
+                    label="Invoice number"
+                    type="text"
                     variant="outlined"
-                    value={billValue}
-                    onChange={handleBillValueChange}
+                    value={invoiceNo}
+                    onChange={handleInvoiceNoChange}
                   />
                   <FormControl>
                     <InputLabel id="billCheckedByIdLabel">
@@ -500,7 +489,7 @@ export default function Inwards() {
                         </MenuItem>
                       ))}
                     </Select>
-                  </FormControl> */}
+                  </FormControl>
                 </div>
 
                 <DialogActions>
@@ -530,7 +519,7 @@ export default function Inwards() {
         setConfirmDialog={setConfirmDialog}
       />
 
-      <UpdateInwards inwards={editModalItem} godowns={godowns} products={products} suppliers={suppliers} invoices={invoices} handleClose={handleEditModalClose} />
+      <UpdateInwards inwards={editModalItem} godowns={godowns} products={products} suppliers={suppliers} employees={employees} handleClose={handleEditModalClose} />
     </>
   );
 }

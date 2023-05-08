@@ -91,21 +91,21 @@ function Products() {
     initialValues: {
       name: null,
       price: null,
-      stock: null
+      weight: null
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().required("Name is required"),
-      stock: Yup.number().required("Stock is required")
-        .min(0, "Stock must be positive"),
       price: Yup.number().required("Price is required")
         .min(0, "Price must be positive"),
+      weight: Yup.number().required("Weight is required")
+        .positive("Weight must be positive"),
     }),
     onSubmit: values => {
       let formData = {};
 
       formData["name"] = values.name;
-      formData["stock"] = values.stock;
       formData["price"] = values.price;
+      formData["weight"] = values.weight;
 
       console.log(formData);
 
@@ -165,15 +165,6 @@ function Products() {
                 helperText={formik.touched.name && formik.errors.name}
               />
               <TextField
-                id="stock"
-                label="Stock"
-                type="number"
-                variant="outlined"
-                {...formik.getFieldProps('stock')}
-                error={formik.touched.stock && formik.errors.stock ? true : false}
-                helperText={formik.touched.stock && formik.errors.stock}
-              />
-              <TextField
                 id="price"
                 label="Price"
                 type="number"
@@ -181,6 +172,15 @@ function Products() {
                 {...formik.getFieldProps('price')}
                 error={formik.touched.price && formik.errors.price ? true : false}
                 helperText={formik.touched.price && formik.errors.price}
+              />
+              <TextField
+                id="weight"
+                label="Weight"
+                type="number"
+                variant="outlined"
+                {...formik.getFieldProps('weight')}
+                error={formik.touched.weight && formik.errors.weight ? true : false}
+                helperText={formik.touched.weight && formik.errors.weight}
               />
             </div>
 
@@ -241,10 +241,10 @@ function Products() {
                       color="textSecondary"
                       component="p"
                     >
-                      {"Stock:"}
+                      {"Price:"}
                     </Typography>
                     <Typography variant="body2" component="p">
-                      {product.stock}
+                      {product.price}
                     </Typography>
                   </div>
 
@@ -254,10 +254,10 @@ function Products() {
                       color="textSecondary"
                       component="p"
                     >
-                      {"Price:"}
+                      {"Weight:"}
                     </Typography>
                     <Typography variant="body2" component="p">
-                      {product.price}
+                      {product.weight}
                     </Typography>
                   </div>
                 </div>
