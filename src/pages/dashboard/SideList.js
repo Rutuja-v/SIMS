@@ -100,6 +100,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function SideList({ children }) {
+  const [user] = useContext(Context);
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
@@ -118,22 +119,37 @@ export default function SideList({ children }) {
     setOpen(false);
   };
 
-  const links = [
-    {
-      label: "Godowns",
-      path: "./",
-      icon: <InventoryIcon style={{ color: "#171717" }} />,
-    },
-    {
-      label: "Employees",
-      path: "./employees",
-      icon: <GroupIcon style={{ color: "#171717" }} />,
-    },
-    {
-      label: "Inwards",
-      path: "./inwards",
-      icon: <LocalShippingIcon style={{ color: "#171717" }} />,
-    },
+  const links = [];
+  if (user.role === "superadmin") {
+    links.push(...[
+      {
+        label: "Godowns",
+        path: "./",
+        icon: <InventoryIcon style={{ color: "#171717" }} />,
+      },
+      {
+        label: "Employees",
+        path: "./employees",
+        icon: <GroupIcon style={{ color: "#171717" }} />,
+      },
+      {
+        label: "Inwards",
+        path: "./inwards",
+        icon: <LocalShippingIcon style={{ color: "#171717" }} />,
+      },
+    ]);
+  }
+  else {
+    links.push(...[
+      {
+        label: "Inwards",
+        path: "./",
+        icon: <LocalShippingIcon style={{ color: "#171717" }} />,
+      },
+    ])
+  }
+
+  links.push(...[
     {
       label: "Outwards",
       path: "./outwards",
@@ -151,7 +167,7 @@ export default function SideList({ children }) {
       path: "./products",
       icon: <ProductionQuantityLimitsIcon style={{ color: "#171717" }} />,
     },
-  ];
+  ]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -203,40 +219,43 @@ export default function SideList({ children }) {
         <Divider />
         <List>
           {links.map((link, index) => (
-            <NavLink
-              key={index}
-              to={link.path}
-              style={({ isActive }) => ({
-                color: isActive ? "#0a58ca" : "#171717",
-                textDecoration: "none",
-              })}
-            >
-              <ListItem
-                disablePadding
-                sx={{
-                  display: "flex",
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                  "&:hover": {
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
-                  },
-                }}
+            user.role !== "superadmin" &&
+              (link.label === "Godowns" || link.label === "Employees") ? null : (
+              <NavLink
+                key={index}
+                to={link.path}
+                style={({ isActive }) => ({
+                  color: isActive ? "#0a58ca" : "#171717",
+                  textDecoration: "none",
+                })}
               >
-                <ListItemIcon
+                <ListItem
+                  disablePadding
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
+                    display: "flex",
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                    },
                   }}
                 >
-                  {link.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={link.label}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItem>
-            </NavLink>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                    }}
+                  >
+                    {link.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={link.label}
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItem>
+              </NavLink>
+            )
           ))}
         </List>
         <Divider />

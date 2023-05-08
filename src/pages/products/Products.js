@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { Context } from "../../context/ContextProvider";
 import {
   Button,
   Dialog,
@@ -39,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Products() {
+  const [user] = useContext(Context);
   const classes = useStyles();
 
   const [products, setProducts] = useState([]);
@@ -124,15 +126,17 @@ function Products() {
 
   return (
     <div className="App">
-      <Box display="flex" mb={2} justifyContent="flex-end">
-        <Button
-          variant="outlined"
-          startIcon={<AddIcon />}
-          onClick={handleAddModalOpen}
-        >
-          Add new
-        </Button>
-      </Box>
+      {user.role === "superadmin" && (
+        <Box display="flex" mb={2} justifyContent="flex-end">
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={handleAddModalOpen}
+          >
+            Add new
+          </Button>
+        </Box>
+      )}
 
       <Dialog
         open={addModalOpen}
@@ -254,7 +258,7 @@ function Products() {
                       color="textSecondary"
                       component="p"
                     >
-                      {"Weight:"}
+                      {"Weight (in quintals):"}
                     </Typography>
                     <Typography variant="body2" component="p">
                       {product.weight}
@@ -262,26 +266,27 @@ function Products() {
                   </div>
                 </div>
               </CardContent>
-              <CardActions
-                style={{
-                  padding: "16px 24px",
-                }}
-              >
-                <IconButton
-                  color="success"
-                  aria-label="edit"
-                  onClick={() => handleEditModalOpen(product)}
+              {user.role === "superadmin" && (
+                <CardActions
+                  style={{
+                    padding: "16px 24px",
+                  }}
                 >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  aria-label="delete"
-                  onClick={() => handleDelete(product.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </CardActions>
+                  <IconButton
+                    color="success"
+                    aria-label="edit"
+                    onClick={() => handleEditModalOpen(product)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    aria-label="delete"
+                    onClick={() => handleDelete(product.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </CardActions>)}
             </Card>
           </Grid>
         ))}

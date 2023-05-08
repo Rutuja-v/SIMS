@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { Context } from "../../context/ContextProvider";
 import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
@@ -31,6 +32,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
 import UpdateInwards from "./UpdateInwards";
+import { useMemo } from "react";
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -49,17 +51,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const headCells = [
-  { id: "godown", label: "Godown" },
-  { id: "product_name", label: "Product name" },
-  { id: "supplier_name", label: "Supplier name" },
-  { id: "supply_date", label: "Supply date" },
-  { id: "invoice_no", label: "Invoice number" },
-  { id: "receipt_no", label: "Receipt number" },
-  { id: "actions", label: "Actions", disableSorting: true },
-];
-
 export default function Inwards() {
+  const headCells = useMemo(() => [
+    { id: "godown", label: "Godown" },
+    { id: "product_name", label: "Product name" },
+    { id: "supplier_name", label: "Supplier name" },
+    { id: "supply_date", label: "Supply date" },
+    { id: "invoice_no", label: "Invoice number" },
+    { id: "receipt_no", label: "Receipt number" },
+  ], []);
+
+  useEffect(() => {
+    if (user.role === "manager") {
+      headCells.push({ id: "actions", label: "Actions", disableSorting: true });
+    }
+  }, []);
+
+  const [user] = useContext(Context);
   const classes = useStyles();
   const [inwards, setInwards] = useState([]);
   const [filterFn, setFilterFn] = useState({
@@ -284,15 +292,17 @@ export default function Inwards() {
             }}
             onChange={handleSearch}
           />
-          <Button
-            style={{ position: "absolute", right: "10px" }}
-            variant="outlined"
-            startIcon={<AddIcon />}
-            className={classes.newButton}
-            onClick={handleAddModalOpen}
-          >
-            Add new
-          </Button>
+          {user.role === "manager" && (
+            <Button
+              style={{ position: "absolute", right: "10px" }}
+              variant="outlined"
+              startIcon={<AddIcon />}
+              className={classes.newButton}
+              onClick={handleAddModalOpen}
+            >
+              Add new
+            </Button>
+          )}
         </Toolbar>
         <TblContainer>
           <TblHead />
@@ -339,27 +349,29 @@ export default function Inwards() {
                   </Typography>
                 </TableCell>
                 <TableCell>{item.receipt_no}</TableCell>
-                <TableCell>
-                  <Controls.ActionButton
-                    onClick={() => { handleEditModalOpen(item) }}
-                  >
-                    <EditOutlinedIcon fontSize="small" />
-                  </Controls.ActionButton>
-                  <Controls.ActionButton
-                    onClick={() => {
-                      setConfirmDialog({
-                        isOpen: true,
-                        title: "Are you sure to delete this record?",
-                        subTitle: "You can't undo this operation",
-                        onConfirm: () => {
-                          handleDelete(item.id);
-                        },
-                      });
-                    }}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </Controls.ActionButton>
-                </TableCell>
+                {user.role === "manager" && (
+                  <TableCell>
+                    <Controls.ActionButton
+                      onClick={() => { handleEditModalOpen(item) }}
+                    >
+                      <EditOutlinedIcon fontSize="small" />
+                    </Controls.ActionButton>
+                    <Controls.ActionButton
+                      onClick={() => {
+                        setConfirmDialog({
+                          isOpen: true,
+                          title: "Are you sure to delete this record?",
+                          subTitle: "You can't undo this operation",
+                          onConfirm: () => {
+                            handleDelete(item.id);
+                          },
+                        });
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </Controls.ActionButton>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

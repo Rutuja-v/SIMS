@@ -29,9 +29,17 @@ function App() {
                     )
                   }
                 >
-                  <Route index element={<Godowns />} />
-                  <Route path="employees" element={<Employees />} />
-                  <Route path="inwards" element={<Inwards />} />
+                  {user && user.role === "superadmin" && (
+                    <>
+                      <Route index element={<Godowns />} />
+                      <Route path="employees" element={<Employees />} />
+                    </>
+                  )}
+                  {user && user.role !== "superadmin" ? (
+                    <Route index element={<Inwards />} />
+                  ) : (
+                    <Route path="inwards" element={<Inwards />} />
+                  )}
                   <Route path="outwards" element={<Outwards />} />
                   <Route path="products" element={<Products />} />
                   <Route path="returns" element={<Returns />} />
