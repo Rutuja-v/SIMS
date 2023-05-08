@@ -106,7 +106,7 @@ export default function Employees() {
         if (target.value === "") return items;
         else
           return items.filter((x) =>
-            x.employee_name.toLowerCase().includes(target.value)
+            x.name.toLowerCase().includes(target.value)
           );
       },
     });

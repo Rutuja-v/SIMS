@@ -123,7 +123,7 @@ export default function Inwards() {
         if (target.value === "") return items;
         else
           return items.filter((x) =>
-            x.supplier_name.toLowerCase().includes(target.value)
+            x.supplier.name.toLowerCase().includes(target.value)
           );
       },
     });
