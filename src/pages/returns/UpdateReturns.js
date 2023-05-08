@@ -307,6 +307,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
                       variant="outlined"
                       value={invoiceNo}
                       onChange={handleInvoiceNoChange}
+                      inputProps={{ maxLength: 12 }}
                     />
                     <FormControl>
                       <InputLabel id="billCheckedByIdLabel">
