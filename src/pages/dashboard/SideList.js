@@ -173,6 +173,12 @@ export default function SideList({ children }) {
   ]);
 
   function toSentenceCase(str) {
+    if (str === undefined || str === null) {
+      return;
+    }
+    if (str.length === 1) {
+      return str.toUpperCase();
+    }
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
 
