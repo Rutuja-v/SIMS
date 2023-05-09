@@ -119,6 +119,7 @@ function UpdateProduct({ product, handleClose }) {
                   id="price"
                   label="Price"
                   type="number"
+                  inputProps={{min:1}}
                   variant="outlined"
                   value={price}
                   onChange={handlePriceChange}

@@ -218,6 +218,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                   id="quantity"
                   label="Quantity"
                   type="number"
+                  inputProps={{min:1}}
                   variant="outlined"
                   value={quantity}
                   onChange={handleQuantityChange}
@@ -270,6 +271,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                   id="receiptNo"
                   label="Receipt number"
                   type="number"
+                  inputProps={{min:1}}
                   variant="outlined"
                   value={receiptNo}
                   onChange={handleReceiptNoChange}

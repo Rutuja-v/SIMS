@@ -15,7 +15,7 @@ import Box from "@material-ui/core/Box";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-
+import Notification from "../../Components/Notification";
 import {
   Card,
   CardContent,
@@ -47,7 +47,7 @@ function Products() {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
-
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
   useEffect(() => {
     getData();
   }, []);
@@ -87,6 +87,11 @@ function Products() {
       .catch((error) => {
         console.error(error);
       });
+      setNotify({
+        isOpen: true,
+        message: 'Product Deleted Successfully',
+        type: 'error'
+    })
   };
 
   const formik = useFormik({
@@ -121,6 +126,11 @@ function Products() {
         });
 
       handleAddModalClose();
+      setNotify({
+        isOpen: true,
+        message: 'Product Submitted Successfully',
+        type: 'success'
+    })
     },
   });
 
@@ -181,6 +191,7 @@ function Products() {
                 id="weight"
                 label="Weight"
                 type="number"
+                inputProps={{min:1}}
                 variant="outlined"
                 {...formik.getFieldProps('weight')}
                 error={formik.touched.weight && formik.errors.weight ? true : false}
@@ -291,7 +302,11 @@ function Products() {
           </Grid>
         ))}
       </Grid>
+      <Notification
+                notify={notify}
+                setNotify={setNotify}
 
+            />
       <UpdateProduct
         product={editModalItem}
         handleClose={handleEditModalClose}

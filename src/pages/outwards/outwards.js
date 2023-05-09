@@ -3,6 +3,7 @@ import { Context } from "../../context/ContextProvider";
 import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import Notification from "../../Components/Notification";
 import {
   Paper,
   TableBody,
@@ -21,15 +22,17 @@ import {
   Select,
   MenuItem,
   DialogActions,
+  FormHelperText,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
+import * as Yup from "yup";
 import Controls from "../../Components/controls/Controls";
 import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import CloseIcon from "@material-ui/icons/Close";
 import ConfirmDialog from "../../Components/ConfirmDialog";
-import { Form, Formik } from "formik";
+import { Form, Formik, useFormik } from "formik";
 import moment from "moment";
 import UpdateOutwards from "./UpdateOutwards";
 
@@ -51,16 +54,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Outwards() {
-  const headCells = useMemo(() => [
-    { id: "godown", label: "Godown" },
-    { id: "product_name", label: "Product name" },
-    { id: "delivered_to", label: "Delivered To" },
-    { id: "purpose", label: "Purpose" },
-    { id: "supply_date", label: "Supply Date" },
-    { id: "delivery_date", label: "Delivery Date" },
-    { id: "invoice_no", label: "Invoice Number" },
-    { id: "receipt_no", label: "Receipt Number" },
-  ], []);
+  const headCells = useMemo(
+    () => [
+      { id: "godown", label: "Godown" },
+      { id: "product_name", label: "Product name" },
+      { id: "delivered_to", label: "Delivered To" },
+      { id: "purpose", label: "Purpose" },
+      { id: "supply_date", label: "Supply Date" },
+      { id: "delivery_date", label: "Delivery Date" },
+      { id: "invoice_no", label: "Invoice Number" },
+      { id: "receipt_no", label: "Receipt Number" },
+    ],
+    []
+  );
 
   useEffect(() => {
     if (user.role === "manager") {
@@ -82,23 +88,17 @@ export default function Outwards() {
     subTitle: "",
   });
 
-  const [godownId, setGodownId] = useState("");
-  const [productId, setProductId] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [deliveredTo, setDeliveredTo] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [supplyDate, setSupplyDate] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [receiptNo, setReceiptNo] = useState("");
-  const [billCheckedById, setBillCheckedById] = useState("");
-
   const [godowns, setGodowns] = useState([]);
   const [products, setProducts] = useState([]);
   const [employees, setEmployees] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
-
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
+  });
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(outwards, headCells, filterFn);
 
@@ -140,91 +140,88 @@ export default function Outwards() {
         console.error(error);
       });
 
+    setNotify({
+      isOpen: true,
+      message: "Record Deleted Successfully",
+      type: "error",
+    });
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
     });
   };
 
-  const handleGodownIdChange = (event) => {
-    setGodownId(event.target.value);
-  };
-  const handleProductIdChange = (event) => {
-    setProductId(event.target.value);
-  };
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
-  };
-  const handleDeliveredToChange = (event) => {
-    setDeliveredTo(event.target.value);
-  };
-  const handlePurposeChange = (event) => {
-    setPurpose(event.target.value);
-  };
-  const handleSupplyDateChange = (event) => {
-    setSupplyDate(event.target.value);
-  };
-  const handleDeliveryDateChange = (event) => {
-    setDeliveryDate(event.target.value);
-  };
-  const handleReceiptNoChange = (event) => {
-    setReceiptNo(event.target.value);
-  };
-  const handleBillValueCheckedByIdChange = (event) => {
-    setBillCheckedById(event.target.value);
-  };
+  const validationSchema = Yup.object().shape({
+    godownId: Yup.number().required("Godown is required"),
+    productId: Yup.number().required("Product is required"),
+    deliveredTo: Yup.string().required("This field is required"),
+    supplyDate: Yup.date().required("Supply date is required"),
+    deliveryDate: Yup.date().required("Delivery date is required"),
+    receiptNo: Yup.number().required("Receipt number is required"),
+    quantity: Yup.number().required("Quantity is required"),
+    purpose: Yup.string().required("Purpose is required"),
+    billCheckedById: Yup.number().required("This field is required"),
+  });
+  const formik = useFormik({
+    initialValues: {
+      godownId: null,
+      productId: null,
+      deliveredTo: null,
+      supplyDate: null,
+      deliveryDate: null,
+      purpose: null,
+      receiptNo: null,
+      quantity: null,
+      billCheckedById: null,
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      let formData = {};
+      formData["godown"] = {
+        id: values.godownId,
+      };
+      formData["product"] = {
+        id: values.productId,
+      };
+      formData["quantity"] = values.quantity;
+      formData["deliveredTo"] = values.deliveredTo;
+      formData["purpose"] = values.purpose;
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    let formData = {};
-    formData["godown"] = {
-      id: godownId,
-    };
-    formData["product"] = {
-      id: productId,
-    };
-    formData["quantity"] = quantity;
-    formData["deliveredTo"] = deliveredTo;
-    formData["purpose"] = purpose;
+      const supplyDateObj = new Date(values.supplyDate);
+      const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
+      formData["supplyDate"] = formattedSupplyDate;
 
-    const supplyDateObj = new Date(supplyDate);
-    const formattedSupplyDate = moment(supplyDateObj).format("DD/MM/YYYY");
-    formData["supplyDate"] = formattedSupplyDate;
+      const deliveryDateObj = new Date(values.deliveryDate);
+      const formattedDeliveryDate =
+        moment(deliveryDateObj).format("DD/MM/YYYY");
+      formData["deliveryDate"] = formattedDeliveryDate;
 
-    const deliveryDateObj = new Date(deliveryDate);
-    const formattedDeliveryDate = moment(deliveryDateObj).format("DD/MM/YYYY");
-    formData["deliveryDate"] = formattedDeliveryDate;
+      formData["receiptNo"] = values.receiptNo;
+      formData["invoice"] = {
+        billCheckedBy: {
+          id: values.billCheckedById,
+        },
+      };
 
-    formData["receiptNo"] = receiptNo;
-    formData["invoice"] = {
-      billCheckedBy: {
-        id: billCheckedById,
-      },
-    };
+      console.log(formData);
 
-    console.log(formData);
+      axios
+        .post("http://localhost:8080/api/outwards", formData)
+        .then((response) => {
+          getData();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
 
-    axios
-      .post("http://localhost:8080/api/outwards", formData)
-      .then((response) => {
-        getData();
-      })
-      .catch((error) => {
-        console.error(error);
+      handleAddModalClose();
+      setNotify({
+        isOpen: true,
+        message: "Record Submitted Successfully",
+        type: "success",
       });
-
-    setGodownId("");
-    setProductId("");
-    setQuantity("");
-    setDeliveredTo("");
-    setPurpose("");
-    setSupplyDate("");
-    setDeliveryDate("");
-    setReceiptNo("");
-    setBillCheckedById("");
-    handleAddModalClose();
-    setAddModalOpen(false);
-  };
+    },
+  });
 
   function getData() {
     axios
@@ -337,9 +334,7 @@ export default function Outwards() {
                     {"Quantity: " + item.quantity}
                   </Typography>
                 </TableCell>
-                <TableCell>
-                  {item.delivered_to}
-                </TableCell>
+                <TableCell>{item.delivered_to}</TableCell>
                 <TableCell>{item.purpose}</TableCell>
                 <TableCell>{item.supply_date}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
@@ -356,12 +351,14 @@ export default function Outwards() {
                 <TableCell>{item.receipt_no}</TableCell>
                 {user.role === "manager" && (
                   <TableCell>
-                    <Controls.ActionButton
-                      onClick={() => { handleEditModalOpen(item) }}
+                    <Button
+                      onClick={() => {
+                        handleEditModalOpen(item);
+                      }}
                     >
-                      <EditOutlinedIcon fontSize="small" />
-                    </Controls.ActionButton>
-                    <Controls.ActionButton
+                      <EditOutlinedIcon fontSize="small" color="success" />
+                    </Button>
+                    <Button
                       onClick={() => {
                         setConfirmDialog({
                           isOpen: true,
@@ -373,8 +370,8 @@ export default function Outwards() {
                         });
                       }}
                     >
-                      <CloseIcon fontSize="small" />
-                    </Controls.ActionButton>
+                      <CloseIcon fontSize="small" color="error" />
+                    </Button>
                   </TableCell>
                 )}
               </TableRow>
@@ -393,9 +390,9 @@ export default function Outwards() {
           Add outwards
         </DialogTitle>
         <DialogContent>
-          <Formik onSubmit={handleSubmit}>
+          <Formik>
             {(formikProps) => (
-              <Form>
+              <Form onSubmit={formik.handleSubmit}>
                 <div
                   style={{
                     marginTop: "32px",
@@ -411,9 +408,13 @@ export default function Outwards() {
                     <Select
                       labelId="godownIdLabel"
                       id="godownId"
-                      value={godownId}
                       label="Godown"
-                      onChange={handleGodownIdChange}
+                      {...formik.getFieldProps("godownId")}
+                      error={
+                        formik.touched.godownId && formik.errors.godownId
+                          ? true
+                          : false
+                      }
                     >
                       {godowns.map((godown, index) => (
                         <MenuItem key={index} value={godown.id}>
@@ -421,15 +422,24 @@ export default function Outwards() {
                         </MenuItem>
                       ))}
                     </Select>
+                    {formik.touched.godownId && formik.errors.godownId && (
+                      <FormHelperText error>
+                        {formik.touched.godownId && formik.errors.godownId}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                   <FormControl>
                     <InputLabel id="productIdLabel">Product</InputLabel>
                     <Select
                       labelId="productIdLabel"
                       id="productId"
-                      value={productId}
                       label="Product"
-                      onChange={handleProductIdChange}
+                      {...formik.getFieldProps("productId")}
+                      error={
+                        formik.touched.productId && formik.errors.productId
+                          ? true
+                          : false
+                      }
                     >
                       {products.map((product, index) => (
                         <MenuItem key={index} value={product.id}>
@@ -437,43 +447,79 @@ export default function Outwards() {
                         </MenuItem>
                       ))}
                     </Select>
+                    {formik.touched.productId && formik.errors.productId && (
+                      <FormHelperText error>
+                        {formik.touched.productId && formik.errors.productId}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                   <TextField
                     id="quantity"
                     label="Quantity"
                     type="number"
+                    inputProps={{ min: 1 }}
                     variant="outlined"
-                    value={quantity}
-                    onChange={handleQuantityChange}
+                    {...formik.getFieldProps("quantity")}
+                    error={
+                      formik.touched.quantity && formik.errors.quantity
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.quantity && formik.errors.quantity
+                    }
                   />
                   <TextField
                     id="deliveredTo"
                     label="Delivered to"
                     type="text"
                     variant="outlined"
-                    value={deliveredTo}
-                    onChange={handleDeliveredToChange}
+                    {...formik.getFieldProps("deliveredTo")}
+                    error={
+                      formik.touched.deliveredTo && formik.errors.deliveredTo
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.deliveredTo && formik.errors.deliveredTo
+                    }
                   />
                   <FormControl>
                     <InputLabel id="purposeIdLabel">Purpose</InputLabel>
                     <Select
                       labelId="purposeIdLabel"
                       id="productId"
-                      value={purpose}
                       label="Purpose"
-                      onChange={handlePurposeChange}
+                      {...formik.getFieldProps("purpose")}
+                      error={
+                        formik.touched.purpose && formik.errors.purpose
+                          ? true
+                          : false
+                      }
                     >
                       <MenuItem value="sales">Sales</MenuItem>
                       <MenuItem value="service">Service</MenuItem>
                     </Select>
+                    {formik.touched.purpose && formik.errors.purpose && (
+                      <FormHelperText error>
+                        {formik.touched.purpose && formik.errors.purpose}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                   <TextField
                     id="supplyDate"
                     label="Supply date"
                     type="date"
                     variant="outlined"
-                    value={supplyDate}
-                    onChange={handleSupplyDateChange}
+                    {...formik.getFieldProps("supplyDate")}
+                    error={
+                      formik.touched.supplyDate && formik.errors.supplyDate
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.supplyDate && formik.errors.supplyDate
+                    }
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -483,8 +529,15 @@ export default function Outwards() {
                     label="Delivery date"
                     type="date"
                     variant="outlined"
-                    value={deliveryDate}
-                    onChange={handleDeliveryDateChange}
+                    {...formik.getFieldProps("deliveryDate")}
+                    error={
+                      formik.touched.deliveryDate && formik.errors.deliveryDate
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.deliveryDate && formik.errors.deliveryDate
+                    }
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -493,9 +546,17 @@ export default function Outwards() {
                     id="receiptNo"
                     label="Receipt number"
                     type="number"
+                    inputProps={{ min: 1 }}
                     variant="outlined"
-                    value={receiptNo}
-                    onChange={handleReceiptNoChange}
+                    {...formik.getFieldProps("receiptNo")}
+                    error={
+                      formik.touched.receiptNo && formik.errors.receiptNo
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.receiptNo && formik.errors.receiptNo
+                    }
                   />
                   <FormControl>
                     <InputLabel id="billCheckedByIdLabel">
@@ -504,9 +565,14 @@ export default function Outwards() {
                     <Select
                       labelId="billCheckedByIdLabel"
                       id="billCheckedById"
-                      value={billCheckedById}
                       label="Bill checked by"
-                      onChange={handleBillValueCheckedByIdChange}
+                      {...formik.getFieldProps("billCheckedById")}
+                      error={
+                        formik.touched.billCheckedById &&
+                        formik.errors.billCheckedById
+                          ? true
+                          : false
+                      }
                     >
                       {employees.map((employee, index) => (
                         <MenuItem key={index} value={employee.id}>
@@ -514,6 +580,13 @@ export default function Outwards() {
                         </MenuItem>
                       ))}
                     </Select>
+                    {formik.touched.billCheckedById &&
+                      formik.errors.billCheckedById && (
+                        <FormHelperText error>
+                          {formik.touched.billCheckedById &&
+                            formik.errors.billCheckedById}
+                        </FormHelperText>
+                      )}
                   </FormControl>
                 </div>
 
@@ -528,7 +601,6 @@ export default function Outwards() {
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}
-                    onClick={handleSubmit}
                   >
                     Add
                   </Button>
@@ -538,13 +610,19 @@ export default function Outwards() {
           </Formik>
         </DialogContent>
       </Dialog>
-
+      <Notification notify={notify} setNotify={setNotify} />
       <ConfirmDialog
         confirmDialog={confirmDialog}
         setConfirmDialog={setConfirmDialog}
       />
 
-      <UpdateOutwards outwards={editModalItem} godowns={godowns} products={products} employees={employees} handleClose={handleEditModalClose} />
+      <UpdateOutwards
+        outwards={editModalItem}
+        godowns={godowns}
+        products={products}
+        employees={employees}
+        handleClose={handleEditModalClose}
+      />
     </>
   );
 }

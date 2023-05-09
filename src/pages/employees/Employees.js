@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import Notification from "../../Components/Notification";
+import * as Yup from "yup";
 import {
   Paper,
   TableBody,
@@ -19,6 +21,7 @@ import {
   Select,
   MenuItem,
   DialogActions,
+  FormHelperText,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -29,7 +32,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import UpdateEmployee from "./UpdateEmployee";
 import { Form, Formik } from "formik";
-
+import { useFormik } from "formik";
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     padding: theme.spacing(3),
@@ -58,6 +61,11 @@ const headCells = [
 export default function Employees() {
   const classes = useStyles();
   const [employees, setEmployees] = useState([]);
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
+  });
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
@@ -68,12 +76,6 @@ export default function Employees() {
     title: "",
     subTitle: "",
   });
-
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [roleId, setRoleId] = useState("");
-  const [godownId, setGodownId] = useState("");
 
   const [roles, setRoles] = useState([]);
   const [godowns, setGodowns] = useState([]);
@@ -126,57 +128,70 @@ export default function Employees() {
       ...confirmDialog,
       isOpen: false,
     });
+    setNotify({
+      isOpen: true,
+      message: "Deleted Successfully",
+      type: "error",
+    });
   };
 
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value);
-  };
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-  const handleRoleIdChange = (event) => {
-    setRoleId(event.target.value);
-  };
-  const handleGodownIdChange = (event) => {
-    setGodownId(event.target.value);
-  };
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    username: Yup.string()
+      .required("Username is required")
+      .min(6, "Username must be at least 6 characters"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 8 characters"),
+    roleId: Yup.number().required("Role is required"),
+    godownId: Yup.number().nullable(),
+  });
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    let formData = {};
-    formData["name"] = name;
-    formData["username"] = username;
-    formData["password"] = password;
-    formData["role"] = {
-      id: Number(roleId),
-    };
-    if (godownId != -1) {
-      formData["godown"] = {
-        id: Number(godownId),
+  const formik = useFormik({
+    initialValues: {
+      name: null,
+      username: null,
+      password: null,
+      roleId: null,
+      godownId: null,
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values, { resetForm }) => {
+      let formData = {};
+
+      formData["name"] = values.name;
+      formData["username"] = values.username;
+      formData["password"] = values.password;
+      formData["role"] = {
+        id: values.roleId,
+      };
+      if (values.godownId != -1) {
+        formData["godown"] = {
+          id: values.godownId,
+        };
       }
-    }
 
-    console.log(formData);
+      console.log(formData);
 
-    axios
-      .post("http://localhost:8080/api/employees", formData)
-      .then((response) => {
-        getData();
-      })
-      .catch((error) => {
-        console.error(error);
+      axios
+        .post("http://localhost:8080/api/employees", formData)
+        .then((response) => {
+          getData();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      resetForm();
+
+      setAddModalOpen(false);
+      setNotify({
+        isOpen: true,
+        message: "Employee Added Successfully",
+        type: "success",
       });
-
-    setName("");
-    setUsername("");
-    setPassword("");
-    setRoleId("");
-    setGodownId("");
-    setAddModalOpen(false);
-  };
+    },
+  });
 
   function getData() {
     axios
@@ -195,6 +210,7 @@ export default function Employees() {
           };
           rows.push(obj);
         }
+        rows.sort((e1, e2) => e1.name.localeCompare(e2.name));
         setEmployees(rows);
       })
       .catch((err) => console.log(err));
@@ -217,6 +233,12 @@ export default function Employees() {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    if (!addModalOpen) {
+      formik.resetForm();
+    }
+  }, [addModalOpen]);
 
   return (
     <>
@@ -253,14 +275,15 @@ export default function Employees() {
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.username}</TableCell>
                 <TableCell>{item.role.role}</TableCell>
-                <TableCell>{item.godown === null ? "None" : item.godown.location}</TableCell>
                 <TableCell>
-                  <Controls.ActionButton
-                    onClick={() => handleEditModalOpen(item)}
-                  >
+                  {item.godown === null ? "None" : item.godown.location}
+                </TableCell>
+                <TableCell>
+                  <Button onClick={() => handleEditModalOpen(item)}>
                     <EditOutlinedIcon fontSize="small" />
-                  </Controls.ActionButton>
-                  <Controls.ActionButton
+                  </Button>
+
+                  <Button
                     onClick={() => {
                       setConfirmDialog({
                         isOpen: true,
@@ -272,8 +295,8 @@ export default function Employees() {
                       });
                     }}
                   >
-                    <CloseIcon fontSize="small" />
-                  </Controls.ActionButton>
+                    <CloseIcon fontSize="small" color="error" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -291,9 +314,9 @@ export default function Employees() {
           Add an employee
         </DialogTitle>
         <DialogContent>
-          <Formik onSubmit={handleSubmit}>
+          <Formik>
             {(formikProps) => (
-              <Form>
+              <Form onSubmit={formik.handleSubmit}>
                 <div
                   style={{
                     marginTop: "32px",
@@ -305,54 +328,85 @@ export default function Employees() {
                   }}
                 >
                   <TextField
-                    autoFocus
                     id="name"
                     label="Name"
                     type="text"
                     variant="outlined"
-                    value={name}
-                    onChange={handleNameChange}
+                    {...formik.getFieldProps("name")}
+                    error={
+                      formik.touched.name && formik.errors.name ? true : false
+                    }
+                    helperText={formik.touched.name && formik.errors.name}
                   />
                   <TextField
                     id="username"
                     label="Username"
                     type="text"
                     variant="outlined"
-                    value={username}
-                    onChange={handleUsernameChange}
+                    {...formik.getFieldProps("username")}
+                    error={
+                      formik.touched.username && formik.errors.username
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.username && formik.errors.username
+                    }
                   />
                   <TextField
                     id="password"
                     label="Password"
                     type="password"
                     variant="outlined"
-                    value={password}
-                    onChange={handlePasswordChange}
+                    {...formik.getFieldProps("password")}
+                    error={
+                      formik.touched.password && formik.errors.password
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.password && formik.errors.password
+                    }
                   />
                   <FormControl>
                     <InputLabel id="roleIdLabel">Role</InputLabel>
                     <Select
                       labelId="roleIdLabel"
                       id="roleId"
-                      value={roleId}
                       label="Role"
-                      onChange={handleRoleIdChange}
+                      {...formik.getFieldProps("roleId")}
+                      error={
+                        formik.touched.roleId && formik.errors.roleId
+                          ? true
+                          : false
+                      }
                     >
-                      {roles.filter(role => role.role !== "manager").map((role, index) => (
-                        <MenuItem key={index} value={role.id}>
-                          {role.role}
-                        </MenuItem>
-                      ))}
+                      {roles
+                        .filter((role) => role.role === "employee")
+                        .map((role, index) => (
+                          <MenuItem key={index} value={role.id}>
+                            {role.role}
+                          </MenuItem>
+                        ))}
                     </Select>
+                    {formik.touched.roleId && formik.errors.roleId && (
+                      <FormHelperText error>
+                        {formik.touched.roleId && formik.errors.roleId}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                   <FormControl>
                     <InputLabel id="godownIdLabel">Godown</InputLabel>
                     <Select
                       labelId="godownIdLabel"
                       id="godownId"
-                      value={godownId}
                       label="Godown"
-                      onChange={handleGodownIdChange}
+                      {...formik.getFieldProps("godownId")}
+                      error={
+                        formik.touched.godownId && formik.errors.godownId
+                          ? true
+                          : false
+                      }
                     >
                       <MenuItem key={0} value={-1}>
                         None
@@ -363,6 +417,11 @@ export default function Employees() {
                         </MenuItem>
                       ))}
                     </Select>
+                    {formik.touched.godownId && formik.errors.godownId && (
+                      <FormHelperText error>
+                        {formik.touched.godownId && formik.errors.godownId}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 </div>
 
@@ -377,7 +436,6 @@ export default function Employees() {
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}
-                    onClick={handleSubmit}
                   >
                     Add
                   </Button>
@@ -387,7 +445,7 @@ export default function Employees() {
           </Formik>
         </DialogContent>
       </Dialog>
-
+      <Notification notify={notify} setNotify={setNotify} />
       <ConfirmDialog
         confirmDialog={confirmDialog}
         setConfirmDialog={setConfirmDialog}

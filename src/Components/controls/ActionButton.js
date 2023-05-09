@@ -25,7 +25,7 @@ export default function ActionButton(props) {
   const classes = useStyles();
 
   return (
-    <Button className={`${classes.root} ${classes[color]}`} onClick={onClick}>
+    <Button className={`${classes.root} `} onClick={onClick}>
       {children}
     </Button>
   );

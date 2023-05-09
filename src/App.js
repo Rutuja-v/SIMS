@@ -6,11 +6,11 @@ import Employees from "./pages/employees/Employees";
 import ContextProvider, { Context } from "./context/ContextProvider";
 import DashboardLayout from "./pages/DashboardLayout";
 import Godowns from "./pages/dashboard/godowns/Godowns";
-
+import  Analytics  from "./pages/analytics/Analytics";
 import Inwards from "./pages/inwards/inwards";
 import Outwards from "./pages/outwards/outwards";
 import Returns from "./pages/returns/Returns";
-
+import ForgotPassword from "./Components/ForgotPassword";
 function App() {
   return (
     <ContextProvider>
@@ -29,6 +29,7 @@ function App() {
                     )
                   }
                 >
+                   <Route path="/reset-password" element={<ForgotPassword />}></Route>
                   {user && user.role === "superadmin" && (
                     <>
                       <Route index element={<Godowns />} />
@@ -43,6 +44,7 @@ function App() {
                   <Route path="outwards" element={<Outwards />} />
                   <Route path="products" element={<Products />} />
                   <Route path="returns" element={<Returns />} />
+              <Route path="analytics" element={<Analytics/>}/>
                 </Route>
                 <Route
                   path="/login"

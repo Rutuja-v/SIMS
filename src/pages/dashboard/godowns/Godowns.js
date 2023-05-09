@@ -5,10 +5,12 @@ import axios from "axios";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-
+import { useFormik } from "formik";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import moment from "moment";
+import Notification from "../../../Components/Notification";
 import UpdateGodown from "./UpdateGodown";
+
 import {
   Box,
   Button,
@@ -27,6 +29,7 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  FormHelperText,
 } from "@mui/material";
 
 export const initialValues = {
@@ -84,7 +87,11 @@ function Godowns({ onDelete, onEdit }) {
   const [managerUsername, setManagerUsername] = useState("");
   const [managerPassword, setManagerPassword] = useState("");
   const [managerRoleId, setManagerRoleId] = useState("");
-
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
+  });
   const [godowns, setGodowns] = useState([]);
   const [managers, setManagers] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -148,34 +155,12 @@ function Godowns({ onDelete, onEdit }) {
       .catch((error) => {
         console.error(error);
       });
+    setNotify({
+      isOpen: true,
+      message: "Godown Deleted Successfully",
+      type: "error",
+    });
   };
-  // const handleDelete = async (id) => {
-
-  //       try {
-
-  //         // Delete godown from server
-
-  //         await fetch(`http://localhost:8080/api/godowns/91/${id}`, {
-
-  //           method: 'DELETE',
-
-  //         });
-
-  //         // Delete godown from local state
-
-  //           setUsers(users.filter((user) => user.id !== id));
-
-  //       } catch (error) {
-
-  //         console.error('Error deleting godown:', error);
-
-  //       }
-
-  //     };
-
-  // const handleEdit = () => {
-  //   setEditing(true);
-  // };
 
   const handleLocationChange = (event) => {
     setLocation(event.target.value);
@@ -199,45 +184,77 @@ function Godowns({ onDelete, onEdit }) {
   const handleManagerRoleIdChange = (event) => {
     setManagerRoleId(event.target.value);
   };
+  const validationSchema = Yup.object().shape({
+    location: Yup.string().required("Location is required"),
+    capacity: Yup.number()
+      .typeError("Capacity must be a number")
+      .required("Capacity is required")
+      .min(1, "Capacity must be at least 1"),
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    let formData = {};
-    formData["location"] = location;
-    formData["capacityInQuintals"] = capacity;
-    formData["manager"] = {
-      name: managerName,
-      username: managerUsername,
-      password: managerPassword,
-      role: {
-        id: Number(managerRoleId)
-      },
-    };
+    // date: Yup.date().required('Date is required'),
+    managerRoleId: Yup.number().required("Manager Name is required"),
+  });
+  const formik = useFormik({
+    initialValues: {
+      location: null,
+      capacity: null,
+      date: null,
+      managerName: null,
+    },
+    validationSchema: validationSchema,
 
-    const dateObj = new Date(date);
-    const formattedDate = moment(dateObj).format("DD/MM/YYYY");
-    formData["startDate"] = formattedDate;
+    onSubmit: (values, { resetForm }) => {
+      // event.preventDefault();
+      let formData = {};
+      formData["location"] = values.location;
+      formData["capacityInQuintals"] = values.capacity;
+      formData["manager"] = {
+        name: managerName,
+        username: managerUsername,
+        password: managerPassword,
+        role: {
+          // id: Number(managerRoleId)
+          id: values.managerRoleId,
+        },
+      };
 
-    console.log(formData);
+      const dateObj = new Date(date);
+      const formattedDate = moment(dateObj).format("DD/MM/YYYY");
+      formData["startDate"] = formattedDate;
 
-    axios
-      .post("http://localhost:8080/api/godowns", formData)
-      .then((response) => {
-        getData();
-      })
-      .catch((error) => {
-        console.error(error);
+      console.log(formData);
+
+      axios
+        .post("http://localhost:8080/api/godowns", formData)
+        .then((response) => {
+          getData();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      // setLocation("");
+      // setCapacity("");
+      setDate("");
+      // setManagerName("");
+      // setManagerUsername("");
+      // setManagerPassword("");
+      // setManagerRoleId("");
+      resetForm();
+      setAddModalOpen(false);
+
+      setNotify({
+        isOpen: true,
+        message: "Godown Submitted Successfully",
+        type: "success",
       });
-
-    setLocation("");
-    setCapacity("");
-    setDate("");
-    setManagerName("");
-    setManagerUsername("");
-    setManagerPassword("");
-    setManagerRoleId("");
-    setAddModalOpen(false);
-  };
+    },
+  });
+  useEffect(() => {
+    if (!addModalOpen) {
+      formik.resetForm();
+    }
+  }, [addModalOpen]);
 
   return (
     <div className="App">
@@ -263,10 +280,10 @@ function Godowns({ onDelete, onEdit }) {
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={handleSubmit}
+            // onSubmit={handleSubmit}
           >
             {(formikProps) => (
-              <Form>
+              <Form onSubmit={formik.handleSubmit}>
                 <div
                   style={{
                     marginTop: "32px",
@@ -278,21 +295,39 @@ function Godowns({ onDelete, onEdit }) {
                   }}
                 >
                   <TextField
-                    autoFocus
                     id="location"
                     label="Location"
                     type="text"
                     variant="outlined"
-                    value={location}
-                    onChange={handleLocationChange}
+                    // value={location}
+                    // onChange={handleLocationChange}
+                    {...formik.getFieldProps("location")}
+                    error={
+                      formik.touched.location && formik.errors.location
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.location && formik.errors.location
+                    }
                   />
                   <TextField
                     id="capacity"
                     label="Capacity"
                     type="number"
+                    inputProps={{ min: 1 }}
                     variant="outlined"
-                    value={capacity}
-                    onChange={handleCapacityChange}
+                    // value={capacity}
+                    // onChange={handleCapacityChange}
+                    {...formik.getFieldProps("capacity")}
+                    error={
+                      formik.touched.capacity && formik.errors.capacity
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.capacity && formik.errors.capacity
+                    }
                   />
                   <TextField
                     id="date"
@@ -301,6 +336,11 @@ function Godowns({ onDelete, onEdit }) {
                     variant="outlined"
                     value={date}
                     onChange={handleDateChange}
+                    // {...formik.getFieldProps("date")}
+                    // error={
+                    //   formik.touched.date && formik.errors.date ? true : false
+                    // }
+                    // helperText={formik.touched.date && formik.errors.date}
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -321,22 +361,32 @@ function Godowns({ onDelete, onEdit }) {
                     value={managerUsername}
                     onChange={handleManagerUsernameChange}
                   />
-                  <TextField
+                  {/* <TextField
                     id="managerPassword"
                     label="Manager Password"
                     type="text"
                     variant="outlined"
                     value={managerPassword}
                     onChange={handleManagerPasswordChange}
-                  />
+                  /> */}
                   <FormControl>
                     <InputLabel id="roleIdLabel">Manager role</InputLabel>
                     <Select
                       labelId="roleIdLabel"
                       id="roleId"
-                      value={managerRoleId}
+                      defaultValue={
+                        roles.find((role) => role.role === "manager")?.id
+                      }
+                      // value={managerRoleId}
                       label="Manager role"
-                      onChange={handleManagerRoleIdChange}
+                      // onChange={handleManagerRoleIdChange}
+                      {...formik.getFieldProps("managerRoleId")}
+                      error={
+                        formik.touched.managerRoleId &&
+                        formik.errors.managerRoleId
+                          ? true
+                          : false
+                      }
                     >
                       {roles.map((role, index) => (
                         <MenuItem key={index} value={role.id}>
@@ -344,6 +394,13 @@ function Godowns({ onDelete, onEdit }) {
                         </MenuItem>
                       ))}
                     </Select>
+                    {formik.touched.managerRoleId &&
+                      formik.errors.managerRoleId && (
+                        <FormHelperText error>
+                          {formik.touched.managerRoleId &&
+                            formik.errors.managerRoleId}
+                        </FormHelperText>
+                      )}
                   </FormControl>
                 </div>
 
@@ -358,7 +415,7 @@ function Godowns({ onDelete, onEdit }) {
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}
-                    onClick={handleSubmit}
+                    onClick={() => formik.handleSubmit()}
                   >
                     Add
                   </Button>
@@ -464,7 +521,7 @@ function Godowns({ onDelete, onEdit }) {
           </Grid>
         ))}
       </Grid>
-
+      <Notification notify={notify} setNotify={setNotify} />
       <UpdateGodown
         godown={editModalOpen}
         managers={managers}

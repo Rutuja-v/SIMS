@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import React, { useContext, useState } from "react";
 
-import { Button } from "@mui/material";
+import { Alert, AlertTitle, Button } from "@mui/material";
 
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
@@ -39,6 +39,7 @@ const boxstyle = {
 
 export default function Login() {
   const [user, setUser] = useContext(Context);
+  const [alert, setalert] = useState(0);
   const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
@@ -68,7 +69,7 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(loginUser));
         navigate("/");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setOpen(true));
   };
 
   const handleClose = (event, reason) => {
@@ -89,8 +90,16 @@ export default function Login() {
         autoHideDuration={3000}
         onClose={handleClose}
         TransitionComponent={TransitionLeft}
-        anchorOrigin={{ vertical, horizontal }} />
-
+        anchorOrigin={{ vertical, horizontal }}
+      >
+        <Alert
+          severity="error"
+          TransitionComponent={TransitionLeft}
+          sx={{ width: "100%" }}
+        >
+          Failed! Enter correct username and password.
+        </Alert>
+      </Snackbar>
       <div
         style={{
           backgroundImage: `url(${stock})`,
@@ -189,7 +198,16 @@ export default function Login() {
                   }
                 />
               </ThemeProvider>
-
+              {/* <Typography
+                              variant="body1"
+                              component="span"
+                              onClick={() => {
+                                navigate("/reset-password");
+                              }}
+                              style={{ marginTop: "10px", cursor: "pointer" }}
+                            >
+                              Forgot password?
+                            </Typography> */}
               <Button
                 type="submit"
                 variant="contained"

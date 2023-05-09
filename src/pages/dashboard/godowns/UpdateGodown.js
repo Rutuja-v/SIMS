@@ -188,6 +188,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                   id="capacity"
                   label="Capacity"
                   type="number"
+                  inputProps={{min:1}}
                   variant="outlined"
                   value={capacity}
                   onChange={handleCapacityChange}

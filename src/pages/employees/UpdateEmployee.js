@@ -77,25 +77,23 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
     if (godownId != -1) {
       formData["godown"] = {
         id: Number(godownId),
-      }
+      };
     }
 
     console.log(formData);
 
     await axios
       .put(`http://localhost:8080/api/employees/${employee?.id}`, formData)
-      .then((response) => {
-
-      })
+      .then((response) => {})
       .catch((error) => {
         console.error(error);
       });
 
-    setName("");
-    setUsername("");
-    setPassword("");
-    setRoleId("");
-    setGodownId("");
+    setName(null);
+    setUsername(null);
+    setPassword(null);
+    setRoleId(null);
+    setGodownId(null);
     handleClose();
   };
 
@@ -147,43 +145,51 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
                   value={password}
                   onChange={handlePasswordChange}
                 />
-                <FormControl>
-                  <InputLabel id="roleIdLabel">Role</InputLabel>
-                  <Select
-                    labelId="roleIdLabel"
-                    id="roleId"
-                    defaultValue={employee?.role.id}
-                    value={roleId}
-                    label="Role"
-                    onChange={handleRoleIdChange}
-                  >
-                    {roles.map((role, index) => (
-                      <MenuItem key={index} value={role.id}>
-                        {role.role}
+                {employee?.role.role !== "superadmin" && (
+                  <FormControl>
+                    <InputLabel id="roleIdLabel">Role</InputLabel>
+                    <Select
+                      labelId="roleIdLabel"
+                      id="roleId"
+                      defaultValue={employee?.role.id}
+                      value={roleId}
+                      label="Role"
+                      onChange={handleRoleIdChange}
+                    >
+                      {roles
+                        .filter((role) => role.role !== "superadmin")
+                        .map((role, index) => (
+                          <MenuItem key={index} value={role.id}>
+                            {role.role}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                )}
+                {employee?.role.role !== "superadmin" && (
+                  <FormControl>
+                    <InputLabel id="godownIdLabel">Godown</InputLabel>
+                    <Select
+                      labelId="godownIdLabel"
+                      id="godownId"
+                      defaultValue={
+                        employee?.godown == null ? -1 : employee?.godown.id
+                      }
+                      value={godownId}
+                      label="Godown"
+                      onChange={handleGodownIdChange}
+                    >
+                      <MenuItem key={0} value={-1}>
+                        None
                       </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <InputLabel id="godownIdLabel">Godown</InputLabel>
-                  <Select
-                    labelId="godownIdLabel"
-                    id="godownId"
-                    defaultValue={employee?.godown == null ? -1 : employee?.godown.id}
-                    value={godownId}
-                    label="Godown"
-                    onChange={handleGodownIdChange}
-                  >
-                    <MenuItem key={0} value={-1}>
-                      None
-                    </MenuItem>
-                    {godowns.map((godown, index) => (
-                      <MenuItem key={index + 1} value={godown.id}>
-                        {godown.location}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                      {godowns.map((godown, index) => (
+                        <MenuItem key={index + 1} value={godown.id}>
+                          {godown.location}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
               </div>
 
               <DialogActions>

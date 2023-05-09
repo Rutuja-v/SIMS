@@ -32,7 +32,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employees, handleClose }) {
+function UpdateInwards({
+  inwards,
+  godowns,
+  products,
+  suppliers,
+  invoices,
+  employees,
+  handleClose,
+}) {
   const classes = useStyles();
 
   const [godownId, setGodownId] = useState("");
@@ -51,9 +59,10 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employ
     setQuantity(inwards?.quantity);
     setSupplierId(inwards?.supplier.id);
 
-    const formattedSupplyDate = moment(inwards?.supply_date, "DD/MM/YYYY").format(
-      "YYYY-MM-DD"
-    );
+    const formattedSupplyDate = moment(
+      inwards?.supply_date,
+      "DD/MM/YYYY"
+    ).format("YYYY-MM-DD");
     setSupplyDate(formattedSupplyDate);
 
     setInvoiceId(inwards?.invoice.id);
@@ -99,7 +108,7 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employ
     };
     formData["quantity"] = quantity;
     formData["supplier"] = {
-      id: supplierId
+      id: supplierId,
     };
 
     const supplyDateObj = new Date(supplyDate);
@@ -114,20 +123,17 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employ
           id: billCheckedById,
         },
       };
-    }
-    else {
+    } else {
       formData["invoice"] = {
-        id: invoiceId
-      }
+        id: invoiceId,
+      };
     }
 
     console.log(formData);
 
     await axios
       .put(`http://localhost:8080/api/inwards/${inwards?.id}`, formData)
-      .then((response) => {
-
-      })
+      .then((response) => {})
       .catch((error) => {
         console.error(error);
       });
@@ -205,6 +211,7 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employ
                   id="quantity"
                   label="Quantity"
                   type="number"
+                  inputProps={{ min: 1 }}
                   variant="outlined"
                   value={quantity}
                   onChange={handleQuantityChange}
@@ -241,6 +248,7 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employ
                   id="receiptNo"
                   label="Receipt number"
                   type="number"
+                  inputProps={{ min: 1 }}
                   variant="outlined"
                   value={receiptNo}
                   onChange={handleReceiptNoChange}
@@ -255,9 +263,7 @@ function UpdateInwards({ inwards, godowns, products, suppliers, invoices, employ
                     label="Invoice"
                     onChange={handleInvoiceIdChange}
                   >
-                    <MenuItem value={-1}>
-                      Add new invoice
-                    </MenuItem>
+                    <MenuItem value={-1}>Add new invoice</MenuItem>
                     <MenuItem value={inwards?.invoice.id}>
                       {inwards?.invoice.invoiceNo}
                     </MenuItem>

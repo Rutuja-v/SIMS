@@ -31,7 +31,6 @@ import GroupIcon from "@mui/icons-material/Group";
 import "./sidelist.css";
 import { Avatar, Tooltip } from "@mui/material";
 import { Logout } from "@mui/icons-material";
-
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -165,6 +164,11 @@ export default function SideList({ children }) {
     {
       label: "Products",
       path: "./products",
+      icon: <ProductionQuantityLimitsIcon style={{ color: "#171717" }} />,
+    },
+    {
+      label: "Analytics",
+      path: "./analytics",
       icon: <ProductionQuantityLimitsIcon style={{ color: "#171717" }} />,
     },
   ]);
