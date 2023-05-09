@@ -108,7 +108,7 @@ export default function Employees() {
         if (target.value === "") return items;
         else
           return items.filter((x) =>
-            x.employee_name.toLowerCase().includes(target.value)
+            x.name.toLowerCase().includes(target.value)
           );
       },
     });
@@ -234,6 +234,10 @@ export default function Employees() {
     getData();
   }, []);
 
+  function toSentenceCase(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   useEffect(() => {
     if (!addModalOpen) {
       formik.resetForm();
@@ -274,10 +278,8 @@ export default function Employees() {
               <TableRow key={item.id}>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.username}</TableCell>
-                <TableCell>{item.role.role}</TableCell>
-                <TableCell>
-                  {item.godown === null ? "None" : item.godown.location}
-                </TableCell>
+                <TableCell>{toSentenceCase(item.role.role)}</TableCell>
+                <TableCell>{item.godown === null ? "None" : item.godown.location}</TableCell>
                 <TableCell>
                   <Button onClick={() => handleEditModalOpen(item)}>
                     <EditOutlinedIcon fontSize="small" />

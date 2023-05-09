@@ -59,11 +59,11 @@ export default function Login() {
         password: values.password,
       })
       .then((res) => {
-        localStorage.setItem("token", res.data.token);
         const loginUser = {
           name: res.data.name,
-          email: res.data.username,
+          username: res.data.username,
           role: res.data.role.role,
+          godown: res.data.godown,
         };
         setUser(loginUser);
         localStorage.setItem("user", JSON.stringify(loginUser));
@@ -137,87 +137,80 @@ export default function Login() {
               xs={12}
               sm={12}
               lg={6}
-              style={{
-                backgroundSize: "cover",
-                backgroundColor: "#339999",
-                padding: "48px 48px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
             >
-              <ThemeProvider theme={darkTheme}>
-                <Typography style={{ textAlign: "center" }} variant="h5">
-                  Smart Inventory Management System
-                </Typography>
+              <form
+                onSubmit={handleSubmit}
+                style={{
+                  backgroundSize: "cover",
+                  backgroundColor: "#339999",
+                  padding: "48px 48px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}>
+                <ThemeProvider theme={darkTheme}>
+                  <Typography style={{ textAlign: "center" }} variant="h5">
+                    Smart Inventory Management System
+                  </Typography>
 
-                <Box
-                  style={{
-                    marginTop: "32px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "5px",
+                  <Box
+                    style={{
+                      marginTop: "32px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "5px",
+                    }}
+                  >
+                    <Avatar sx={{ bgcolor: "#ffffff" }}></Avatar>
+                    <Typography component="h1" variant="h6">
+                      Sign in
+                    </Typography>
+                  </Box>
+
+                  <TextField
+                    sx={{
+                      mt: 2,
+                      width: "75%",
+                    }}
+                    required
+                    id="username"
+                    label="Username"
+                    name="username"
+                    autoComplete="username"
+                    onChange={(e) =>
+                      setValues({ ...values, username: e.target.value })
+                    }
+                  />
+
+                  <TextField
+                    sx={{
+                      mt: 2,
+                      width: "75%",
+                    }}
+                    required
+                    id="password"
+                    label="Password"
+                    type="password"
+                    name="password"
+                    autoComplete="password"
+                    onChange={(e) =>
+                      setValues({ ...values, password: e.target.value })
+                    }
+                  />
+                </ThemeProvider>
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    mt: 2,
                   }}
                 >
-                  <Avatar sx={{ bgcolor: "#ffffff" }}></Avatar>
-                  <Typography component="h1" variant="h6">
-                    Sign in
-                  </Typography>
-                </Box>
-
-                <TextField
-                  sx={{
-                    mt: 2,
-                    width: "75%",
-                  }}
-                  required
-                  id="username"
-                  label="Username"
-                  name="username"
-                  autoComplete="username"
-                  onChange={(e) =>
-                    setValues({ ...values, username: e.target.value })
-                  }
-                />
-
-                <TextField
-                  sx={{
-                    mt: 2,
-                    width: "75%",
-                  }}
-                  required
-                  id="password"
-                  label="Password"
-                  type="password"
-                  name="password"
-                  autoComplete="password"
-                  onChange={(e) =>
-                    setValues({ ...values, password: e.target.value })
-                  }
-                />
-              </ThemeProvider>
-              {/* <Typography
-                              variant="body1"
-                              component="span"
-                              onClick={() => {
-                                navigate("/reset-password");
-                              }}
-                              style={{ marginTop: "10px", cursor: "pointer" }}
-                            >
-                              Forgot password?
-                            </Typography> */}
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  mt: 2,
-                }}
-                onClick={handleSubmit}
-              >
-                Sign in
-              </Button>
+                  Sign in
+                </Button>
+              </form>
             </Grid>
           </Grid>
         </Box>

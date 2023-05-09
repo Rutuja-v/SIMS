@@ -14,13 +14,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 
 import { useNavigate } from "react-router-dom";
 import { Context } from "../../context/ContextProvider";
-import PersonIcon from "@mui/icons-material/Person";
 
 import AssignmentReturnedIcon from "@mui/icons-material/AssignmentReturned";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -29,9 +27,10 @@ import TakeoutDiningIcon from "@mui/icons-material/TakeoutDining";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import GroupIcon from "@mui/icons-material/Group";
 import "./sidelist.css";
-import { Avatar, Tooltip } from "@mui/material";
+import { Avatar, Button, Tooltip } from "@mui/material";
 import { Logout } from "@mui/icons-material";
-const drawerWidth = 240;
+
+const drawerWidth = 200;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -173,6 +172,10 @@ export default function SideList({ children }) {
     },
   ]);
 
+  function toSentenceCase(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -264,34 +267,33 @@ export default function SideList({ children }) {
         </List>
         <Divider />
         <Box sx={{ mx: "auto", mt: 3, mb: 1 }}>
-          <Tooltip title={currentUser?.username || ""}>
+          <Tooltip title={currentUser?.name}>
             <Avatar
-              src={currentUser?.photoURL}
               {...(open && { sx: { width: 50, height: 50 } })}
             />
           </Tooltip>
         </Box>
         <Box>
-          <Box sx={{ textAlign: "center" }}>
-            {open && <Typography>{currentUser?.username}</Typography>}
-            <Typography variant="body2">
-              {currentUser?.role || "role"}
-            </Typography>
-            {open && (
-              <Typography variant="body2">{currentUser?.email}</Typography>
-            )}
-            <Tooltip title="Logout" sx={{ mt: 1 }}>
-              <IconButton style={{ color: "#171717" }} onClick={handleLogout}>
-                <Logout />
-              </IconButton>
-            </Tooltip>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+            {open && <Typography>{currentUser?.name}</Typography>}
+            {open && <Typography variant="caption" color="textSecondary">{"Username: " + currentUser?.username}</Typography>}
+            {open && <Typography variant="caption" color="textSecondary">
+              {"Role: " + toSentenceCase(currentUser?.role)}
+            </Typography>}
+            {open && currentUser?.godown && <Typography variant="caption" color="textSecondary">{"Location: " + currentUser?.godown.location}</Typography>}
+            <Button style={{ color: "#171717" }} onClick={handleLogout}>
+              <Logout />
+              {open && <Typography sx={{ ml: 1 }} variant="caption">
+                Logout
+              </Typography>}
+            </Button>
           </Box>
         </Box>
-      </Drawer>
+      </Drawer >
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         {children}
       </Box>
-    </Box>
+    </Box >
   );
 }

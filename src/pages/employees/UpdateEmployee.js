@@ -74,7 +74,7 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
     formData["role"] = {
       id: roleId,
     };
-    if (godownId != -1) {
+    if (godownId !== -1) {
       formData["godown"] = {
         id: Number(godownId),
       };
