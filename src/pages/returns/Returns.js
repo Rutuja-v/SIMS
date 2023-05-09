@@ -285,6 +285,10 @@ export default function Returns() {
     getData();
   }, []);
 
+  function toSentenceCase(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   return (
     <>
       <Paper className={classes.pageContent}>
@@ -346,7 +350,7 @@ export default function Returns() {
                   </Typography>
                 </TableCell>
                 <TableCell>{item.returned_by}</TableCell>
-                <TableCell>{item.reason}</TableCell>
+                <TableCell>{toSentenceCase(item.reason)}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
                 <TableCell>{item.return_date}</TableCell>
                 <TableCell>

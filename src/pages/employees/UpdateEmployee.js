@@ -74,7 +74,7 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
     formData["role"] = {
       id: roleId,
     };
-    if (godownId != -1) {
+    if (godownId !== -1) {
       formData["godown"] = {
         id: Number(godownId),
       }
@@ -91,11 +91,11 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
         console.error(error);
       });
 
-    setName("");
-    setUsername("");
-    setPassword("");
-    setRoleId("");
-    setGodownId("");
+    setName(null);
+    setUsername(null);
+    setPassword(null);
+    setRoleId(null);
+    setGodownId(null);
     handleClose();
   };
 

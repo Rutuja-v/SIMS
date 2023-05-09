@@ -277,6 +277,10 @@ export default function Outwards() {
     getData();
   }, []);
 
+  function toSentenceCase(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   return (
     <>
       <Paper className={classes.pageContent}>
@@ -340,7 +344,7 @@ export default function Outwards() {
                 <TableCell>
                   {item.delivered_to}
                 </TableCell>
-                <TableCell>{item.purpose}</TableCell>
+                <TableCell>{toSentenceCase(item.purpose)}</TableCell>
                 <TableCell>{item.supply_date}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
                 <TableCell>

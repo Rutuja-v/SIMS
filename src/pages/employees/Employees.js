@@ -69,11 +69,11 @@ export default function Employees() {
     subTitle: "",
   });
 
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [roleId, setRoleId] = useState("");
-  const [godownId, setGodownId] = useState("");
+  const [name, setName] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [roleId, setRoleId] = useState(null);
+  const [godownId, setGodownId] = useState(null);
 
   const [roles, setRoles] = useState([]);
   const [godowns, setGodowns] = useState([]);
@@ -153,7 +153,7 @@ export default function Employees() {
     formData["role"] = {
       id: Number(roleId),
     };
-    if (godownId != -1) {
+    if (godownId !== -1) {
       formData["godown"] = {
         id: Number(godownId),
       }
@@ -170,11 +170,11 @@ export default function Employees() {
         console.error(error);
       });
 
-    setName("");
-    setUsername("");
-    setPassword("");
-    setRoleId("");
-    setGodownId("");
+    setName(null);
+    setUsername(null);
+    setPassword(null);
+    setRoleId(null);
+    setGodownId(null);
     setAddModalOpen(false);
   };
 
@@ -218,6 +218,10 @@ export default function Employees() {
     getData();
   }, []);
 
+  function toSentenceCase(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
   return (
     <>
       <Paper className={classes.pageContent}>
@@ -252,7 +256,7 @@ export default function Employees() {
               <TableRow key={item.id}>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.username}</TableCell>
-                <TableCell>{item.role.role}</TableCell>
+                <TableCell>{toSentenceCase(item.role.role)}</TableCell>
                 <TableCell>{item.godown === null ? "None" : item.godown.location}</TableCell>
                 <TableCell>
                   <Controls.ActionButton
