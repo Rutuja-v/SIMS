@@ -34,10 +34,13 @@ import CloseIcon from "@material-ui/icons/Close";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
+import Grid from '@mui/material/Grid';
 import UpdateInwards from "./UpdateInwards";
 import { useMemo } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+const Excel = require("exceljs");
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     padding: theme.spacing(3),
@@ -56,6 +59,118 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Inwards() {
+
+  const inwardsExcel = async () => {
+
+    let reportData = [];
+
+    for (let i = 0; i < inwards.length; i++) {
+      let item = inwards[i];
+
+      let obj = {
+        'Godown': item.godown.location,
+        'Godown Capacity': item.godown.capacityInQuintals,
+        'Product Name': item.product.name,
+        'Product Price': item.product.price,
+        'Product Qty': item.quantity,
+        'Supplier Name': item.supplier.name,
+        'Supply Date': item.supply_date,
+        'Invoice No.': item.invoice.invoiceNo,
+        'Bill Value': item.invoice.billValue,
+        'Receipt No.': item.receipt_no
+      }
+
+      reportData.push(obj);
+    }
+
+    let workbook = new Excel.Workbook();
+
+    let keys = Object.keys(reportData[0]);
+
+    let headers = getColumnHeaders(keys, keys);
+
+    let columnHeaders = getExcelColumnHeaders(headers);
+
+    let sheet = workbook.addWorksheet('Inwards', {
+      views: [{ state: "frozen", ySplit: 1 }],
+    });
+
+    console.log("Headers", headers, "Column Headers", columnHeaders)
+
+    sheet.columns = columnHeaders;
+
+    // add data to excel sheet
+    sheet.addRows(reportData);
+
+    // make the header bold
+    sheet.getRow(1).font = { bold: true };
+
+    console.log("report", reportData)
+
+    // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
+
+    // fileBuffer = fileBuffer.toString('base64');
+
+    let fileBuffer = await workbook.xlsx.writeBuffer();
+
+    const fileBlob = new Blob(
+      [fileBuffer],
+      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+    );
+
+    const fileName = `${'Inwards'}_${new Date().toISOString()}.xlsx`;
+
+    const url = URL.createObjectURL(fileBlob);
+
+    let link = document.createElement('a');
+
+    link.href = url;
+
+    link.setAttribute('download', fileName);
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    URL.revokeObjectURL(url)
+
+  }
+
+  const getColumnHeaders = (columns, keys = []) => {
+    const columnHeaders = [];
+    for (let i = 0; i < columns.length; i++) {
+      let currrentColumn = columns[i].trim();
+      columnHeaders.push({
+        header: currrentColumn,
+        key: keys[i] ? keys[i] : currrentColumn,
+      });
+    }
+
+    return columnHeaders;
+  };
+
+  const getExcelColumnHeaders = (headers) => {
+    let columnHeaders = [];
+    for (let i = 0; i < headers.length; i++) {
+      columnHeaders.push({
+        header: headers[i].header,
+        key: headers[i].key,
+        width:
+          headers[i].header == "Message" ? 50 : headers[i].header.length + 10,
+        style: {
+          alignment: {
+            vertical: "middle",
+            horizontal: "center",
+            wrapText: true,
+          },
+          bgColor: { argb: "#008000" },
+        },
+      });
+    }
+
+    return columnHeaders;
+  };
+
   const headCells = useMemo(
     () => [
       { id: "godown", label: "Godown" },
@@ -291,116 +406,125 @@ export default function Inwards() {
     <>
       <Paper className={classes.pageContent}>
         <Toolbar>
-          <TextField
-            disabled={recordsAfterPagingAndSorting()?.length === 0}
-            label="Search by supplier name"
-            className={classes.searchInput}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-            onChange={handleSearch}
-          />
-          {user.role === "manager" && (
-            <Button
-              style={{ position: "absolute", right: "10px" }}
-              variant="outlined"
-              startIcon={<AddIcon />}
-              className={classes.newButton}
-              onClick={handleAddModalOpen}
-            >
-              Add new
-            </Button>
-          )}
-        </Toolbar>
-        {recordsAfterPagingAndSorting()?.length === 0 ? (
-          <Grid sx={{ mt: 2, ml: 3 }}>
-            There are currently 0 inwards records.
-          </Grid>
-        ) : (
-          <>
-            <TblContainer>
-              <TblHead />
-              <TableBody>
-                {recordsAfterPagingAndSorting()?.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      {item.godown.location}
-                      <Typography
-                        variant="caption"
-                        color="textSecondary"
-                        component="p"
-                      >
-                        {"Capacity: " + item.godown.capacityInQuintals}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      {item.product.name}
-                      <Typography
-                        variant="caption"
-                        color="textSecondary"
-                        component="p"
-                      >
-                        {"Price: " + item.product.price}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="textSecondary"
-                        component="p"
-                      >
-                        {"Quantity: " + item.quantity}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{item.supplier.name}</TableCell>
-                    <TableCell>{item.supply_date}</TableCell>
-                    <TableCell>
-                      {item.invoice.invoiceNo}
-                      <Typography
-                        variant="caption"
-                        color="textSecondary"
-                        component="p"
-                      >
-                        {"Bill value: " + item.invoice.billValue}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{item.receipt_no}</TableCell>
-                    {user.role === "manager" && (
-                      <TableCell>
-                        <Button
-                          onClick={() => {
-                            handleEditModalOpen(item);
-                          }}
-                        >
-                          <EditOutlinedIcon fontSize="small" color="success" />
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setConfirmDialog({
-                              isOpen: true,
-                              title: "Are you sure to delete this record?",
-                              subTitle: "You can't undo this operation",
-                              onConfirm: () => {
-                                handleDelete(item.id);
-                              },
-                            });
-                          }}
-                        >
-                          <CloseIcon fontSize="small" color="error" />
-                        </Button>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </TblContainer>
-            <TblPagination />
-          </>
-        )}
-      </Paper>
+          <Grid container spacing={2} direction="row">
+            <Grid item>
+              <TextField
+                label="Search by supplier name"
+                className={classes.searchInput}
+                sx={{width : '700px'}}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={handleSearch}
+              />
+            </Grid>
 
+            <Grid item >
+              <Button
+                variant="contained"
+                sx={{marginLeft : '110px', marginTop : '10px' }}
+                className={classes.newButton}
+                onClick={inwardsExcel}
+              >
+                Download Report
+              </Button>
+            </Grid>
+            <Grid item>
+              {user.role === "manager" && (
+                <Button
+                  variant="outlined"
+                  sx={{marginLeft : '10px', marginTop : '10px' }}
+                  startIcon={<AddIcon />}
+                  className={classes.newButton}
+                  onClick={handleAddModalOpen}
+                >
+                  Add new
+                </Button>
+              )}
+            </Grid>
+          </Grid>
+
+        </Toolbar>
+        <TblContainer>
+          <TblHead />
+          <TableBody>
+            {recordsAfterPagingAndSorting().map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>
+                  {item.godown.location}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Capacity: " + item.godown.capacityInQuintals}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  {item.product.name}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Price: " + item.product.price}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Quantity: " + item.quantity}
+                  </Typography>
+                </TableCell>
+                <TableCell>{item.supplier.name}</TableCell>
+                <TableCell>{item.supply_date}</TableCell>
+                <TableCell>
+                  {item.invoice.invoiceNo}
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Bill value: " + item.invoice.billValue}
+                  </Typography>
+                </TableCell>
+                <TableCell>{item.receipt_no}</TableCell>
+                {user.role === "manager" && (
+                  <TableCell>
+                    <Button
+                      onClick={() => {
+                        handleEditModalOpen(item);
+                      }}
+                    >
+                      <EditOutlinedIcon fontSize="small" color="success" />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setConfirmDialog({
+                          isOpen: true,
+                          title: "Are you sure to delete this record?",
+                          subTitle: "You can't undo this operation",
+                          onConfirm: () => {
+                            handleDelete(item.id);
+                          },
+                        });
+                      }}
+                    >
+                      <CloseIcon fontSize="small" color="error" />
+                    </Button>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </TblContainer>
+        <TblPagination />
+      </Paper >
       <Dialog
         open={addModalOpen}
         onClose={handleAddModalClose}
