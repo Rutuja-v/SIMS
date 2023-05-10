@@ -5,7 +5,7 @@ import { Chart } from "chart.js/auto";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import moment from "moment";
 import GodownsChart from "./GodownsChart";
-
+import ProductsChart from "./ProductsChart";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -59,8 +59,8 @@ const optionsForProductsData = {
     },
     title: {
       display: true,
+      // text: "Products Vs Quantity (Inwards & Outwards)",
       text: "Products Vs Quantity (Inwards & Outwards)",
-      text: "Godown (Capacity Vs. Location)",
     },
   },
 };
@@ -92,22 +92,22 @@ const Analytics = () => {
   const [employees, setEmployees] = useState([]);
   const [employeeRoles, setEmployeeRoles] = useState([]);
   const [chartData, setChartData] = useState(null);
-  // const [data, setData] = useState({
-  //   datasets: [
-  //     {
-  //       label: "Dataset 1",
-  //       data: [],
-  //       borderColor: "rgb(255, 99, 132)",
-  //       backgroundColor: "rgba(25, 90, 13, 0.5)",
-  //     },
-  //     {
-  //       label: "Dataset 2",
-  //       data: [],
-  //       borderColor: "rgb(53, 162, 235)",
-  //       backgroundColor: "rgba(53, 162, 235, 0.5)",
-  //     },
-  //   ],
-  // });
+  const [data, setData] = useState({
+    datasets: [
+      {
+        label: "Dataset 1",
+        data: [],
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(25, 90, 13, 0.5)",
+      },
+      {
+        label: "Dataset 2",
+        data: [],
+        borderColor: "rgb(53, 162, 235)",
+        backgroundColor: "rgba(53, 162, 235, 0.5)",
+      },
+    ],
+  });
 
   const [productsData, setProductsData] = useState({
     datasets: [
@@ -139,8 +139,8 @@ const Analytics = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const outwards = "http://localhost:8080/api/outwards";
-      const inwards = "http://localhost:8080/api/inwards";
+       const outwards = "http://localhost:8080/api/outwards";
+      // const inwards = "http://localhost:8080/api/inwards";
       const returns = "http://localhost:8080/api/returns";
 
       const labelSet = [];
@@ -187,55 +187,55 @@ const Analytics = () => {
           console.log("error", e);
         });
 
-      await fetch(inwards)
-        .then((data) => {
-          console.log("API data", data);
-          const res = data.json();
-          return res;
-        })
-        .then((res) => {
-          console.log("res", res);
-          for (let i = 0; i < dataSetForOutwardsProducts.length; i++) {
-            dataSetForInwardsProducts.push(0);
-          }
-          for (const val of res) {
-            if (labelSetForProductsData.includes(val.product.name)) {
-              let idx = labelSetForProductsData.findIndex(
-                (item) => item == val.product.name
-              );
-              dataSetForInwardsProducts[idx] =
-                Number(dataSetForInwardsProducts[idx]) + Number(val.quantity);
-            } else {
-              labelSetForProductsData.push(val.product.name);
-              dataSetForInwardsProducts.push(val.quantity);
-            }
-            // labelSet.push(val.name)
-          }
+      // await fetch(inwards)
+      //   .then((data) => {
+      //     console.log("API data", data);
+      //     const res = data.json();
+      //     return res;
+      //   })
+        // .then((res) => {
+        //   console.log("res", res);
+        //   for (let i = 0; i < dataSetForOutwardsProducts.length; i++) {
+        //     dataSetForInwardsProducts.push(0);
+        //   }
+        //   for (const val of res) {
+        //     if (labelSetForProductsData.includes(val.product.name)) {
+        //       let idx = labelSetForProductsData.findIndex(
+        //         (item) => item == val.product.name
+        //       );
+        //       dataSetForInwardsProducts[idx] =
+        //         Number(dataSetForInwardsProducts[idx]) + Number(val.quantity);
+        //     } else {
+        //       labelSetForProductsData.push(val.product.name);
+        //       dataSetForInwardsProducts.push(val.quantity);
+        //     }
+        //     // labelSet.push(val.name)
+        //   }
 
-          if (
-            dataSetForInwardsProducts.length > dataSetForOutwardsProducts.length
-          ) {
-            for (
-              let i = 0;
-              i <
-              dataSetForInwardsProducts.length -
-                dataSetForOutwardsProducts.length;
-              i++
-            ) {
-              dataSetForOutwardsProducts.push(0);
-            }
-          }
+        //   if (
+        //     dataSetForInwardsProducts.length > dataSetForOutwardsProducts.length
+        //   ) {
+        //     for (
+        //       let i = 0;
+        //       i <
+        //       dataSetForInwardsProducts.length -
+        //         dataSetForOutwardsProducts.length;
+        //       i++
+        //     ) {
+        //       dataSetForOutwardsProducts.push(0);
+        //     }
+        //   }
 
-          console.log(
-            "arrData",
-            dataSet1,
-            dataSet2,
-            dataSetForOutwardsProducts
-          );
-        })
-        .catch((e) => {
-          console.log("error", e);
-        });
+        //   console.log(
+        //     "arrData",
+        //     dataSet1,
+        //     dataSet2,
+        //     dataSetForOutwardsProducts
+        //   );
+        // })
+        // .catch((e) => {
+        //   console.log("error", e);
+        // });
 
       await fetch(returns)
         .then((data) => {
@@ -260,23 +260,23 @@ const Analytics = () => {
           console.log("error", e);
         });
 
-      // setData({
-      //   labels: labelSet,
-      //   datasets: [
-      //     {
-      //       label: "Inwards",
-      //       data: dataSet1,
-      //       borderColor: "#495057",
-      //       backgroundColor: "#6c757d;",
-      //     },
-      //     {
-      //       label: "Outwards",
-      //       data: dataSet2,
-      //       borderColor: "#495057",
-      //       backgroundColor: "#ced4da"
-      //     },
-      //   ],
-      // });
+      setData({
+        labels: labelSet,
+        datasets: [
+          {
+            label: "Inwards",
+            data: dataSet1,
+            borderColor: "#495057",
+            backgroundColor: "#6c757d;",
+          },
+          {
+            label: "Outwards",
+            data: dataSet2,
+            borderColor: "#495057",
+            backgroundColor: "#ced4da"
+          },
+        ],
+      });
 
       setProductsData({
         labels: labelSetForProductsData,
@@ -362,7 +362,7 @@ const Analytics = () => {
 
   return (
     <div style={{ width: "100%", height: "500%" }}>
-      {/* <Bar data={data} height={'55px'} options={options} /> */}
+      <Bar data={data} height={'55px'} options={options} />
       <br></br>
       <br></br>
       {chartData ? (
@@ -435,6 +435,12 @@ const Analytics = () => {
         >
           <GodownsChart />
         </div>
+      </>
+    
+      <>
+      <div style={{ marginBottom: '40px', border: '1px solid gray', padding: '20px' }}>
+  <ProductsChart godownId={3}/>
+  </div>
       </>
     </div>
   );

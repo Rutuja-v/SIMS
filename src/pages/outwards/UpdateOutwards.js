@@ -329,7 +329,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                   variant="contained"
                   onClick={handleSubmit}
                 >
-                  Edit
+                  Save
                 </Button>
               </DialogActions>
             </Form>

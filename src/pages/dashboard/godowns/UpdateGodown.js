@@ -280,7 +280,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                   variant="contained"
                   onClick={handleSubmit}
                 >
-                  Edit
+                  Save
                 </Button>
               </DialogActions>
             </Form>

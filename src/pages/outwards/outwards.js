@@ -4,7 +4,9 @@ import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
+
 import {
+  Grid,
   Paper,
   TableBody,
   TableRow,
@@ -76,7 +78,7 @@ export default function Outwards() {
 
   const [user] = useContext(Context);
   const classes = useStyles();
-  const [outwards, setOutwards] = useState([]);
+  const [outwards, setOutwards] = useState(null);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
@@ -301,6 +303,7 @@ export default function Outwards() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
+            disabled={recordsAfterPagingAndSorting()?.length === 0}
             label="Search by customer (delivered to)"
             className={classes.searchInput}
             InputProps={{
@@ -324,10 +327,16 @@ export default function Outwards() {
             </Button>
           )}
         </Toolbar>
+        {recordsAfterPagingAndSorting()?.length === 0 ? (
+          <Grid sx={{ mt: 2, ml: 3 }}>
+            There are currently 0 outwards records.
+          </Grid>
+        ) : (
+          <>
         <TblContainer>
           <TblHead />
           <TableBody>
-            {recordsAfterPagingAndSorting().map((item) => (
+            {recordsAfterPagingAndSorting()?.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   {item.godown.location}
@@ -356,9 +365,7 @@ export default function Outwards() {
                     {"Quantity: " + item.quantity}
                   </Typography>
                 </TableCell>
-                <TableCell>
-                  {item.delivered_to}
-                </TableCell>
+                <TableCell>{item.delivered_to}</TableCell>
                 <TableCell>{toSentenceCase(item.purpose)}</TableCell>
                 <TableCell>{item.supply_date}</TableCell>
                 <TableCell>{item.delivery_date}</TableCell>
@@ -403,6 +410,8 @@ export default function Outwards() {
           </TableBody>
         </TblContainer>
         <TblPagination />
+        </>
+        )}
       </Paper>
 
       <Dialog
@@ -593,7 +602,7 @@ export default function Outwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }
@@ -622,6 +631,7 @@ export default function Outwards() {
                     Cancel
                   </Button>
                   <Button
+                    disabled={!formik.isValid || !formik.dirty}
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}

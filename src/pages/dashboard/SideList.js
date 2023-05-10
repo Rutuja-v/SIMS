@@ -19,7 +19,7 @@ import ListItemText from "@mui/material/ListItemText";
 
 import { useNavigate } from "react-router-dom";
 import { Context } from "../../context/ContextProvider";
-
+import { makeStyles } from "@material-ui/core";
 import AssignmentReturnedIcon from "@mui/icons-material/AssignmentReturned";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -29,7 +29,8 @@ import GroupIcon from "@mui/icons-material/Group";
 
 import { Avatar, Button, Tooltip } from "@mui/material";
 import { Logout } from "@mui/icons-material";
-import AnalyticsIcon from '@mui/icons-material/Analytics';
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import profileIcon from "../../Components/assets/profile.svg";
 const drawerWidth = 200;
 
 const openedMixin = (theme) => ({
@@ -40,7 +41,18 @@ const openedMixin = (theme) => ({
   }),
   overflowX: "hidden",
 });
-
+const useStyles = makeStyles((theme) => ({
+  drawer: {
+    width: 240,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+  },
+  paper: {
+    width: 240,
+    borderRight: 'none', // Remove right border
+    overflowX: 'hidden', // Hide horizontal overflow
+  },
+}));
 const closedMixin = (theme) => ({
   transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
@@ -102,7 +114,7 @@ export default function SideList({ children }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
-
+  const classes = useStyles();
   const [currentUser, setCurrentUser] = useContext(Context);
   const handleLogout = () => {
     navigate("/");
@@ -119,58 +131,63 @@ export default function SideList({ children }) {
 
   const links = [];
   if (user.role === "superadmin") {
-    links.push(...[
-      {
-        label: "Godowns",
-        path: "./",
-        icon: <InventoryIcon style={{ color: "#171717" }} />,
-      },
-      {
-        label: "Employees",
-        path: "./employees",
-        icon: <GroupIcon style={{ color: "#171717" }} />,
-      },
-    ]);
+    links.push(
+      ...[
+        {
+          label: "Godowns",
+          path: "./",
+          icon: <InventoryIcon style={{ color: "#171717" }} />,
+        },
+        {
+          label: "Employees",
+          path: "./employees",
+          icon: <GroupIcon style={{ color: "#171717" }} />,
+        },
+      ]
+    );
+  } else {
+    links.push(
+      ...[
+        {
+          label: "Stock",
+          path: "./",
+          icon: <InventoryIcon style={{ color: "#171717" }} />,
+        },
+      ]
+    );
   }
-  else {
-    links.push(...[
+
+  links.push(
+    ...[
       {
-        label: "Stock",
-        path: "./",
-        icon: <InventoryIcon style={{ color: "#171717" }} />,
+        label: "Inwards",
+        path: "./inwards",
+        icon: <LocalShippingIcon style={{ color: "#171717" }} />,
       },
-    ])
-  }
+      {
+        label: "Outwards",
+        path: "./outwards",
+        icon: <TakeoutDiningIcon style={{ color: "#171717" }} />,
+      },
 
-  links.push(...[
-    {
-      label: "Inwards",
-      path: "./inwards",
-      icon: <LocalShippingIcon style={{ color: "#171717" }} />,
-    },
-    {
-      label: "Outwards",
-      path: "./outwards",
-      icon: <TakeoutDiningIcon style={{ color: "#171717" }} />,
-    },
+      {
+        label: "Returns",
+        path: "./returns",
+        icon: <AssignmentReturnedIcon style={{ color: "#171717" }} />,
+      },
 
-    {
-      label: "Returns",
-      path: "./returns",
-      icon: <AssignmentReturnedIcon style={{ color: "#171717" }} />,
-    },
-
-    {
-      label: "Products",
-      path: "./products",
-      icon: <ProductionQuantityLimitsIcon style={{ color: "#171717" }} />,
-    },
-    {
-      label: "Analytics",
-      path: "./analytics",
-      icon: <AnalyticsIcon style={{ color: "#171717" }} />,
-    },
-  ]);
+      {
+        label: "Products",
+        path: "./products",
+        icon: <ProductionQuantityLimitsIcon style={{ color: "#171717" }} />,
+      },
+      {
+        label: "Analytics",
+        path: "./analytics",
+        icon: <AnalyticsIcon style={{ color: "#171717" }} />,
+      },
+    ]
+  );
 
   function toSentenceCase(str) {
     if (str === undefined || str === null) {
@@ -206,40 +223,42 @@ export default function SideList({ children }) {
               }}
             />
           )}
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" Wrap component="div">
             Smart Inventory Management System
           </Typography>
-            {/* <IconButton sx={{ display: { xs: 'flex', md: 'none' } }}
+
+          {/* <IconButton sx={{ display: { xs: 'flex', md: 'none' } }}
             
             >
               <HomeIcon style={{color:"#000000"}}/>
             </IconButton> */}
-
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
-          {theme.direction === "rtl" ? (
+           {theme.direction === "rtl" ? (
             <ChevronRightIcon
+              onClick={handleDrawerOpen}
+              style={{
+                cursor: "pointer",
+              }}
+            />
+          ) : ( 
+             <ChevronLeftIcon
               onClick={handleDrawerClose}
               style={{
                 cursor: "pointer",
               }}
             />
-          ) : (
-            <ChevronLeftIcon
-              onClick={handleDrawerClose}
-              style={{
-                cursor: "pointer",
-              }}
-            />
-          )}
+          )} 
+         
         </DrawerHeader>
+        
         <Divider />
         <List>
-          {links.map((link, index) => (
+          {links.map((link, index) =>
             user.role !== "superadmin" &&
-              (link.label === "Godowns" || link.label === "Employees") ? null : (
+            (link.label === "Godowns" || link.label === "Employees") ? null : (
               <NavLink
                 key={index}
                 to={link.path}
@@ -275,37 +294,57 @@ export default function SideList({ children }) {
                 </ListItem>
               </NavLink>
             )
-          ))}
+          )}
         </List>
         <Divider />
         <Box sx={{ mx: "auto", mt: 3, mb: 1 }}>
           <Tooltip title={currentUser?.name}>
             <Avatar
-              {...(open && { sx: { width: 50, height: 50 } })}
+              src={profileIcon}
+              {...(open && { sx: { width: 40, height: 40 } })}
             />
           </Tooltip>
         </Box>
         <Box>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
             {open && <Typography>{currentUser?.name}</Typography>}
-            {open && <Typography variant="caption" color="textSecondary">{"Username: " + currentUser?.username}</Typography>}
-            {open && <Typography variant="caption" color="textSecondary">
-              {"Role: " + toSentenceCase(currentUser?.role)}
-            </Typography>}
-            {open && currentUser?.godown && <Typography variant="caption" color="textSecondary">{"Location: " + currentUser?.godown.location}</Typography>}
+            {open && (
+              <Typography variant="caption" color="textSecondary">
+                {"Username: " + currentUser?.username}
+              </Typography>
+            )}
+            {open && (
+              <Typography variant="caption" color="textSecondary">
+                {"Role: " + toSentenceCase(currentUser?.role)}
+              </Typography>
+            )}
+            {open && currentUser?.godown && (
+              <Typography variant="caption" color="textSecondary">
+                {"Location: " + currentUser?.godown.location}
+              </Typography>
+            )}
             <Button style={{ color: "#171717" }} onClick={handleLogout}>
               <Logout />
-              {open && <Typography sx={{ ml: 1 }} variant="caption">
-                Logout
-              </Typography>}
+              {open && (
+                <Typography sx={{ ml: 1 }} variant="caption">
+                  Logout
+                </Typography>
+              )}
             </Button>
           </Box>
         </Box>
-      </Drawer >
+      </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         {children}
       </Box>
-    </Box >
+    </Box>
   );
 }

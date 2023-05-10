@@ -9,18 +9,17 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import { MenuItem,InputLabel,Select,
+FormControl } from "@mui/material";
 import { useState, forwardRef } from "react";
 import Snackbar from "@mui/material/Snackbar";
-import Stack from "@mui/material/Stack";
-import MuiAlert from "@mui/material/Alert";
+
 import Slide from "@mui/material/Slide";
 import { useNavigate } from "react-router-dom";
 
-const Alert = forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+// const Alert = forwardRef(function Alert(props, ref) {
+//   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+// });
 
 const darkTheme = createTheme({
   palette: {
@@ -29,25 +28,25 @@ const darkTheme = createTheme({
 });
 
 const boxstyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+ mt: 4,
+  mb: 4,
   width: "75%",
-  height: "70%",
-  bgcolor: "background.paper",
+  backgroundColor: "background.paper",
   boxShadow: 24,
 };
 
-const center = {
-  position: "relative",
-  top: "50%",
-  left: "30%",
-};
+// const center = {
+//   position: "relative",
+//   top: "50%",
+//   left: "30%",
+// };
 
 export default function ForgotPassword() {
+  const [question1, setQuestion1] = useState('');
+  const [question2, setQuestion2] = useState('');
+  const [submissionMessage, setSubmissionMessage] = useState('');
   const [open, setOpen] = useState(false);
-  const [remember, setRemember] = useState(false);
+  
   const vertical = "top";
   const horizontal = "right";
   const navigate = useNavigate();
@@ -78,32 +77,37 @@ export default function ForgotPassword() {
         TransitionComponent={TransitionLeft}
         anchorOrigin={{ vertical, horizontal }}
       >
-        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
-          Failed! Enter correct username and password.
-        </Alert>
+       
       </Snackbar>
       <div
         style={{
           backgroundImage: `url(${stock})`,
           backgroundSize: "cover",
-          height: "100vh",
+          height: "100%",
+          minHeight: "100vh",
           color: "#f5f5f5",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <Box sx={boxstyle}>
-          <Grid container>
-            <Grid item xs={12} sm={12} lg={6}>
-              <Box
+          <Grid container
+            style={{
+              display: "flex",
+              alignItems: "stretch",
+            }}
+          >
+          
+            <Grid item xs={12} sm={12} lg={6}
+            
                 style={{
-                  backgroundImage: `url(${signin})`,
-                  backgroundSize: "cover",
-                  marginTop: "40px",
-                  marginLeft: "15px",
-                  marginRight: "15px",
-                  height: "63vh",
-                  color: "#f5f5f5",
+                backgroundImage: `url(${signin})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                color: "#f5f5f5",
                 }}
-              ></Box>
+              >
             </Grid>
             <Grid item xs={12} sm={12} lg={6}>
               <Box
@@ -111,31 +115,43 @@ export default function ForgotPassword() {
                   backgroundSize: "cover",
                   height: "70vh",
                   minHeight: "500px",
-                  backgroundColor: "#3b33d5",
+                  backgroundColor: "#339999",
                 }}
               >
                 <ThemeProvider theme={darkTheme}>
-                  <Container>
-                    <Box height={35} />
-                    <Box sx={center}>
+                <Typography style={{ textAlign: "center" }} variant="h5">
+                    Smart Inventory Management System
+                  </Typography>
+                <Box
+                    style={{
+                      marginTop: "32px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "5px",
+                    }}
+                  >
                       <Avatar
-                        sx={{ ml: "85px", mb: "4px", bgcolor: "#ffffff" }}
+                        sx={{ bgcolor: "#ffffff" }}
                       >
                         <LockOutlinedIcon />
                       </Avatar>
-                      <Typography component="h1" variant="h4">
+                      <Typography component="h1" variant="h6">
                         Reset Password
                       </Typography>
                     </Box>
-                    <Box
+                    {/* <Box
                       component="form"
                       noValidate
                       onSubmit={handleSubmit}
                       sx={{ mt: 2 }}
                     >
-                      <Grid container spacing={1}>
-                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
+        
                           <TextField
+                           sx={{
+                            mt: 2,
+                            width: "75%",
+                          }}
                             required
                             fullWidth
                             id="email"
@@ -143,26 +159,55 @@ export default function ForgotPassword() {
                             name="email"
                             autoComplete="email"
                           />
-                        </Grid>
-                        <Grid item xs={12} sx={{ ml: "5em", mr: "5em" }}>
-                          <Button
-                            type="submit"
-                            variant="contained"
-                            fullWidth="true"
-                            size="large"
-                            sx={{
-                              mt: "15px",
-                              mr: "20px",
-                              borderRadius: 28,
-                              color: "#ffffff",
-                              minWidth: "170px",
-                              backgroundColor: "#FF9A01",
-                            }}
-                          >
-                            Send Reset Link
-                          </Button>
-                        </Grid>
-                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
+                          </Box> */}
+                           <FormControl fullWidth>
+          <InputLabel id="question1-label">Question 1</InputLabel>
+          <Select
+            labelId="question1-label"
+            id="question1"
+            value={question1}
+            onChange={(e) => setQuestion1(e.target.value)}
+          >
+            <MenuItem value="q1-option1">Question 1 Option 1</MenuItem>
+            <MenuItem value="q1-option2">Question 1 Option 2</MenuItem>
+            <MenuItem value="q1-option3">Question 1 Option 3</MenuItem>
+          </Select>
+        </FormControl>
+                           {/* <TextField
+          sx={{
+            mt: 2,
+            width: '75%',
+          }}
+          required
+          fullWidth
+          id="Answer"
+          label="Answer "
+          value={Answer}
+          onChange={(e) => setQuestion1(e.target.value)}
+        /> */}
+        {/* <TextField
+          sx={{
+            mt: 2,
+            width: '75%',
+          }}
+          required
+          fullWidth
+          id="question2"
+          label="Question 2"
+          value={question2}
+          onChange={(e) => setQuestion2(e.target.value)}
+        /> */}
+                     </ThemeProvider>  
+                      <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    mt: 2,
+                  }}
+                >
+                  Send resend link
+                </Button>
+                        {/* <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
                           <Stack direction="row" spacing={2}>
                             <Typography
                               variant="body1"
@@ -180,15 +225,17 @@ export default function ForgotPassword() {
                               </span>
                             </Typography>
                           </Stack>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Container>
-                </ThemeProvider>
-              </Box>
+                        </Grid> */}
+                     
+                    
+
+                   
+                     </Box>
             </Grid>
-          </Grid>
-        </Box>
+           
+         </Grid>
+      
+      </Box>
       </div>
     </>
   );

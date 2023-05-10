@@ -310,7 +310,7 @@ function UpdateInwards({
                   variant="contained"
                   onClick={handleSubmit}
                 >
-                  Edit
+                  Save
                 </Button>
               </DialogActions>
             </Form>

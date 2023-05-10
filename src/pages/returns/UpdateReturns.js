@@ -342,7 +342,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
                   variant="contained"
                   onClick={handleSubmit}
                 >
-                  Edit
+                  Save
                 </Button>
               </DialogActions>
             </Form>

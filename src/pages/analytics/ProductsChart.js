@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Pie } from 'react-chartjs-2';
-import { Select, MenuItem, FormControl, InputLabel } from '@material-ui/core';
-
+// import { Select, MenuItem, FormControl, InputLabel} from '@material-ui/core';
+import { InputLabel,FormControl,MenuItem,Select } from '@mui/material';
 const ProductsChart = () => {
   const [products, setProducts] = useState([]);
   const [godowns, setGodowns] = useState([]);

@@ -143,7 +143,7 @@ function UpdateProduct({ product, handleClose }) {
                   variant="contained"
                   onClick={handleSubmit}
                 >
-                  Edit
+                  Save
                 </Button>
               </DialogActions>
             </Form>

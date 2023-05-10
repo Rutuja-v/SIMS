@@ -15,6 +15,7 @@ import Box from "@material-ui/core/Box";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import productImage from "../../Components/assets/product.jpg";
 import Notification from "../../Components/Notification";
 import {
   Card,
@@ -47,7 +48,11 @@ function Products() {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
-  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
+  });
   useEffect(() => {
     getData();
   }, []);
@@ -87,27 +92,29 @@ function Products() {
       .catch((error) => {
         console.error(error);
       });
-      setNotify({
-        isOpen: true,
-        message: 'Product Deleted Successfully',
-        type: 'error'
-    })
+    setNotify({
+      isOpen: true,
+      message: "Product Deleted Successfully",
+      type: "error",
+    });
   };
 
   const formik = useFormik({
     initialValues: {
       name: null,
       price: null,
-      weight: null
+      weight: null,
     },
     validationSchema: Yup.object().shape({
       name: Yup.string().required("Name is required"),
-      price: Yup.number().required("Price is required")
+      price: Yup.number()
+        .required("Price is required")
         .min(0, "Price must be positive"),
-      weight: Yup.number().required("Weight is required")
+      weight: Yup.number()
+        .required("Weight is required")
         .positive("Weight must be positive"),
     }),
-    onSubmit: (values,{resetForm}) => {
+    onSubmit: (values, { resetForm }) => {
       let formData = {};
 
       formData["name"] = values.name;
@@ -124,13 +131,13 @@ function Products() {
         .catch((error) => {
           console.error(error);
         });
-        resetForm();
+      resetForm();
       handleAddModalClose();
       setNotify({
         isOpen: true,
-        message: 'Product Submitted Successfully',
-        type: 'success'
-    })
+        message: "Product Submitted Successfully",
+        type: "success",
+      });
     },
   });
   function toSentenceCase(str) {
@@ -183,7 +190,7 @@ function Products() {
                 label="Name"
                 type="text"
                 variant="outlined"
-                {...formik.getFieldProps('name')}
+                {...formik.getFieldProps("name")}
                 error={formik.touched.name && formik.errors.name ? true : false}
                 helperText={formik.touched.name && formik.errors.name}
               />
@@ -192,33 +199,32 @@ function Products() {
                 label="Price"
                 type="number"
                 variant="outlined"
-                {...formik.getFieldProps('price')}
-                error={formik.touched.price && formik.errors.price ? true : false}
+                {...formik.getFieldProps("price")}
+                error={
+                  formik.touched.price && formik.errors.price ? true : false
+                }
                 helperText={formik.touched.price && formik.errors.price}
               />
               <TextField
                 id="weight"
                 label="Weight"
                 type="number"
-                inputProps={{min:1}}
+                inputProps={{ min: 1 }}
                 variant="outlined"
-                {...formik.getFieldProps('weight')}
-                error={formik.touched.weight && formik.errors.weight ? true : false}
+                {...formik.getFieldProps("weight")}
+                error={
+                  formik.touched.weight && formik.errors.weight ? true : false
+                }
                 helperText={formik.touched.weight && formik.errors.weight}
               />
             </div>
 
             <DialogActions>
-              <Button
-                variant="outlined"
-                onClick={() => setAddModalOpen(false)}
-              >
+              <Button variant="outlined" onClick={() => setAddModalOpen(false)}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="contained"
-              >
+              <Button 
+                    disabled={!formik.isValid || !formik.dirty} type="submit" variant="contained" >
                 Add
               </Button>
             </DialogActions>
@@ -233,7 +239,7 @@ function Products() {
               <CardMedia
                 style={{ height: "180px" }}
                 component="img"
-                image="https://www.cassidybros.ie/wp-content/uploads/2020/11/product-placeholder.jpg"
+                image={productImage}
                 title="product image"
               />
               <CardContent
@@ -306,16 +312,13 @@ function Products() {
                   >
                     <DeleteIcon />
                   </IconButton>
-                </CardActions>)}
+                </CardActions>
+              )}
             </Card>
           </Grid>
         ))}
       </Grid>
-      <Notification
-                notify={notify}
-                setNotify={setNotify}
-
-            />
+      <Notification notify={notify} setNotify={setNotify} />
       <UpdateProduct
         product={editModalItem}
         handleClose={handleEditModalClose}

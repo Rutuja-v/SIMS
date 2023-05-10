@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
 import * as Yup from "yup";
 import {
+  Grid,
   Paper,
   TableBody,
   TableRow,
@@ -60,7 +61,7 @@ const headCells = [
 
 export default function Employees() {
   const classes = useStyles();
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState(null);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -255,7 +256,8 @@ export default function Employees() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
-            label="Search Employees(name)"
+            disabled={recordsAfterPagingAndSorting()?.length === 0}
+            label="Search by employee name"
             className={classes.searchInput}
             InputProps={{
               startAdornment: (
@@ -276,16 +278,23 @@ export default function Employees() {
             Add new
           </Button>
         </Toolbar>
-
+ {recordsAfterPagingAndSorting()?.length === 0 ? (
+          <Grid sx={{ mt: 2, ml: 3 }}>
+            There are currently 0 employees records.
+          </Grid>
+        ) : (
+          <>
         <TblContainer>
           <TblHead />
           <TableBody>
-            {recordsAfterPagingAndSorting().map((item) => (
+            {recordsAfterPagingAndSorting()?.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.username}</TableCell>
                 <TableCell>{toSentenceCase(item.role.role)}</TableCell>
-                <TableCell>{item.godown === null ? "None" : item.godown.location}</TableCell>
+                <TableCell>
+                  {item.godown === null ? "None" : item.godown.location}
+                </TableCell>
                 <TableCell>
                   <Button onClick={() => handleEditModalOpen(item)}>
                     <EditOutlinedIcon fontSize="small" />
@@ -311,13 +320,15 @@ export default function Employees() {
           </TableBody>
         </TblContainer>
         <TblPagination />
+        </>
+        )}
       </Paper>
 
       <Dialog
         open={addModalOpen}
         onClose={handleAddModalClose}
         aria-labelledby="form-dialog-title"
-      > 
+      >
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
           Add an employee
         </DialogTitle>
@@ -441,6 +452,7 @@ export default function Employees() {
                     Cancel
                   </Button>
                   <Button
+                    disabled={!formik.isValid || !formik.dirty}
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}

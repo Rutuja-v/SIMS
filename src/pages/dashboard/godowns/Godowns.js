@@ -387,6 +387,7 @@ function Godowns() {
                     Cancel
                   </Button>
                   <Button
+                    disabled={!formik.isValid || !formik.dirty}
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}
@@ -464,7 +465,7 @@ function Godowns() {
                       color="textSecondary"
                       component="p"
                     >
-                      {"Capacity (in quintals):"}
+                      {"Total capacity (in quintals):"}
                     </Typography>
                     <Typography variant="body2" component="p">
                       {godown.capacityInQuintals}
@@ -495,7 +496,10 @@ function Godowns() {
                     <DeleteIcon />
                   </IconButton>
                 </div>
-                <Button onClick={() => handleClickSeeStock(godown)}>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleClickSeeStock(godown)}
+                >
                   See stock
                 </Button>
               </CardActions>
