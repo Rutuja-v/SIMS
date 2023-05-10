@@ -293,11 +293,21 @@ export default function SideList({ children }) {
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
-          <DrawerHeader>
+          <Box sx={{ mx: "auto", mt: 1, mb: 1 }}>
+            <Tooltip title={currentUser?.name}>
+              <Avatar
+                {...(open && { sx: { width: 50, height: 50 } })}
+              />
+            </Tooltip>
+          </Box>
+          <Box>
             {theme.direction === "rtl" ? (
               <ChevronRightIcon
                 onClick={handleDrawerClose}
                 style={{
+                  position: "absolute",
+                  top: "20px",
+                  right: "8px",
                   cursor: "pointer",
                 }}
               />
@@ -305,11 +315,31 @@ export default function SideList({ children }) {
               <ChevronLeftIcon
                 onClick={handleDrawerClose}
                 style={{
+                  position: "absolute",
+                  top: "20px",
+                  right: "8px",
                   cursor: "pointer",
                 }}
               />
             )}
-          </DrawerHeader>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+              {open && <Typography>{currentUser?.name}</Typography>}
+              {open && <Typography variant="caption" color="textSecondary">{"Username: " + currentUser?.username}</Typography>}
+              {open && <Typography variant="caption" color="textSecondary">
+                {"Role: " + toSentenceCase(currentUser?.role)}
+              </Typography>}
+              {open && currentUser?.godown && <Typography variant="caption" color="textSecondary">{"Location: " + currentUser?.godown.location}</Typography>}
+              <Button sx={{ mt: open ? 1 : 2, mb: 1 }} variant={open ? "contained" : null} size="small" onClick={handleLogout}>
+                <Logout />
+                {open && <Typography sx={{ ml: 1 }} variant="caption">
+                  Logout
+                </Typography>}
+              </Button>
+              {open && <Button style={{ textTransform: "capitalize", marginBottom: "16px" }} variant="outlined" size="small" onClick={() => setChangePasswordModalOpen(true)}>
+                Change password
+              </Button>}
+            </Box>
+          </Box>
           <Divider />
           <List>
             {links.map((link, index) => (
@@ -352,33 +382,6 @@ export default function SideList({ children }) {
               )
             ))}
           </List>
-          <Divider />
-          <Box sx={{ mx: "auto", mt: 3, mb: 1 }}>
-            <Tooltip title={currentUser?.name}>
-              <Avatar
-                {...(open && { sx: { width: 50, height: 50 } })}
-              />
-            </Tooltip>
-          </Box>
-          <Box>
-            <Box sx={{ mb: 2, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-              {open && <Typography>{currentUser?.name}</Typography>}
-              {open && <Typography variant="caption" color="textSecondary">{"Username: " + currentUser?.username}</Typography>}
-              {open && <Typography variant="caption" color="textSecondary">
-                {"Role: " + toSentenceCase(currentUser?.role)}
-              </Typography>}
-              {open && currentUser?.godown && <Typography variant="caption" color="textSecondary">{"Location: " + currentUser?.godown.location}</Typography>}
-              <Button sx={{ mt: 1, mb: 1 }} variant={open ? "contained" : null} size="small" onClick={handleLogout}>
-                <Logout />
-                {open && <Typography sx={{ ml: 1 }} variant="caption">
-                  Logout
-                </Typography>}
-              </Button>
-              {open && <Button style={{ textTransform: "capitalize" }} variant="outlined" size="small" onClick={() => setChangePasswordModalOpen(true)}>
-                Change password
-              </Button>}
-            </Box>
-          </Box>
         </Drawer >
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <DrawerHeader />
