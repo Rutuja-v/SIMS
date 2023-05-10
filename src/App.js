@@ -30,17 +30,24 @@ function App() {
                     )
                   }
                 >
-                  <Route path="/reset-password" element={<ForgotPassword />}></Route>
                   {user && user.role === "superadmin" && (
                     <>
                       <Route index element={<Godowns />} />
                       <Route path="employees" element={<Employees />} />
                     </>
                   )}
-                  {user && (user.role === "superadmin" ?
-                    <Route path="godown/:id/stock" element={<ProductsStock />} />
-                    : <Route index element={<ProductsStock godown={user.godown} />} />
-                  )}
+                  {user &&
+                    (user.role === "superadmin" ? (
+                      <Route
+                        path="godown/:id/stock"
+                        element={<ProductsStock />}
+                      />
+                    ) : (
+                      <Route
+                        index
+                        element={<ProductsStock godown={user.godown} />}
+                      />
+                    ))}
                   <Route path="inwards" element={<Inwards />} />
                   <Route path="outwards" element={<Outwards />} />
                   <Route path="products" element={<Products />} />
@@ -53,6 +60,10 @@ function App() {
                     user === null ? <Login /> : <Navigate to="/" replace />
                   }
                 />
+                <Route
+                  path="/reset-password"
+                  element={<ForgotPassword />}
+                ></Route>
               </Routes>
             </BrowserRouter>
           </div>

@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  Card,
-  CardContent,
-  Grid,
-  CardMedia,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, Grid, CardMedia, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import productImage from "../../Components/assets/product.jpg";
 
 function ProductsStock({ godown }) {
   const { state } = useLocation();
+  const [currentCapacity, setCurrentCapacity] = useState(null);
 
   if (godown === undefined || godown === null) {
     godown = state;
   }
 
-  const [productsStock, setProductsStock] = useState([]);
+  const [productsStock, setProductsStock] = useState(null);
 
   useEffect(() => {
     getData();
@@ -35,6 +31,15 @@ function ProductsStock({ godown }) {
       .catch((error) => {
         console.error(error);
       });
+
+    axios
+      .get(`http://localhost:8080/api/godowns/${godown?.id}/currentCapacity`)
+      .then((response) => {
+        setCurrentCapacity(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   let children;
@@ -42,17 +47,17 @@ function ProductsStock({ godown }) {
   if (godown === undefined || godown === null) {
     children = <Grid item>Oops! You are not mapped to a godown yet.</Grid>
   }
-  else if (productsStock.length === 0) {
+  else if (productsStock !== null && productsStock.length === 0) {
     children = <Grid item>Oops! No products are in stock in this godown!</Grid>;
   }
   else {
-    children = productsStock.map((productsStock) => (
+    children = productsStock && productsStock.map((productsStock) => (
       <Grid item xs={12} sm={6} md={4} key={productsStock.product.id}>
         <Card>
           <CardMedia
             style={{ height: "180px" }}
             component="img"
-            image="https://www.cassidybros.ie/wp-content/uploads/2020/11/product-placeholder.jpg"
+            image={productImage}
             title="product image"
           />
           <CardContent
@@ -120,11 +125,22 @@ function ProductsStock({ godown }) {
           </CardContent>
         </Card>
       </Grid>
-    ))
+    ));
   }
 
   return (
-    <div className="App">
+    <div>
+      {(godown !== undefined || godown !== null) &&
+        <div style={{ textAlign: "end", marginBottom: "8px" }}>
+          <Typography color="textSecondary">
+            {"Current capacity/Total capacity: "}
+          </Typography>
+          <Typography>{(currentCapacity !== null ? currentCapacity : "---") + "/" + godown.capacityInQuintals}</Typography>
+          {currentCapacity !== null && <Typography color="textSecondary">
+            {"The godown is " + parseFloat((currentCapacity / godown.capacityInQuintals * 100).toFixed(2)) + "% full"}
+          </Typography>}
+        </div>
+      }
       <Grid container spacing={6}>
         {children}
       </Grid>

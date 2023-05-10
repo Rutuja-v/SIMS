@@ -219,16 +219,17 @@ export default function Login() {
                   helperText={passwordErrorText}
                 />
 
-                {/* <Typography
-                  variant="body1"
-                  component="span"
-                  onClick={() => {
-                    navigate("/reset-password");
-                  }}
-                  style={{ marginTop: "10px", cursor: "pointer" }}
-                >
-                  Forgot password?
-                </Typography> */}
+                            <Typography
+                              variant="body1"
+                              component="span"
+                              onClick={() => {
+                                navigate("/reset-password");
+                              }}
+                              style={{ marginTop: "10px", cursor: "pointer" }}
+                            >
+                              Forgot password?
+                            </Typography>
+                          
 
                 <Button
                   type="submit"

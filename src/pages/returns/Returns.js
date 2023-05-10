@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
 import {
+  Grid,
   Paper,
   TableBody,
   TableRow,
@@ -78,7 +79,7 @@ export default function Returns() {
 
   const [user] = useContext(Context);
   const classes = useStyles();
-  const [returns, setReturns] = useState([]);
+  const [returns, setReturns] = useState(null);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
@@ -267,7 +268,7 @@ export default function Returns() {
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/products`)//?godownId=${user.godown?.id}`)
+      .get(`http://localhost:8080/api/products`) //?godownId=${user.godown?.id}`)
       .then((res) => {
         setProducts(res.data);
       })
@@ -306,6 +307,7 @@ export default function Returns() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
+            disabled={recordsAfterPagingAndSorting()?.length === 0}
             label="Search by customer (returned by)"
             className={classes.searchInput}
             InputProps={{
@@ -329,10 +331,16 @@ export default function Returns() {
             </Button>
           )}
         </Toolbar>
+         {recordsAfterPagingAndSorting()?.length === 0 ? (
+          <Grid sx={{ mt: 2, ml: 3 }}>
+            There are currently 0 returns records.
+          </Grid>
+        ) : (
+          <>
         <TblContainer>
           <TblHead />
           <TableBody>
-            {recordsAfterPagingAndSorting().map((item) => (
+            {recordsAfterPagingAndSorting()?.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   {item.godown.location}
@@ -402,6 +410,8 @@ export default function Returns() {
           </TableBody>
         </TblContainer>
         <TblPagination />
+        </>
+        )}
       </Paper>
 
       <Dialog
@@ -608,7 +618,7 @@ export default function Returns() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }
@@ -637,6 +647,7 @@ export default function Returns() {
                     Cancel
                   </Button>
                   <Button
+                    disabled={!formik.isValid || !formik.dirty}
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}

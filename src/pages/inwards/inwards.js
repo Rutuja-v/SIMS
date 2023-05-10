@@ -23,6 +23,7 @@ import {
   MenuItem,
   DialogActions,
   FormHelperText,
+  Grid,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -190,7 +191,7 @@ export default function Inwards() {
 
   const [user] = useContext(Context);
   const classes = useStyles();
-  const [inwards, setInwards] = useState([]);
+  const [inwards, setInwards] = useState(null);
   const [filterFn, setFilterFn] = useState({
     fn: (items) => {
       return items;
@@ -524,7 +525,6 @@ export default function Inwards() {
         </TblContainer>
         <TblPagination />
       </Paper >
-
       <Dialog
         open={addModalOpen}
         onClose={handleAddModalClose}
@@ -698,7 +698,7 @@ export default function Inwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }
@@ -727,6 +727,7 @@ export default function Inwards() {
                     Cancel
                   </Button>
                   <Button
+                    disabled={!formik.isValid || !formik.dirty}
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}

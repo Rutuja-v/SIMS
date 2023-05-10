@@ -188,7 +188,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                   id="capacity"
                   label="Capacity"
                   type="number"
-                  inputProps={{min:1}}
+                  inputProps={{ min: godown?.capacityInQuintals }}
                   variant="outlined"
                   value={capacity}
                   onChange={handleCapacityChange}
@@ -280,7 +280,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                   variant="contained"
                   onClick={handleSubmit}
                 >
-                  Edit
+                  Save
                 </Button>
               </DialogActions>
             </Form>
