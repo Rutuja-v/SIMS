@@ -107,7 +107,7 @@ function Products() {
       weight: Yup.number().required("Weight is required")
         .positive("Weight must be positive"),
     }),
-    onSubmit: values => {
+    onSubmit: (values,{resetForm}) => {
       let formData = {};
 
       formData["name"] = values.name;
@@ -124,7 +124,7 @@ function Products() {
         .catch((error) => {
           console.error(error);
         });
-
+        resetForm();
       handleAddModalClose();
       setNotify({
         isOpen: true,
@@ -133,6 +133,15 @@ function Products() {
     })
     },
   });
+  function toSentenceCase(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+  useEffect(() => {
+    if (!addModalOpen) {
+      formik.resetForm();
+    }
+  }, [addModalOpen]);
 
   return (
     <div className="App">
@@ -169,7 +178,7 @@ function Products() {
               }}
             >
               <TextField
-                autoFocus
+                // autoFocus
                 id="name"
                 label="Name"
                 type="text"

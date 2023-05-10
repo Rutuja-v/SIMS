@@ -6,28 +6,19 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import React, { useContext, useState } from "react";
 
-import { Alert, AlertTitle, Button } from "@mui/material";
+import { Alert, Button } from "@mui/material";
 
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-
-import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import Snackbar from "@mui/material/Snackbar";
 
 import Slide from "@mui/material/Slide";
 
-import { makeStyles } from "@material-ui/core/styles";
-
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../context/ContextProvider";
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+import Notification from "./Notification";
 
 const boxstyle = {
   mt: 4,
@@ -39,11 +30,19 @@ const boxstyle = {
 
 export default function Login() {
   const [user, setUser] = useContext(Context);
-  const [alert, setalert] = useState(0);
   const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
     password: "",
+  });
+
+  const [usernameErrorText, setUsernameErrorText] = useState(null);
+  const [passwordErrorText, setPasswordErrorText] = useState(null);
+
+  const [notify, setNotify] = useState({
+    isOpen: false,
+    message: "",
+    type: "",
   });
 
   const [open, setOpen] = useState(false);
@@ -60,6 +59,7 @@ export default function Login() {
       })
       .then((res) => {
         const loginUser = {
+          id: res.data.id,
           name: res.data.name,
           username: res.data.username,
           role: res.data.role.role,
@@ -69,7 +69,17 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(loginUser));
         navigate("/");
       })
-      .catch((err) => setOpen(true));
+      .catch((error) => {
+        if (error.response.data.code === "INVALID_USERNAME") {
+          setUsernameErrorText("This username does not exist");
+        }
+        else if (error.response.data.code === "WRONG_PASSWORD") {
+          setPasswordErrorText("The entered password is wrong");
+        }
+        else {
+          setOpen(true)
+        }
+      });
   };
 
   const handleClose = (event, reason) => {
@@ -106,7 +116,6 @@ export default function Login() {
           backgroundSize: "cover",
           height: "100%",
           minHeight: "100vh",
-          color: "#f5f5f5",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -142,64 +151,84 @@ export default function Login() {
                 onSubmit={handleSubmit}
                 style={{
                   backgroundSize: "cover",
-                  backgroundColor: "#339999",
+                  backgroundColor: "#E8E8E8",
                   padding: "48px 48px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                }}>
-                <ThemeProvider theme={darkTheme}>
-                  <Typography style={{ textAlign: "center" }} variant="h5">
-                    Smart Inventory Management System
+                }}
+              >
+                <Typography style={{ textAlign: "center" }} variant="h5">
+                  Smart Inventory Management System
+                </Typography>
+
+                <Box
+                  style={{
+                    marginTop: "32px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <Avatar sx={{ bgcolor: "#000000" }}></Avatar>
+                  <Typography component="h1" variant="h6">
+                    Sign in
                   </Typography>
+                </Box>
 
-                  <Box
-                    style={{
-                      marginTop: "32px",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "5px",
-                    }}
-                  >
-                    <Avatar sx={{ bgcolor: "#ffffff" }}></Avatar>
-                    <Typography component="h1" variant="h6">
-                      Sign in
-                    </Typography>
-                  </Box>
-
-                  <TextField
-                    sx={{
-                      mt: 2,
-                      width: "75%",
-                    }}
-                    required
-                    id="username"
-                    label="Username"
-                    name="username"
-                    autoComplete="username"
-                    onChange={(e) =>
-                      setValues({ ...values, username: e.target.value })
+                <TextField
+                  sx={{
+                    mt: 2,
+                    width: "75%",
+                  }}
+                  required
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                  onChange={(e) => {
+                    if (usernameErrorText !== null) {
+                      setUsernameErrorText(null);
                     }
-                  />
+                    setValues({ ...values, username: e.target.value })
+                  }}
+                  error={usernameErrorText !== null}
+                  helperText={usernameErrorText}
+                />
 
-                  <TextField
-                    sx={{
-                      mt: 2,
-                      width: "75%",
-                    }}
-                    required
-                    id="password"
-                    label="Password"
-                    type="password"
-                    name="password"
-                    autoComplete="password"
-                    onChange={(e) =>
-                      setValues({ ...values, password: e.target.value })
+                <TextField
+                  sx={{
+                    mt: 2,
+                    width: "75%",
+                  }}
+                  required
+                  id="password"
+                  label="Password"
+                  type="password"
+                  name="password"
+                  autoComplete="password"
+                  onChange={(e) => {
+                    if (passwordErrorText !== null) {
+                      setPasswordErrorText(null);
                     }
-                  />
-                </ThemeProvider>
+                    setValues({ ...values, password: e.target.value })
+                  }}
+                  error={passwordErrorText !== null}
+                  helperText={passwordErrorText}
+                />
+
+                {/* <Typography
+                  variant="body1"
+                  component="span"
+                  onClick={() => {
+                    navigate("/reset-password");
+                  }}
+                  style={{ marginTop: "10px", cursor: "pointer" }}
+                >
+                  Forgot password?
+                </Typography> */}
 
                 <Button
                   type="submit"
@@ -215,6 +244,8 @@ export default function Login() {
           </Grid>
         </Box>
       </div>
+
+      <Notification notify={notify} setNotify={setNotify} />
     </>
   );
 }
