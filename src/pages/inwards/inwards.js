@@ -34,7 +34,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
-import Grid from '@mui/material/Grid';
+// import Grid from '@mui/material/Grid';
 import UpdateInwards from "./UpdateInwards";
 import { useMemo } from "react";
 import * as Yup from "yup";
@@ -409,6 +409,7 @@ export default function Inwards() {
           <Grid container spacing={2} direction="row">
             <Grid item>
               <TextField
+                disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
                 sx={{width : '700px'}}
@@ -449,10 +450,16 @@ export default function Inwards() {
           </Grid>
 
         </Toolbar>
+        {recordsAfterPagingAndSorting()?.length === 0 ? (
+          <Grid sx={{ mt: 2, ml: 3 }}>
+            There are currently 0 outwards records.
+          </Grid>
+        ) : (
+          <>
         <TblContainer>
           <TblHead />
           <TableBody>
-            {recordsAfterPagingAndSorting().map((item) => (
+            {recordsAfterPagingAndSorting()?.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   {item.godown.location}
@@ -524,6 +531,8 @@ export default function Inwards() {
           </TableBody>
         </TblContainer>
         <TblPagination />
+        </>
+        )}
       </Paper >
       <Dialog
         open={addModalOpen}

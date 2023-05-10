@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
-import Grid from '@mui/material/Grid';
+// import Grid from '@mui/material/Grid';
 
 import {
   Grid,
@@ -422,6 +422,7 @@ export default function Outwards() {
           <Grid container spacing={2} direction="row">
             <Grid item>
               <TextField
+                disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by customer (delivered to)"
                 className={classes.searchInput}
                 sx={{ width: '700px' }}
