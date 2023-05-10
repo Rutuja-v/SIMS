@@ -4,6 +4,8 @@ import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
+import Grid from '@mui/material/Grid';
+
 import {
   Paper,
   TableBody,
@@ -35,6 +37,8 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik, useFormik } from "formik";
 import moment from "moment";
 import UpdateOutwards from "./UpdateOutwards";
+const Excel = require("exceljs");
+
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -54,6 +58,120 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Outwards() {
+
+  const outwardsExcel = async () => {
+
+    let reportData = [];
+
+    for (let i = 0; i < outwards.length; i++) {
+      let item = outwards[i];
+
+      let obj = {
+        'Godown': item.godown.location,
+        'Godown Capacity': item.godown.capacityInQuintals,
+        'Product Name': item.product.name,
+        'Product Price': item.product.price,
+        'Product Qty': item.quantity,
+        'Delivered To': item.delivered_to,
+        'Purpose': item.purpose,
+        'Delivery Date': item.delivery_date,
+        'Supply Date': item.supply_date,
+        'Invoice No.': item.invoice.invoiceNo,
+        'Bill Value': item.invoice.billValue,
+        'Receipt No.': item.receipt_no
+      }
+
+      reportData.push(obj);
+    }
+
+    let workbook = new Excel.Workbook();
+
+    let keys = Object.keys(reportData[0]);
+
+    let headers = getColumnHeaders(keys, keys);
+
+    let columnHeaders = getExcelColumnHeaders(headers);
+
+    let sheet = workbook.addWorksheet('Outwards', {
+      views: [{ state: "frozen", ySplit: 1 }],
+    });
+
+    console.log("Headers", headers, "Column Headers", columnHeaders)
+
+    sheet.columns = columnHeaders;
+
+    // add data to excel sheet
+    sheet.addRows(reportData);
+
+    // make the header bold
+    sheet.getRow(1).font = { bold: true };
+
+    console.log("report", reportData)
+
+    // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
+
+    // fileBuffer = fileBuffer.toString('base64');
+
+    let fileBuffer = await workbook.xlsx.writeBuffer();
+
+    const fileBlob = new Blob(
+      [fileBuffer],
+      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+    );
+
+    const fileName = `${'Outwards'}_${new Date().toISOString()}.xlsx`;
+
+    const url = URL.createObjectURL(fileBlob);
+
+    let link = document.createElement('a');
+
+    link.href = url;
+
+    link.setAttribute('download', fileName);
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    URL.revokeObjectURL(url)
+
+  }
+
+  const getColumnHeaders = (columns, keys = []) => {
+    const columnHeaders = [];
+    for (let i = 0; i < columns.length; i++) {
+      let currrentColumn = columns[i].trim();
+      columnHeaders.push({
+        header: currrentColumn,
+        key: keys[i] ? keys[i] : currrentColumn,
+      });
+    }
+
+    return columnHeaders;
+  };
+
+  const getExcelColumnHeaders = (headers) => {
+    let columnHeaders = [];
+    for (let i = 0; i < headers.length; i++) {
+      columnHeaders.push({
+        header: headers[i].header,
+        key: headers[i].key,
+        width:
+          headers[i].header == "Message" ? 50 : headers[i].header.length + 10,
+        style: {
+          alignment: {
+            vertical: "middle",
+            horizontal: "center",
+            wrapText: true,
+          },
+          bgColor: { argb: "#008000" },
+        },
+      });
+    }
+
+    return columnHeaders;
+  };
+
   const headCells = useMemo(
     () => [
       { id: "godown", label: "Godown" },
@@ -282,29 +400,47 @@ export default function Outwards() {
     <>
       <Paper className={classes.pageContent}>
         <Toolbar>
-          <TextField
-            label="Search by customer (delivered to)"
-            className={classes.searchInput}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-            onChange={handleSearch}
-          />
-          {user.role === "manager" && (
-            <Button
-              style={{ position: "absolute", right: "10px" }}
-              variant="outlined"
-              startIcon={<AddIcon />}
-              className={classes.newButton}
-              onClick={handleAddModalOpen}
-            >
-              Add new
-            </Button>
-          )}
+          <Grid container spacing={2} direction="row">
+            <Grid item>
+              <TextField
+                label="Search by customer (delivered to)"
+                className={classes.searchInput}
+                sx={{ width: '700px' }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={handleSearch}
+              />
+            </Grid>
+
+            <Grid item >
+              <Button
+                variant="contained"
+                sx={{ marginLeft: '110px', marginTop: '10px' }}
+                className={classes.newButton}
+                onClick={outwardsExcel}
+              >
+                Download Report
+              </Button>
+            </Grid>
+            <Grid item>
+              {user.role === "manager" && (
+                <Button
+                  style={{ position: "absolute", right: "10px" }}
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  className={classes.newButton}
+                  onClick={handleAddModalOpen}
+                >
+                  Add new
+                </Button>
+              )}
+            </Grid>
+          </Grid>
         </Toolbar>
         <TblContainer>
           <TblHead />
@@ -575,7 +711,7 @@ export default function Outwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                        formik.errors.billCheckedById
+                          formik.errors.billCheckedById
                           ? true
                           : false
                       }
