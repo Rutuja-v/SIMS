@@ -130,24 +130,24 @@ export default function SideList({ children }) {
         path: "./employees",
         icon: <GroupIcon style={{ color: "#171717" }} />,
       },
-      {
-        label: "Inwards",
-        path: "./inwards",
-        icon: <LocalShippingIcon style={{ color: "#171717" }} />,
-      },
     ]);
   }
   else {
     links.push(...[
       {
-        label: "Inwards",
+        label: "Stock",
         path: "./",
-        icon: <LocalShippingIcon style={{ color: "#171717" }} />,
+        icon: <InventoryIcon style={{ color: "#171717" }} />,
       },
     ])
   }
 
   links.push(...[
+    {
+      label: "Inwards",
+      path: "./inwards",
+      icon: <LocalShippingIcon style={{ color: "#171717" }} />,
+    },
     {
       label: "Outwards",
       path: "./outwards",

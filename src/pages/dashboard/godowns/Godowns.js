@@ -31,6 +31,7 @@ import {
   FormControl,
   FormHelperText,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export const initialValues = {
   id: "",
@@ -82,7 +83,7 @@ function Godowns({ onDelete, onEdit }) {
   const [editModalOpen, setEditModalOpen] = useState(null);
   const [location, setLocation] = useState("");
   const [capacity, setCapacity] = useState("");
-  const [date, setDate] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [managerName, setManagerName] = useState("");
   const [managerUsername, setManagerUsername] = useState("");
   const [managerPassword, setManagerPassword] = useState("");
@@ -95,6 +96,8 @@ function Godowns({ onDelete, onEdit }) {
   const [godowns, setGodowns] = useState([]);
   const [managers, setManagers] = useState([]);
   const [roles, setRoles] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -162,6 +165,10 @@ function Godowns({ onDelete, onEdit }) {
     });
   };
 
+  const handleClickSeeStock = (godown) => {
+    navigate(`/godown/${godown.id}/stock`, { state: godown });
+  };
+
   const handleLocationChange = (event) => {
     setLocation(event.target.value);
   };
@@ -169,8 +176,8 @@ function Godowns({ onDelete, onEdit }) {
   const handleCapacityChange = (event) => {
     setCapacity(event.target.value);
   };
-  const handleDateChange = (event) => {
-    setDate(event.target.value);
+  const handleStartDateChange = (event) => {
+    setStartDate(event.target.value);
   };
   const handleManagerNameChange = (event) => {
     setManagerName(event.target.value);
@@ -218,7 +225,7 @@ function Godowns({ onDelete, onEdit }) {
         },
       };
 
-      const dateObj = new Date(date);
+      const dateObj = new Date(startDate);
       const formattedDate = moment(dateObj).format("DD/MM/YYYY");
       formData["startDate"] = formattedDate;
 
@@ -235,7 +242,7 @@ function Godowns({ onDelete, onEdit }) {
 
       // setLocation("");
       // setCapacity("");
-      setDate("");
+      setStartDate("");
       // setManagerName("");
       // setManagerUsername("");
       // setManagerPassword("");
@@ -280,7 +287,7 @@ function Godowns({ onDelete, onEdit }) {
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            // onSubmit={handleSubmit}
+          // onSubmit={handleSubmit}
           >
             {(formikProps) => (
               <Form onSubmit={formik.handleSubmit}>
@@ -330,12 +337,12 @@ function Godowns({ onDelete, onEdit }) {
                     }
                   />
                   <TextField
-                    id="date"
-                    label="Date"
+                    id="startDate"
+                    label="Start date"
                     type="date"
                     variant="outlined"
-                    value={date}
-                    onChange={handleDateChange}
+                    value={startDate}
+                    onChange={handleStartDateChange}
                     // {...formik.getFieldProps("date")}
                     // error={
                     //   formik.touched.date && formik.errors.date ? true : false
@@ -383,7 +390,7 @@ function Godowns({ onDelete, onEdit }) {
                       {...formik.getFieldProps("managerRoleId")}
                       error={
                         formik.touched.managerRoleId &&
-                        formik.errors.managerRoleId
+                          formik.errors.managerRoleId
                           ? true
                           : false
                       }
@@ -500,22 +507,27 @@ function Godowns({ onDelete, onEdit }) {
               <CardActions
                 style={{
                   padding: "0px",
+                  display: "flex",
+                  justifyContent: "space-between"
                 }}
               >
-                <IconButton
-                  color="success"
-                  aria-label="edit"
-                  onClick={() => handleClickEditModalOpen(godown)}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  aria-label="delete"
-                  onClick={() => handleDelete(godown.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <div>
+                  <IconButton
+                    color="success"
+                    aria-label="edit"
+                    onClick={() => handleClickEditModalOpen(godown)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    aria-label="delete"
+                    onClick={() => handleDelete(godown.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
+                <Button onClick={() => handleClickSeeStock(godown)}>See stock</Button>
               </CardActions>
             </Card>
           </Grid>

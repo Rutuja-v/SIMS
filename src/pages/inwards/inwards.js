@@ -255,7 +255,7 @@ export default function Inwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/products`)//?godownId=${user.godown?.id}`)
+      .get(`http://localhost:8080/api/products`)
       .then((res) => {
         setProducts(res.data);
       })
