@@ -26,7 +26,9 @@ import {
   MenuItem,
   DialogActions,
   FormHelperText,
+  IconButton
 } from "@mui/material";
+import DownloadIcon from '@mui/icons-material/Download';
 import useTable from "../../Components/useTable";
 import * as Yup from "yup";
 import Controls from "../../Components/controls/Controls";
@@ -438,20 +440,21 @@ export default function Outwards() {
             </Grid>
 
             <Grid item >
-              <Button
-                variant="contained"
-                sx={{ marginLeft: '110px', marginTop: '10px' }}
-                className={classes.newButton}
+            <IconButton  color="success"
+                // variant="contained"
+                sx={{marginLeft : '10px', marginTop : '10px'}}
+                // className={classes.newButton}
                 onClick={outwardsExcel}
               >
-                Download Report
-              </Button>
+                <DownloadIcon />
+              </IconButton>
             </Grid>
             <Grid item>
               {user.role === "manager" && (
                 <Button
-                  style={{ position: "absolute", right: "10px" }}
-                  variant="contained"
+                  // style={{ position: "absolute", right: "10px" }}
+                  variant="outlined"
+                  sx={{marginLeft : '1px', marginTop : '10px' }}
                   startIcon={<AddIcon />}
                   className={classes.newButton}
                   onClick={handleAddModalOpen}

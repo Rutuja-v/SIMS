@@ -4,6 +4,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
+import DownloadIcon from '@mui/icons-material/Download';
 import {
   Paper,
   TableBody,
@@ -24,6 +25,7 @@ import {
   DialogActions,
   FormHelperText,
   Grid,
+  IconButton,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -425,20 +427,21 @@ export default function Inwards() {
             </Grid>
 
             <Grid item >
-              <Button
-                variant="contained"
-                sx={{marginLeft : '110px', marginTop : '10px' }}
-                className={classes.newButton}
+              <IconButton  color="success"
+                // variant="contained"
+                sx={{marginLeft : '10px', marginTop : '10px'}}
+                // className={classes.newButton}
                 onClick={inwardsExcel}
               >
-                Download Report
-              </Button>
+                <DownloadIcon />
+              </IconButton>
+
             </Grid>
             <Grid item>
               {user.role === "manager" && (
                 <Button
                   variant="outlined"
-                  sx={{marginLeft : '10px', marginTop : '10px' }}
+                   sx={{marginLeft : '1px', marginTop : '10px' }}
                   startIcon={<AddIcon />}
                   className={classes.newButton}
                   onClick={handleAddModalOpen}
@@ -452,7 +455,7 @@ export default function Inwards() {
         </Toolbar>
         {recordsAfterPagingAndSorting()?.length === 0 ? (
           <Grid sx={{ mt: 2, ml: 3 }}>
-            There are currently 0 outwards records.
+            There are currently 0 inwards records.
           </Grid>
         ) : (
           <>
