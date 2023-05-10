@@ -65,6 +65,10 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
 
     setInvoiceId(outwards?.invoice.id);
     setReceiptNo(outwards?.receipt_no);
+
+    if ((outwards?.product !== undefined && outwards?.product !== null) && !products.find(product => product.id == outwards?.product.id)) {
+      products.push(outwards?.product);
+    }
   }, [outwards]);
 
   const handleGodownIdChange = (event) => {
@@ -218,7 +222,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                   id="quantity"
                   label="Quantity"
                   type="number"
-                  inputProps={{min:1}}
+                  inputProps={{ min: 1 }}
                   variant="outlined"
                   value={quantity}
                   onChange={handleQuantityChange}
@@ -271,7 +275,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                   id="receiptNo"
                   label="Receipt number"
                   type="number"
-                  inputProps={{min:1}}
+                  inputProps={{ min: 1 }}
                   variant="outlined"
                   value={receiptNo}
                   onChange={handleReceiptNoChange}

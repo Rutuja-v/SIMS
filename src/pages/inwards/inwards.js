@@ -218,8 +218,14 @@ export default function Inwards() {
   });
 
   function getData() {
+    let inwardsEndpoint = "http://localhost:8080/api/inwards";
+
+    if (user.role !== "superadmin") {
+      inwardsEndpoint = inwardsEndpoint + `?godownId=${user.godown?.id}`;
+    }
+
     axios
-      .get("http://localhost:8080/api/inwards", {})
+      .get(inwardsEndpoint)
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {
@@ -242,14 +248,14 @@ export default function Inwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/godowns")
+      .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
-        setGodowns(res.data);
+        setGodowns([res.data]);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/products")
+      .get(`http://localhost:8080/api/products`)
       .then((res) => {
         setProducts(res.data);
       })
@@ -263,7 +269,7 @@ export default function Inwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/employees")
+      .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })
@@ -558,7 +564,7 @@ export default function Inwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                        formik.errors.billCheckedById
+                          formik.errors.billCheckedById
                           ? true
                           : false
                       }
@@ -590,7 +596,6 @@ export default function Inwards() {
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}
-                    // onClick={() => formik.handleSubmit()}
                   >
                     Add
                   </Button>

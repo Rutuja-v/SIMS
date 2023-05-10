@@ -224,8 +224,14 @@ export default function Outwards() {
   });
 
   function getData() {
+    let outwardsEndpoint = "http://localhost:8080/api/outwards";
+
+    if (user.role !== "superadmin") {
+      outwardsEndpoint = outwardsEndpoint + `?godownId=${user.godown?.id}`;
+    }
+
     axios
-      .get("http://localhost:8080/api/outwards", {})
+      .get(outwardsEndpoint)
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {
@@ -249,21 +255,21 @@ export default function Outwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/godowns")
+      .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
-        setGodowns(res.data);
+        setGodowns([res.data]);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/products")
+      .get(`http://localhost:8080/api/products?godownId=${user.godown?.id}`)
       .then((res) => {
         setProducts(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/employees")
+      .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })
@@ -274,7 +280,19 @@ export default function Outwards() {
     getData();
   }, []);
 
+  useEffect(() => {
+    if (!addModalOpen) {
+      formik.resetForm();
+    }
+  }, [addModalOpen]);
+
   function toSentenceCase(str) {
+    if (str === undefined || str === null) {
+      return;
+    }
+    if (str.length === 1) {
+      return str.toUpperCase();
+    }
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
 
@@ -575,7 +593,7 @@ export default function Outwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                        formik.errors.billCheckedById
+                          formik.errors.billCheckedById
                           ? true
                           : false
                       }

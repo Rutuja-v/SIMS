@@ -31,6 +31,7 @@ import {
   FormControl,
   FormHelperText,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export const initialValues = {
   id: "",
@@ -39,7 +40,6 @@ export const initialValues = {
   capacity: "",
   date: "",
 };
-
 
 const useStyles = makeStyles((theme) => ({
   customTitle: {
@@ -68,19 +68,10 @@ function formatDate(date) {
   return formattedDate;
 }
 
-function Godowns({ onDelete, onEdit }) {
-  const [editing, setEditing] = useState(false);
-  const [godownData, setGodownData] = useState([]);
+function Godowns() {
   const classes = useStyles();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(null);
-  const [location, setLocation] = useState("");
-  const [capacity, setCapacity] = useState("");
-  const [date, setDate] = useState("");
-  const [managerName, setManagerName] = useState("");
-  const [managerUsername, setManagerUsername] = useState("");
-  const [managerPassword, setManagerPassword] = useState("");
-  const [managerRoleId, setManagerRoleId] = useState("");
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -89,6 +80,8 @@ function Godowns({ onDelete, onEdit }) {
   const [godowns, setGodowns] = useState([]);
   const [managers, setManagers] = useState([]);
   const [roles, setRoles] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -156,19 +149,10 @@ function Godowns({ onDelete, onEdit }) {
     });
   };
 
+  const handleClickSeeStock = (godown) => {
+    navigate(`/godown/${godown.id}/stock`, { state: godown });
+  };
 
-  const handleManagerNameChange = (event) => {
-    setManagerName(event.target.value);
-  };
-  const handleManagerUsernameChange = (event) => {
-    setManagerUsername(event.target.value);
-  };
-  const handleManagerPasswordChange = (event) => {
-    setManagerPassword(event.target.value);
-  };
-  const handleManagerRoleIdChange = (event) => {
-    setManagerRoleId(event.target.value);
-  };
   const validationSchema = Yup.object().shape({
     location: Yup.string().required("Location is required"),
     capacity: Yup.number()
@@ -176,10 +160,10 @@ function Godowns({ onDelete, onEdit }) {
       .required("Capacity is required")
       .min(1, "Capacity must be at least 1"),
 
-    startDate: Yup.date().required('Date is required'),
-    managerName:Yup.string().required("Manager Name is required"),
-    managerUsername:Yup.string().required("This field is required"),
-    managerRoleId:Yup.number().required("This field is required"),
+    startDate: Yup.date().required("Date is required"),
+    managerName: Yup.string().required("Manager Name is required"),
+    managerUsername: Yup.string().required("This field is required"),
+    managerRoleId: Yup.number().required("This field is required"),
   });
   const formik = useFormik({
     initialValues: {
@@ -187,14 +171,12 @@ function Godowns({ onDelete, onEdit }) {
       capacity: null,
       startDate: null,
       managerName: null,
-      managerUsername:null,
-      managerRoleId:null
-
+      managerUsername: null,
+      managerRoleId: null,
     },
     validationSchema: validationSchema,
 
     onSubmit: (values, { resetForm }) => {
-     
       let formData = {};
       formData["location"] = values.location;
       formData["capacityInQuintals"] = values.capacity;
@@ -223,11 +205,6 @@ function Godowns({ onDelete, onEdit }) {
           console.error(error);
         });
 
-    
-      // setManagerName("");
-      // setManagerUsername("");
-      // setManagerPassword("");
-      // setManagerRoleId("");
       resetForm();
       setAddModalOpen(false);
 
@@ -265,9 +242,7 @@ function Godowns({ onDelete, onEdit }) {
           Add a godown
         </DialogTitle>
         <DialogContent>
-          <Formik
-        
-          >
+          <Formik>
             {(formikProps) => (
               <Form onSubmit={formik.handleSubmit}>
                 <div
@@ -285,7 +260,6 @@ function Godowns({ onDelete, onEdit }) {
                     label="Location"
                     type="text"
                     variant="outlined"
-                 
                     {...formik.getFieldProps("location")}
                     error={
                       formik.touched.location && formik.errors.location
@@ -302,7 +276,6 @@ function Godowns({ onDelete, onEdit }) {
                     type="number"
                     inputProps={{ min: 1 }}
                     variant="outlined"
-              
                     {...formik.getFieldProps("capacity")}
                     error={
                       formik.touched.capacity && formik.errors.capacity
@@ -314,16 +287,19 @@ function Godowns({ onDelete, onEdit }) {
                     }
                   />
                   <TextField
-                    id="date"
-                    label="Date"
+                    id="startDate"
+                    label="Start date"
                     type="date"
                     variant="outlined"
-              
                     {...formik.getFieldProps("startDate")}
                     error={
-                      formik.touched.startDate && formik.errors.startDate ? true : false
+                      formik.touched.startDate && formik.errors.startDate
+                        ? true
+                        : false
                     }
-                    helperText={formik.touched.startDate && formik.errors.startDate}
+                    helperText={
+                      formik.touched.startDate && formik.errors.startDate
+                    }
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -333,7 +309,6 @@ function Godowns({ onDelete, onEdit }) {
                     label="Manager name"
                     type="text"
                     variant="outlined"
-            
                     {...formik.getFieldProps("managerName")}
                     error={
                       formik.touched.managerName && formik.errors.managerName
@@ -349,15 +324,16 @@ function Godowns({ onDelete, onEdit }) {
                     label="Manager username"
                     type="text"
                     variant="outlined"
-                
                     {...formik.getFieldProps("managerUsername")}
                     error={
-                      formik.touched.managerUsername && formik.errors.managerUsername
+                      formik.touched.managerUsername &&
+                      formik.errors.managerUsername
                         ? true
                         : false
                     }
                     helperText={
-                      formik.touched.managerUsername && formik.errors.managerUsername
+                      formik.touched.managerUsername &&
+                      formik.errors.managerUsername
                     }
                   />
                   {/* <TextField
@@ -499,22 +475,29 @@ function Godowns({ onDelete, onEdit }) {
               <CardActions
                 style={{
                   padding: "0px",
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
               >
-                <IconButton
-                  color="success"
-                  aria-label="edit"
-                  onClick={() => handleClickEditModalOpen(godown)}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  aria-label="delete"
-                  onClick={() => handleDelete(godown.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <div>
+                  <IconButton
+                    color="success"
+                    aria-label="edit"
+                    onClick={() => handleClickEditModalOpen(godown)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    aria-label="delete"
+                    onClick={() => handleDelete(godown.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
+                <Button onClick={() => handleClickSeeStock(godown)}>
+                  See stock
+                </Button>
               </CardActions>
             </Card>
           </Grid>

@@ -1,12 +1,10 @@
-
-
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Bar } from 'react-chartjs-2';
-import { Chart } from 'chart.js/auto';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Bar } from "react-chartjs-2";
+import { Chart } from "chart.js/auto";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import moment from "moment";
-import GodownsChart from './GodownsChart';
+import GodownsChart from "./GodownsChart";
 
 import {
   Chart as ChartJS,
@@ -16,6 +14,7 @@ import {
   Title,
 } from "chart.js";
 
+
 import {
   PieChart,
   Pie,
@@ -23,22 +22,15 @@ import {
   Cell,
   ResponsiveContainer,
   Label,
-  Tooltip
+  Tooltip,
 } from "recharts";
 
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title);
 const options = {
   indexAxis: "y",
   elements: {
     bar: {
       borderWidth: 2,
-
     },
   },
   responsive: true,
@@ -68,6 +60,7 @@ const optionsForProductsData = {
     title: {
       display: true,
       text: "Products Vs Quantity (Inwards & Outwards)",
+      text: "Godown (Capacity Vs. Location)",
     },
   },
 };
@@ -75,17 +68,16 @@ const optionsForProductsData = {
 const COLORS = ["#8884d8", "#82ca9d"];
 
 const CustomTooltip = ({ active, payload, label }) => {
+  console.log("Pay", payload);
 
-  console.log("Pay", payload)
-
-  if(active){
+  if (active) {
     return (
       <div
         className="custom-tooltip"
         style={{
           backgroundColor: "#ffff",
           padding: "5px",
-          border: "1px solid #cccc"
+          border: "1px solid #cccc",
         }}
       >
         <label> {`${payload[0].name} : ${payload[0].value}`} </label>
@@ -94,9 +86,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   }
 
   return null;
-    
-}
-
+};
 
 const Analytics = () => {
   const [employees, setEmployees] = useState([]);
@@ -139,12 +129,12 @@ const Analytics = () => {
   const [pieDataForReturns, setPieDataForReturns] = useState([
     {
       name: "Cancelled",
-      value: 0
+      value: 0,
     },
     {
       name: "Damaged",
-      value: 0
-    }
+      value: 0,
+    },
   ]);
 
   useEffect(() => {
@@ -175,16 +165,23 @@ const Analytics = () => {
             dataSet2.push(val.godown.capacityInQuintals);
 
             if (labelSetForProductsData.includes(val.product.name)) {
-              let idx = labelSetForProductsData.findIndex((item) => item == val.product.name);
-              dataSetForOutwardsProducts[idx] = Number(dataSetForOutwardsProducts[idx]) + Number(val.quantity);
-            }
-            else {
+              let idx = labelSetForProductsData.findIndex(
+                (item) => item == val.product.name
+              );
+              dataSetForOutwardsProducts[idx] =
+                Number(dataSetForOutwardsProducts[idx]) + Number(val.quantity);
+            } else {
               labelSetForProductsData.push(val.product.name);
               dataSetForOutwardsProducts.push(val.quantity);
             }
             // labelSet.push(val.name)
           }
-          console.log("arrData", dataSet1, dataSet2, dataSetForOutwardsProducts);
+          console.log(
+            "arrData",
+            dataSet1,
+            dataSet2,
+            dataSetForOutwardsProducts
+          );
         })
         .catch((e) => {
           console.log("error", e);
@@ -202,25 +199,39 @@ const Analytics = () => {
             dataSetForInwardsProducts.push(0);
           }
           for (const val of res) {
-
             if (labelSetForProductsData.includes(val.product.name)) {
-              let idx = labelSetForProductsData.findIndex((item) => item == val.product.name);
-              dataSetForInwardsProducts[idx] = Number(dataSetForInwardsProducts[idx]) + Number(val.quantity);
-            }
-            else {
+              let idx = labelSetForProductsData.findIndex(
+                (item) => item == val.product.name
+              );
+              dataSetForInwardsProducts[idx] =
+                Number(dataSetForInwardsProducts[idx]) + Number(val.quantity);
+            } else {
               labelSetForProductsData.push(val.product.name);
               dataSetForInwardsProducts.push(val.quantity);
             }
             // labelSet.push(val.name)
           }
 
-          if (dataSetForInwardsProducts.length > dataSetForOutwardsProducts.length) {
-            for (let i = 0; i < (dataSetForInwardsProducts.length - dataSetForOutwardsProducts.length); i++) {
+          if (
+            dataSetForInwardsProducts.length > dataSetForOutwardsProducts.length
+          ) {
+            for (
+              let i = 0;
+              i <
+              dataSetForInwardsProducts.length -
+                dataSetForOutwardsProducts.length;
+              i++
+            ) {
               dataSetForOutwardsProducts.push(0);
             }
           }
 
-          console.log("arrData", dataSet1, dataSet2, dataSetForOutwardsProducts);
+          console.log(
+            "arrData",
+            dataSet1,
+            dataSet2,
+            dataSetForOutwardsProducts
+          );
         })
         .catch((e) => {
           console.log("error", e);
@@ -236,14 +247,14 @@ const Analytics = () => {
           console.log("res", res);
 
           for (const val of res) {
-            if (val.reason == 'cancelled') {
-              pieDataForReturns[0].value = Number(pieDataForReturns[0].value) + Number(val.quantity)
-            }
-            else if (val.reason == 'damaged') {
-              pieDataForReturns[1].value = Number(pieDataForReturns[1].value) + Number(val.quantity)
+            if (val.reason == "cancelled") {
+              pieDataForReturns[0].value =
+                Number(pieDataForReturns[0].value) + Number(val.quantity);
+            } else if (val.reason == "damaged") {
+              pieDataForReturns[1].value =
+                Number(pieDataForReturns[1].value) + Number(val.quantity);
             }
           }
-
         })
         .catch((e) => {
           console.log("error", e);
@@ -280,7 +291,7 @@ const Analytics = () => {
             label: "Outwards",
             data: dataSetForOutwardsProducts,
             borderColor: "#495057",
-            backgroundColor: "#ced4da"
+            backgroundColor: "#ced4da",
           },
         ],
       });
@@ -292,19 +303,21 @@ const Analytics = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const { data } = await axios.get('http://localhost:8080/api/employees');
+        const { data } = await axios.get("http://localhost:8080/api/employees");
         setEmployees(data);
       } catch (error) {
-        console.error('Error fetching employees:', error);
+        console.error("Error fetching employees:", error);
       }
     };
 
     const fetchEmployeeRoles = async () => {
       try {
-        const { data } = await axios.get('http://localhost:8080/api/employeeRoles');
+        const { data } = await axios.get(
+          "http://localhost:8080/api/employeeRoles"
+        );
         setEmployeeRoles(data);
       } catch (error) {
-        console.error('Error fetching employee roles:', error);
+        console.error("Error fetching employee roles:", error);
       }
     };
 
@@ -324,7 +337,9 @@ const Analytics = () => {
     }
 
     const roleCount = employeeRoles.reduce((acc, role) => {
-      const count = employees.filter((employee) => employee.role.role === role.role).length;
+      const count = employees.filter(
+        (employee) => employee.role.role === role.role
+      ).length;
       acc[role.role] = count;
       return acc;
     }, {});
@@ -333,10 +348,10 @@ const Analytics = () => {
       labels: employeeRoles.map((role) => role.role),
       datasets: [
         {
-          label: 'Employee Count',
+          label: "Employee Count",
           data: employeeRoles.map((role) => roleCount[role.role] || 0),
-          backgroundColor: 'rgba(54, 162, 235, 0.5)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: "rgba(54, 162, 235, 0.5)",
+          borderColor: "rgba(54, 162, 235, 1)",
           borderWidth: 1,
         },
       ],
@@ -346,78 +361,82 @@ const Analytics = () => {
   }, [employees, employeeRoles]);
 
   return (
-
     <div style={{ width: "100%", height: "500%" }}>
       {/* <Bar data={data} height={'55px'} options={options} /> */}
-      <br></br><br></br>
+      <br></br>
+      <br></br>
       {chartData ? (
         <Bar
           data={chartData}
           options={{
-            indexAxis: 'y',
+            indexAxis: "y",
             scales: {
               y: {
-                stepSize: 2
-              }
-
+                stepSize: 2,
+              },
             },
-            
 
-            plugins: {
+            plugins: {
+              legend: {
+                position: "right",
+              },
 
-              legend: {
+              title: {
+                display: true,
 
-                position: "right",
-
-              },
-
-              title: {
-
-                display: true,
-
-                text: "Employee Count",
-
-              },
-
-            },
+                text: "Employee Count",
+              },
+            },
           }}
-          height={'50px'}
+          height={"50px"}
         />
       ) : (
         <p>Loading...</p>
       )}
-      <br></br><br></br>
-      <Bar height={'80px'} data={productsData} options={optionsForProductsData} />
-      <br></br><br></br>
-        <strong><h7 style={{marginLeft : '515px'}}>Returns (Cancelled vs Damaged)</h7></strong>
-        <br></br><br></br>
-        <PieChart width={1300} height={300}>
-          <Pie
-            data={pieDataForReturns}
-            color="#000000"
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            fill="#8884d8"
-          >
-            {pieDataForReturns.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-          <Legend />
-        </PieChart>
-        <>
-        <div style={{ marginBottom: '40px', border: '1px solid gray', padding: '20px' }}>
-  <GodownsChart/>
-</div>
-        </>
-      </div>
+      <br></br>
+      <br></br>
+      <Bar
+        height={"80px"}
+        data={productsData}
+        options={optionsForProductsData}
+      />
+      <br></br>
+      <br></br>
+      <strong>
+        <h7 style={{ marginLeft: "515px" }}>Returns (Cancelled vs Damaged)</h7>
+      </strong>
+      <br></br>
+      <br></br>
+      <PieChart width={1300} height={300}>
+        <Pie
+          data={pieDataForReturns}
+          color="#000000"
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={120}
+          fill="#8884d8"
+        >
+          {pieDataForReturns.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip content={<CustomTooltip />} />
+        <Legend />
+      </PieChart>
+      <>
+        <div
+          style={{
+            marginBottom: "40px",
+            border: "1px solid gray",
+            padding: "20px",
+          }}
+        >
+          <GodownsChart />
+        </div>
+      </>
+    </div>
   );
 };
 export default Analytics;
