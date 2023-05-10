@@ -148,7 +148,8 @@ export default function Login() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                }}>
+                }}
+              >
                 <ThemeProvider theme={darkTheme}>
                   <Typography style={{ textAlign: "center" }} variant="h5">
                     Smart Inventory Management System
@@ -200,6 +201,17 @@ export default function Login() {
                     }
                   />
                 </ThemeProvider>
+
+                {/* <Typography
+                  variant="body1"
+                  component="span"
+                  onClick={() => {
+                    navigate("/reset-password");
+                  }}
+                  style={{ marginTop: "10px", cursor: "pointer" }}
+                >
+                  Forgot password?
+                </Typography> */}
 
                 <Button
                   type="submit"

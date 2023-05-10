@@ -130,7 +130,7 @@ export default function Employees() {
     });
     setNotify({
       isOpen: true,
-      message: "Deleted Successfully",
+      message: "Employee Deleted Successfully",
       type: "error",
     });
   };
@@ -140,9 +140,9 @@ export default function Employees() {
     username: Yup.string()
       .required("Username is required")
       .min(6, "Username must be at least 6 characters"),
-    password: Yup.string()
-      .required("Password is required")
-      .min(6, "Password must be at least 8 characters"),
+    // password: Yup.string()
+    //   .required("Password is required")
+    //   .min(6, "Password must be at least 8 characters"),
     roleId: Yup.number().required("Role is required"),
     godownId: Yup.number().nullable(),
   });
@@ -151,7 +151,7 @@ export default function Employees() {
     initialValues: {
       name: null,
       username: null,
-      password: null,
+      // password: null,
       roleId: null,
       godownId: null,
     },
@@ -161,7 +161,7 @@ export default function Employees() {
 
       formData["name"] = values.name;
       formData["username"] = values.username;
-      formData["password"] = values.password;
+      // formData["password"] = values.password;
       formData["role"] = {
         id: values.roleId,
       };
@@ -204,7 +204,7 @@ export default function Employees() {
             id: item.id,
             name: item.name,
             username: item.username,
-            password: item.password,
+            // password: item.password,
             role: item.role,
             godown: item.godown,
           };
@@ -255,7 +255,7 @@ export default function Employees() {
       <Paper className={classes.pageContent}>
         <Toolbar>
           <TextField
-            label="Search Employees"
+            label="Search Employees(name)"
             className={classes.searchInput}
             InputProps={{
               startAdornment: (
@@ -317,7 +317,7 @@ export default function Employees() {
         open={addModalOpen}
         onClose={handleAddModalClose}
         aria-labelledby="form-dialog-title"
-      >
+      > 
         <DialogTitle id="form-dialog-title" className={classes.customTitle}>
           Add an employee
         </DialogTitle>
@@ -361,7 +361,7 @@ export default function Employees() {
                       formik.touched.username && formik.errors.username
                     }
                   />
-                  <TextField
+                  {/* <TextField
                     id="password"
                     label="Password"
                     type="password"
@@ -375,7 +375,7 @@ export default function Employees() {
                     helperText={
                       formik.touched.password && formik.errors.password
                     }
-                  />
+                  /> */}
                   <FormControl>
                     <InputLabel id="roleIdLabel">Role</InputLabel>
                     <Select
@@ -390,7 +390,7 @@ export default function Employees() {
                       }
                     >
                       {roles
-                        .filter((role) => role.role === "employee")
+                        .filter((role) => role.role !== "superadmin")
                         .map((role, index) => (
                           <MenuItem key={index} value={role.id}>
                             {role.role}
