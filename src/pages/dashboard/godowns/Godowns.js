@@ -40,13 +40,7 @@ export const initialValues = {
   date: "",
 };
 
-export const validationSchema = Yup.object().shape({
-  location: Yup.string().required("Location is required"),
-  id: Yup.number().required("ID is required").positive("ID must be positive"),
-  managerId: Yup.number()
-    .required("Manager ID is required")
-    .positive("Manager ID must be positive"),
-});
+
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -162,16 +156,7 @@ function Godowns({ onDelete, onEdit }) {
     });
   };
 
-  const handleLocationChange = (event) => {
-    setLocation(event.target.value);
-  };
 
-  const handleCapacityChange = (event) => {
-    setCapacity(event.target.value);
-  };
-  const handleDateChange = (event) => {
-    setDate(event.target.value);
-  };
   const handleManagerNameChange = (event) => {
     setManagerName(event.target.value);
   };
@@ -191,35 +176,40 @@ function Godowns({ onDelete, onEdit }) {
       .required("Capacity is required")
       .min(1, "Capacity must be at least 1"),
 
-    // date: Yup.date().required('Date is required'),
-    managerRoleId: Yup.number().required("Manager Name is required"),
+    startDate: Yup.date().required('Date is required'),
+    managerName:Yup.string().required("Manager Name is required"),
+    managerUsername:Yup.string().required("This field is required"),
+    managerRoleId:Yup.number().required("This field is required"),
   });
   const formik = useFormik({
     initialValues: {
       location: null,
       capacity: null,
-      date: null,
+      startDate: null,
       managerName: null,
+      managerUsername:null,
+      managerRoleId:null
+
     },
     validationSchema: validationSchema,
 
     onSubmit: (values, { resetForm }) => {
-      // event.preventDefault();
+     
       let formData = {};
       formData["location"] = values.location;
       formData["capacityInQuintals"] = values.capacity;
       formData["manager"] = {
-        name: managerName,
-        username: managerUsername,
-        password: managerPassword,
+        name: values.managerName,
+        username: values.managerUsername,
+        // password: managerPassword,
         role: {
           // id: Number(managerRoleId)
           id: values.managerRoleId,
         },
       };
 
-      const dateObj = new Date(date);
-      const formattedDate = moment(dateObj).format("DD/MM/YYYY");
+      const startDateObj = new Date(values.startDate);
+      const formattedDate = moment(startDateObj).format("DD/MM/YYYY");
       formData["startDate"] = formattedDate;
 
       console.log(formData);
@@ -233,9 +223,7 @@ function Godowns({ onDelete, onEdit }) {
           console.error(error);
         });
 
-      // setLocation("");
-      // setCapacity("");
-      setDate("");
+    
       // setManagerName("");
       // setManagerUsername("");
       // setManagerPassword("");
@@ -278,9 +266,7 @@ function Godowns({ onDelete, onEdit }) {
         </DialogTitle>
         <DialogContent>
           <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            // onSubmit={handleSubmit}
+        
           >
             {(formikProps) => (
               <Form onSubmit={formik.handleSubmit}>
@@ -299,8 +285,7 @@ function Godowns({ onDelete, onEdit }) {
                     label="Location"
                     type="text"
                     variant="outlined"
-                    // value={location}
-                    // onChange={handleLocationChange}
+                 
                     {...formik.getFieldProps("location")}
                     error={
                       formik.touched.location && formik.errors.location
@@ -317,8 +302,7 @@ function Godowns({ onDelete, onEdit }) {
                     type="number"
                     inputProps={{ min: 1 }}
                     variant="outlined"
-                    // value={capacity}
-                    // onChange={handleCapacityChange}
+              
                     {...formik.getFieldProps("capacity")}
                     error={
                       formik.touched.capacity && formik.errors.capacity
@@ -334,13 +318,12 @@ function Godowns({ onDelete, onEdit }) {
                     label="Date"
                     type="date"
                     variant="outlined"
-                    value={date}
-                    onChange={handleDateChange}
-                    // {...formik.getFieldProps("date")}
-                    // error={
-                    //   formik.touched.date && formik.errors.date ? true : false
-                    // }
-                    // helperText={formik.touched.date && formik.errors.date}
+              
+                    {...formik.getFieldProps("startDate")}
+                    error={
+                      formik.touched.startDate && formik.errors.startDate ? true : false
+                    }
+                    helperText={formik.touched.startDate && formik.errors.startDate}
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -350,16 +333,32 @@ function Godowns({ onDelete, onEdit }) {
                     label="Manager name"
                     type="text"
                     variant="outlined"
-                    value={managerName}
-                    onChange={handleManagerNameChange}
+            
+                    {...formik.getFieldProps("managerName")}
+                    error={
+                      formik.touched.managerName && formik.errors.managerName
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.managerName && formik.errors.managerName
+                    }
                   />
                   <TextField
                     id="managerUsername"
                     label="Manager username"
                     type="text"
                     variant="outlined"
-                    value={managerUsername}
-                    onChange={handleManagerUsernameChange}
+                
+                    {...formik.getFieldProps("managerUsername")}
+                    error={
+                      formik.touched.managerUsername && formik.errors.managerUsername
+                        ? true
+                        : false
+                    }
+                    helperText={
+                      formik.touched.managerUsername && formik.errors.managerUsername
+                    }
                   />
                   {/* <TextField
                     id="managerPassword"
@@ -374,9 +373,9 @@ function Godowns({ onDelete, onEdit }) {
                     <Select
                       labelId="roleIdLabel"
                       id="roleId"
-                      defaultValue={
-                        roles.find((role) => role.role === "manager")?.id
-                      }
+                      // defaultValue={
+                      //   roles.find((role) => role.role === "manager")?.id
+                      // }
                       // value={managerRoleId}
                       label="Manager role"
                       // onChange={handleManagerRoleIdChange}
@@ -415,7 +414,7 @@ function Godowns({ onDelete, onEdit }) {
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}
-                    onClick={() => formik.handleSubmit()}
+                    // onClick={() => formik.handleSubmit()}
                   >
                     Add
                   </Button>

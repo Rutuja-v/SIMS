@@ -26,10 +26,10 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import TakeoutDiningIcon from "@mui/icons-material/TakeoutDining";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import GroupIcon from "@mui/icons-material/Group";
-import "./sidelist.css";
+
 import { Avatar, Button, Tooltip } from "@mui/material";
 import { Logout } from "@mui/icons-material";
-
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 const drawerWidth = 200;
 
 const openedMixin = (theme) => ({
@@ -168,7 +168,7 @@ export default function SideList({ children }) {
     {
       label: "Analytics",
       path: "./analytics",
-      icon: <ProductionQuantityLimitsIcon style={{ color: "#171717" }} />,
+      icon: <AnalyticsIcon style={{ color: "#171717" }} />,
     },
   ]);
 
@@ -203,6 +203,12 @@ export default function SideList({ children }) {
           <Typography variant="h6" noWrap component="div">
             Smart Inventory Management System
           </Typography>
+            {/* <IconButton sx={{ display: { xs: 'flex', md: 'none' } }}
+            
+            >
+              <HomeIcon style={{color:"#000000"}}/>
+            </IconButton> */}
+
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
