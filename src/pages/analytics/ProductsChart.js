@@ -115,4 +115,4 @@ const ProductsChart = () => {
   );
 };
 
-export default GodownsChart;
+export default ProductsChart;
