@@ -35,6 +35,7 @@ export default function ForgotPassword() {
   const [question2, setQuestion2] = useState("");
   const [submissionMessage, setSubmissionMessage] = useState("");
   const [open, setOpen] = useState(false);
+  const [values, setValues]=useState("");
 
   const vertical = "top";
   const horizontal = "right";
@@ -142,7 +143,24 @@ export default function ForgotPassword() {
                     alignItems: "center",
                   }}
                 >
+                 
+                   
                   <Grid item sx={{ ml: "3em", mr: "3em" }}>
+                  <TextField
+                  sx={{
+                    mt: 2,
+                   
+                  }}
+                  required
+                  fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                  onChange={(e) => setValues(e.target.value)}
+                
+                /><br></br>
+                <br></br>
                     <FormControl fullWidth>
                       <InputLabel id="questionLabel">Question</InputLabel>
                       <Select

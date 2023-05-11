@@ -8,6 +8,8 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+
+
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
@@ -48,6 +50,7 @@ function Products() {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [notify, setNotify] = useState({
     isOpen: false,
     message: "",
@@ -61,10 +64,21 @@ function Products() {
     axios
       .get("http://localhost:8080/api/products")
       .then((response) => {
+        response.data.sort((p1, p2) => {
+          if (p1.name < p2.name) {
+            return -1;
+          } else if (p1.name > p2.name) {
+            return 1;
+          }
+
+          return 0;
+        });
         setProducts(response.data);
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error(error);
+        setIsLoading(false);
       });
   };
 
@@ -151,179 +165,195 @@ function Products() {
   }, [addModalOpen]);
 
   return (
-    <div className="App">
-      {user.role === "superadmin" && (
-        <Box display="flex" mb={2} justifyContent="flex-end">
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={handleAddModalOpen}
-          >
-            Add new
-          </Button>
-        </Box>
-      )}
-
-      <Dialog
-        open={addModalOpen}
-        onClose={handleAddModalClose}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title" className={classes.customTitle}>
-          Add a product
-        </DialogTitle>
-        <DialogContent>
-          <form onSubmit={formik.handleSubmit}>
-            <div
-              style={{
-                marginTop: "32px",
-                marginBottom: "16px",
-                display: "grid",
-                gridTemplateColumns: "auto auto",
-                columnGap: "16px",
-                rowGap: "24px",
-              }}
-            >
-              <TextField
-                // autoFocus
-                id="name"
-                label="Name"
-                type="text"
+    <>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="App">
+          {user.role === "superadmin" && (
+            <Box display="flex" mb={2} justifyContent="flex-end">
+              <Button
                 variant="outlined"
-                {...formik.getFieldProps("name")}
-                error={formik.touched.name && formik.errors.name ? true : false}
-                helperText={formik.touched.name && formik.errors.name}
-              />
-              <TextField
-                id="price"
-                label="Price"
-                type="number"
-                variant="outlined"
-                {...formik.getFieldProps("price")}
-                error={
-                  formik.touched.price && formik.errors.price ? true : false
-                }
-                helperText={formik.touched.price && formik.errors.price}
-              />
-              <TextField
-                id="weight"
-                label="Weight"
-                type="number"
-                inputProps={{ min: 1 }}
-                variant="outlined"
-                {...formik.getFieldProps("weight")}
-                error={
-                  formik.touched.weight && formik.errors.weight ? true : false
-                }
-                helperText={formik.touched.weight && formik.errors.weight}
-              />
-            </div>
-
-            <DialogActions>
-              <Button variant="outlined" onClick={() => setAddModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
-                    disabled={!formik.isValid || !formik.dirty} type="submit" variant="contained" >
-                Add
-              </Button>
-            </DialogActions>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <Grid container spacing={6}>
-        {products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id}>
-            <Card>
-              <CardMedia
-                style={{ height: "180px" }}
-                component="img"
-                image={productImage}
-                title="product image"
-              />
-              <CardContent
-                style={{
-                  padding: "16px 24px",
-                }}
+                startIcon={<AddIcon />}
+                onClick={handleAddModalOpen}
               >
-                <Typography
-                  gutterBottom
-                  style={{ fontWeight: "bold" }}
-                  variant="h6"
-                  component="h4"
-                >
-                  {product.name}
-                </Typography>
+                Add new
+              </Button>
+            </Box>
+          )}
 
+          <Dialog
+            open={addModalOpen}
+            onClose={handleAddModalClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title" className={classes.customTitle}>
+              Add a product
+            </DialogTitle>
+            <DialogContent>
+              <form onSubmit={formik.handleSubmit}>
                 <div
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: "10px",
+                    marginTop: "32px",
+                    marginBottom: "16px",
+                    display: "grid",
+                    gridTemplateColumns: "auto auto",
+                    columnGap: "16px",
+                    rowGap: "24px",
                   }}
                 >
-                  <div>
-                    <Typography
-                      variant="caption"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {"Price:"}
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                      {product.price}
-                    </Typography>
-                  </div>
-
-                  <div>
-                    <Typography
-                      variant="caption"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {"Weight (in quintals):"}
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                      {product.weight}
-                    </Typography>
-                  </div>
+                  <TextField
+                    // autoFocus
+                    id="name"
+                    label="Name"
+                    type="text"
+                    variant="outlined"
+                    {...formik.getFieldProps("name")}
+                    error={
+                      formik.touched.name && formik.errors.name ? true : false
+                    }
+                    helperText={formik.touched.name && formik.errors.name}
+                  />
+                  <TextField
+                    id="price"
+                    label="Price"
+                    type="number"
+                    variant="outlined"
+                    {...formik.getFieldProps("price")}
+                    error={
+                      formik.touched.price && formik.errors.price ? true : false
+                    }
+                    helperText={formik.touched.price && formik.errors.price}
+                  />
+                  <TextField
+                    id="weight"
+                    label="Weight"
+                    type="number"
+                    inputProps={{ min: 1 }}
+                    variant="outlined"
+                    {...formik.getFieldProps("weight")}
+                    error={
+                      formik.touched.weight && formik.errors.weight
+                        ? true
+                        : false
+                    }
+                    helperText={formik.touched.weight && formik.errors.weight}
+                  />
                 </div>
-              </CardContent>
-              {user.role === "superadmin" && (
-                <CardActions
-                  style={{
-                    padding: "16px 24px",
-                  }}
-                >
-                  <IconButton
-                    color="success"
-                    aria-label="edit"
-                    onClick={() => handleEditModalOpen(product)}
+
+                <DialogActions>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setAddModalOpen(false)}
                   >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    aria-label="delete"
-                    onClick={() => handleDelete(product.id)}
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!formik.isValid || !formik.dirty}
+                    type="submit"
+                    variant="contained"
                   >
-                    <DeleteIcon />
-                  </IconButton>
-                </CardActions>
-              )}
-            </Card>
+                    Add
+                  </Button>
+                </DialogActions>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <Grid container spacing={6}>
+            {products.map((product) => (
+              <Grid item xs={12} sm={6} md={4} key={product.id}>
+                <Card>
+                  <CardMedia
+                    style={{ height: "180px" }}
+                    component="img"
+                    image={productImage}
+                    title="product image"
+                  />
+                  <CardContent
+                    style={{
+                      padding: "16px 24px",
+                    }}
+                  >
+                    <Typography
+                      gutterBottom
+                      style={{ fontWeight: "bold" }}
+                      variant="h6"
+                      component="h4"
+                    >
+                      {product.name}
+                    </Typography>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: "10px",
+                      }}
+                    >
+                      <div>
+                        <Typography
+                          variant="caption"
+                          color="textSecondary"
+                          component="p"
+                        >
+                          {"Price:"}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                          {product.price}
+                        </Typography>
+                      </div>
+
+                      <div>
+                        <Typography
+                          variant="caption"
+                          color="textSecondary"
+                          component="p"
+                        >
+                          {"Weight (in quintals):"}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                          {product.weight}
+                        </Typography>
+                      </div>
+                    </div>
+                  </CardContent>
+                  {user.role === "superadmin" && (
+                    <CardActions
+                      style={{
+                        padding: "16px 24px",
+                      }}
+                    >
+                      <IconButton
+                        color="success"
+                        aria-label="edit"
+                        onClick={() => handleEditModalOpen(product)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        aria-label="delete"
+                        onClick={() => handleDelete(product.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </CardActions>
+                  )}
+                </Card>
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
-      <Notification notify={notify} setNotify={setNotify} />
-      <UpdateProduct
-        product={editModalItem}
-        handleClose={handleEditModalClose}
-      />
-    </div>
+          <Notification notify={notify} setNotify={setNotify} />
+          <UpdateProduct
+            product={editModalItem}
+            handleClose={handleEditModalClose}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

@@ -366,6 +366,9 @@ export default function Outwards() {
           };
           rows.push(obj);
         }
+        rows.sort(
+          (r1, r2) => Date.parse(r1.supply_date) - Date.parse(r2.supply_date)
+        );
         setOutwards(rows);
       })
       .catch((err) => console.log(err));

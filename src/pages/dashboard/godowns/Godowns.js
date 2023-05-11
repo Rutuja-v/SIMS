@@ -90,6 +90,15 @@ function Godowns() {
     axios
       .get("http://localhost:8080/api/godowns")
       .then((response) => {
+        response.data.sort((g1, g2) => {
+          if (g1.location < g2.location) {
+            return -1;
+          } else if (g1.location > g2.location) {
+            return 1;
+          }
+
+          return 0;
+        });
         setGodowns(response.data);
       })
       .catch((error) => {

@@ -357,6 +357,9 @@ export default function Inwards() {
           };
           rows.push(obj);
         }
+        rows.sort(
+          (r1, r2) => Date.parse(r1.supply_date) - Date.parse(r2.supply_date)
+        );
         setInwards(rows);
       })
       .catch((err) => console.log(err));

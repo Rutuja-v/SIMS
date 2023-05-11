@@ -1,11 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
-import { Chart } from 'chart.js/auto';
 
 const EmployeeChart = () => {
   const [employees, setEmployees] = useState([]);
-  const [employeeRoles, setEmployeeRoles] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
@@ -18,12 +18,12 @@ const EmployeeChart = () => {
       }
     };
 
-    const fetchEmployeeRoles = async () => {
+    const fetchLocations = async () => {
       try {
-        const { data } = await axios.get('http://localhost:8080/api/employeeRoles');
-        setEmployeeRoles(data);
+        const { data } = await axios.get('http://localhost:8080/api/godowns');
+        setLocations(data.filter(Boolean).map(godown => godown.location));
       } catch (error) {
-        console.error('Error fetching employee roles:', error);
+        console.error('Error fetching locations:', error);
       }
     };
 
@@ -32,60 +32,79 @@ const EmployeeChart = () => {
     }, 5000);
 
     fetchEmployees();
-    fetchEmployeeRoles();
+    fetchLocations();
 
     return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
-    if (employees.length === 0 || !employeeRoles) {
+    if (employees.length === 0 || locations.length === 0) {
       return;
     }
 
-    const roleCount = employeeRoles.reduce((acc, role) => {
-      const count = employees.filter((employee) => employee.role.role === role.role).length;
-      acc[role.role] = count;
-      return acc;
-    }, {});
+    const employeeCounts = locations.map(location => {
+      const count = employees.filter(employee => employee.godown && employee.godown.location === location).length;
+      return count;
+    });
+    
 
     const chartData = {
-      labels: employeeRoles.map((role) => role.role),
+      labels: locations,
       datasets: [
         {
           label: 'Employee Count',
-          data: employeeRoles.map((role) => roleCount[role.role] || 0),
+          data: employeeCounts,
           backgroundColor: 'rgba(54, 162, 235, 0.5)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
+          barThickness: 30,
+          maxBarThickness: 50
         },
       ],
     };
 
     setChartData(chartData);
-  }, [employees, employeeRoles]);
+  }, [employees, locations]);
 
   return (
     <div>
-      <h6 style={{ textAlign: 'center' }}>Employees</h6>
-
-      {chartData ? (
-        <Bar
-          data={chartData}
-          options={{ 
-            indexAxis: 'y',
-            scales: {
-              x: {
-                stepSize:5,min:0,max:10
-              }
-            }
-          }}
-          width={200}
-          height={50}
-        />
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
+    <h6 style={{ textAlign: 'center' }}>Employees by Location</h6>
+  
+    {chartData ? (
+     <Bar
+     data={chartData}
+     options={{
+       indexAxis: "x",
+       scales: {
+         y: {
+           type: "linear",
+           ticks: {
+             precision: 0,
+           },
+           stepSize: 10,
+         },
+       },
+       plugins: {
+         legend: {
+           position: "right",
+         },
+         title: {
+           display: true,
+           text: "Employee Count",
+         },
+       },
+     }}
+     height={"100px"}
+   />
+   
+    
+    
+    ) : (
+      <p>Loading...</p>
+    )}
+  </div>
+  
   );
 };
+
 export default EmployeeChart;

@@ -256,6 +256,10 @@ export default function Returns() {
           };
           rows.push(obj);
         }
+        rows.sort(
+          (r1, r2) =>
+            Date.parse(r1.delivery_date) - Date.parse(r2.delivery_date)
+        );
         setReturns(rows);
       })
       .catch((err) => console.log(err));
@@ -331,86 +335,86 @@ export default function Returns() {
             </Button>
           )}
         </Toolbar>
-         {recordsAfterPagingAndSorting()?.length === 0 ? (
+        {recordsAfterPagingAndSorting()?.length === 0 ? (
           <Grid sx={{ mt: 2, ml: 3 }}>
             There are currently 0 returns records.
           </Grid>
         ) : (
           <>
-        <TblContainer>
-          <TblHead />
-          <TableBody>
-            {recordsAfterPagingAndSorting()?.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  {item.godown.location}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Capacity: " + item.godown.capacityInQuintals}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  {item.product.name}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Price: " + item.product.price}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Quantity: " + item.quantity}
-                  </Typography>
-                </TableCell>
-                <TableCell>{item.returned_by}</TableCell>
-                <TableCell>{toSentenceCase(item.reason)}</TableCell>
-                <TableCell>{item.delivery_date}</TableCell>
-                <TableCell>{item.return_date}</TableCell>
-                <TableCell>
-                  {item.invoice.invoiceNo}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Bill value: " + item.invoice.billValue}
-                  </Typography>
-                </TableCell>
-                <TableCell>{item.receipt_no}</TableCell>
-                {user.role === "manager" && (
-                  <TableCell>
-                    <Button onClick={() => handleEditModalOpen(item)}>
-                      <EditOutlinedIcon fontSize="small" color="success" />
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setConfirmDialog({
-                          isOpen: true,
-                          title: "Are you sure to delete this record?",
-                          subTitle: "You can't undo this operation",
-                          onConfirm: () => {
-                            handleDelete(item.id);
-                          },
-                        });
-                      }}
-                    >
-                      <CloseIcon fontSize="small" color="error" />
-                    </Button>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </TblContainer>
-        <TblPagination />
-        </>
+            <TblContainer>
+              <TblHead />
+              <TableBody>
+                {recordsAfterPagingAndSorting()?.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      {item.godown.location}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Capacity: " + item.godown.capacityInQuintals}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {item.product.name}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Price: " + item.product.price}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Quantity: " + item.quantity}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{item.returned_by}</TableCell>
+                    <TableCell>{toSentenceCase(item.reason)}</TableCell>
+                    <TableCell>{item.delivery_date}</TableCell>
+                    <TableCell>{item.return_date}</TableCell>
+                    <TableCell>
+                      {item.invoice.invoiceNo}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Bill value: " + item.invoice.billValue}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{item.receipt_no}</TableCell>
+                    {user.role === "manager" && (
+                      <TableCell>
+                        <Button onClick={() => handleEditModalOpen(item)}>
+                          <EditOutlinedIcon fontSize="small" color="success" />
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setConfirmDialog({
+                              isOpen: true,
+                              title: "Are you sure to delete this record?",
+                              subTitle: "You can't undo this operation",
+                              onConfirm: () => {
+                                handleDelete(item.id);
+                              },
+                            });
+                          }}
+                        >
+                          <CloseIcon fontSize="small" color="error" />
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </TblContainer>
+            <TblPagination />
+          </>
         )}
       </Paper>
 
