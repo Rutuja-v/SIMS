@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
 import * as Yup from "yup";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   Grid,
   Paper,
@@ -23,6 +24,7 @@ import {
   MenuItem,
   DialogActions,
   FormHelperText,
+  IconButton
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -34,6 +36,9 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import UpdateEmployee from "./UpdateEmployee";
 import { Form, Formik } from "formik";
 import { useFormik } from "formik";
+const Excel = require("exceljs");
+
+
 const useStyles = makeStyles((theme) => ({
   pageContent: {
     padding: theme.spacing(3),
@@ -60,6 +65,113 @@ const headCells = [
 ];
 
 export default function Employees() {
+
+  const employeesExcel = async () => {
+
+    let reportData = [];
+
+    for (let i = 0; i < employees.length; i++) {
+      let item = employees[i];
+      
+      let obj = {
+        'Employee Name': item.name,
+        'Employee Username': item.username,
+        'Employee Role': item.role == null ? null : item.role.role,
+        'Godown':  item.godown == null ? null : item.godown.location,
+        
+      }
+
+      reportData.push(obj);
+    }
+
+    let workbook = new Excel.Workbook();
+
+    let keys = Object.keys(reportData[0]);
+
+    let headers = getColumnHeaders(keys, keys);
+
+    let columnHeaders = getExcelColumnHeaders(headers);
+
+    let sheet = workbook.addWorksheet('Employees', {
+      views: [{ state: "frozen", ySplit: 1 }],
+    });
+
+    console.log("Headers", headers, "Column Headers", columnHeaders)
+
+    sheet.columns = columnHeaders;
+
+    // add data to excel sheet
+    sheet.addRows(reportData);
+
+    // make the header bold
+    sheet.getRow(1).font = { bold: true };
+
+    console.log("report", reportData)
+
+    // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
+
+    // fileBuffer = fileBuffer.toString('base64');
+
+    let fileBuffer = await workbook.xlsx.writeBuffer();
+
+    const fileBlob = new Blob(
+      [fileBuffer],
+      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+    );
+
+    const fileName = `${'Employees'}_${new Date().toISOString()}.xlsx`;
+
+    const url = URL.createObjectURL(fileBlob);
+
+    let link = document.createElement('a');
+
+    link.href = url;
+
+    link.setAttribute('download', fileName);
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    URL.revokeObjectURL(url)
+
+  }
+
+  const getColumnHeaders = (columns, keys = []) => {
+    const columnHeaders = [];
+    for (let i = 0; i < columns.length; i++) {
+      let currrentColumn = columns[i].trim();
+      columnHeaders.push({
+        header: currrentColumn,
+        key: keys[i] ? keys[i] : currrentColumn,
+      });
+    }
+
+    return columnHeaders;
+  };
+
+  const getExcelColumnHeaders = (headers) => {
+    let columnHeaders = [];
+    for (let i = 0; i < headers.length; i++) {
+      columnHeaders.push({
+        header: headers[i].header,
+        key: headers[i].key,
+        width:
+          headers[i].header == "Message" ? 50 : headers[i].header.length + 10,
+        style: {
+          alignment: {
+            vertical: "middle",
+            horizontal: "center",
+            wrapText: true,
+          },
+          bgColor: { argb: "#008000" },
+        },
+      });
+    }
+
+    return columnHeaders;
+  };
+
   const classes = useStyles();
   const [employees, setEmployees] = useState(null);
   const [notify, setNotify] = useState({
@@ -255,28 +367,41 @@ export default function Employees() {
     <>
       <Paper className={classes.pageContent}>
         <Toolbar>
-          <TextField
-            disabled={recordsAfterPagingAndSorting()?.length === 0}
-            label="Search by employee name"
-            className={classes.searchInput}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-            onChange={handleSearch}
-          />
-          <Button
-            style={{ position: "absolute", right: "10px" }}
-            variant="outlined"
-            startIcon={<AddIcon />}
-            className={classes.newButton}
-            onClick={handleAddModalOpen}
-          >
-            Add new
-          </Button>
+        <Grid container spacing={2} direction="row">
+            <Grid item>
+              <TextField
+                disabled={recordsAfterPagingAndSorting()?.length === 0}
+                label="Search by supplier name"
+                className={classes.searchInput}
+                sx={{width : '700px'}}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={handleSearch}
+              />
+            </Grid>
+
+            <Grid item >
+            <IconButton sx={{marginTop:'8px'}} color="success" onClick={employeesExcel}>
+                <DownloadIcon />
+              </IconButton>
+            </Grid>
+            <Grid item>
+                <Button
+                  variant="outlined"
+                  sx={{marginLeft : '10px', marginTop : '10px' }}
+                  startIcon={<AddIcon />}
+                  className={classes.newButton}
+                  onClick={handleAddModalOpen}
+                >
+                  Add new
+                </Button>
+            </Grid>
+          </Grid>
         </Toolbar>
  {recordsAfterPagingAndSorting()?.length === 0 ? (
           <Grid sx={{ mt: 2, ml: 3 }}>
