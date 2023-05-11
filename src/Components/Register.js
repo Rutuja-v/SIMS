@@ -3,24 +3,34 @@ import Grid from "@mui/material/Grid";
 import signin from "./assets/signin.svg";
 import stock from "./assets/stock.jpeg";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { MenuItem, InputLabel, Select, FormControl, Link } from "@mui/material";
-import { useState, forwardRef } from "react";
-import Snackbar from "@mui/material/Snackbar";
-import Stack from "@mui/material/Stack";
-import Slide from "@mui/material/Slide";
-import { useNavigate } from "react-router-dom";
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+import Stack from "@mui/material/Stack";
+import MuiAlert from "@mui/material/Alert";
+
+import axios from "axios";
+
+import React, { useContext, useState } from "react";
+
+import Typography from "@mui/material/Typography";
+
+import Snackbar from "@mui/material/Snackbar";
+
+import Slide from "@mui/material/Slide";
+
+import TextField from "@mui/material/TextField";
+import { useNavigate } from "react-router-dom";
+import { Link } from "@mui/material";
+
+// const darkTheme = createTheme({
+//   palette: {
+//     mode: "dark",
+//   },
+// });
 
 const boxstyle = {
   mt: 4,
@@ -30,12 +40,15 @@ const boxstyle = {
   boxShadow: 24,
 };
 
-export default function ForgotPassword() {
-  const [answer, setAnswer] = useState("");
-  const [question2, setQuestion2] = useState("");
-  const [submissionMessage, setSubmissionMessage] = useState("");
-  const [open, setOpen] = useState(false);
+// const center = {
+//   position: "relative",
+//   top: "50%",
+//   left: "30%",
+// };
 
+export default function Register() {
+  const [open, setOpen] = useState(false);
+  const [remember, setRemember] = useState(false);
   const vertical = "top";
   const horizontal = "right";
   const navigate = useNavigate();
@@ -72,7 +85,6 @@ export default function ForgotPassword() {
           backgroundSize: "cover",
           height: "100%",
           minHeight: "100vh",
-          // color: "#f5f5f5",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -98,6 +110,7 @@ export default function ForgotPassword() {
                 color: "#f5f5f5",
               }}
             ></Grid>
+
             <Grid item xs={12} sm={12} lg={6}>
               <Box
                 style={{
@@ -106,15 +119,14 @@ export default function ForgotPassword() {
                   justifyContent: "center",
                   alignItems: "center",
                   backgroundSize: "cover",
-                  height: "70vh",
-                  minHeight: "500px",
+                  padding: "48px 48px",
                   backgroundColor: "#E8E8E8",
                 }}
               >
-                {/* <ThemeProvider theme={darkTheme}> */}
                 <Typography style={{ textAlign: "center" }} variant="h5">
                   Smart Inventory Management System
                 </Typography>
+
                 <Box
                   style={{
                     marginTop: "16px",
@@ -128,7 +140,7 @@ export default function ForgotPassword() {
                     <LockOutlinedIcon />
                   </Avatar>
                   <Typography component="h1" variant="h6">
-                    Reset Password
+                    Create Account
                   </Typography>
                 </Box>
 
@@ -136,61 +148,71 @@ export default function ForgotPassword() {
                   container
                   spacing={1}
                   style={{
-                    marginTop: "16px",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                   }}
                 >
                   <Grid item sx={{ ml: "3em", mr: "3em" }}>
-                    <FormControl fullWidth>
-                      <InputLabel id="questionLabel">Question</InputLabel>
-                      <Select
-                        labelId="questionLabel"
-                        id="question"
-                        label="Question"
-                      >
-                        <MenuItem value={1}>
-                          What is the name of the place you were born at?
-                        </MenuItem>
-                        <MenuItem value={2}>
-                          What is the first school you attended?
-                        </MenuItem>
-                        <MenuItem value={3}>
-                          What is your favourite food item?
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
                     <TextField
-                      sx={{ mt: 2 }}
+                      sx={{
+                        mt: 1,
+                      }}
                       required
-                      fullWidth
-                      id="answer"
-                      label="Answer"
-                      name="answer"
-                      value={answer}
-                      onChange={(e) => setAnswer(e.target.value)}
+                      id="email"
+                      label="Username"
+                      name="email"
+                      autoComplete="email"
                     />
                   </Grid>
-
+                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
+                    <TextField
+                      required
+                      name="password"
+                      label="Password"
+                      type="password"
+                      id="password"
+                      autoComplete="new-password"
+                    />
+                  </Grid>
+                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
+                    <TextField
+                      required
+                      name="confirmpassword"
+                      label="Confirm Password"
+                      type="password"
+                      id="confirmpassword"
+                      autoComplete="new-password"
+                    />
+                  </Grid>
                   <Button
                     type="submit"
                     variant="contained"
                     sx={{
-                      mt: 3,
+                      mt: 2,
                     }}
                   >
-                    Reset Password
+                    Register
                   </Button>
-                  <Link
-                    style={{ cursor: "pointer" }}
-                    sx={{ mt: 1 }}
-                    onClick={() => {
-                      navigate("/");
-                    }}
-                  >
-                    Go back
-                  </Link>
+                  <Grid item sx={{ mt: 1, ml: "3em", mr: "3em" }}>
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      style={{ marginTop: "10px" }}
+                    >
+                      Already have an Account?{" "}
+                      <Link
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          navigate("/");
+                        }}
+                      >
+                        Sign In
+                      </Link>
+                    </Typography>
+                  </Grid>
+
+                  <Grid></Grid>
                 </Grid>
               </Box>
             </Grid>

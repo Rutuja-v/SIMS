@@ -26,9 +26,9 @@ import {
   MenuItem,
   DialogActions,
   FormHelperText,
-  IconButton
+  IconButton,
 } from "@mui/material";
-import DownloadIcon from '@mui/icons-material/Download';
+import DownloadIcon from "@mui/icons-material/Download";
 import useTable from "../../Components/useTable";
 import * as Yup from "yup";
 import Controls from "../../Components/controls/Controls";
@@ -41,7 +41,6 @@ import { Form, Formik, useFormik } from "formik";
 import moment from "moment";
 import UpdateOutwards from "./UpdateOutwards";
 const Excel = require("exceljs");
-
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -61,28 +60,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Outwards() {
-
   const outwardsExcel = async () => {
-
     let reportData = [];
 
     for (let i = 0; i < outwards.length; i++) {
       let item = outwards[i];
 
       let obj = {
-        'Godown': item.godown.location,
-        'Godown Capacity': item.godown.capacityInQuintals,
-        'Product Name': item.product.name,
-        'Product Price': item.product.price,
-        'Product Qty': item.quantity,
-        'Delivered To': item.delivered_to,
-        'Purpose': item.purpose,
-        'Delivery Date': item.delivery_date,
-        'Supply Date': item.supply_date,
-        'Invoice No.': item.invoice.invoiceNo,
-        'Bill Value': item.invoice.billValue,
-        'Receipt No.': item.receipt_no
-      }
+        Godown: item.godown.location,
+        "Godown Capacity": item.godown.capacityInQuintals,
+        "Product Name": item.product.name,
+        "Product Price": item.product.price,
+        "Product Qty": item.quantity,
+        "Delivered To": item.delivered_to,
+        Purpose: item.purpose,
+        "Delivery Date": item.delivery_date,
+        "Supply Date": item.supply_date,
+        "Invoice No.": item.invoice.invoiceNo,
+        "Bill Value": item.invoice.billValue,
+        "Receipt No.": item.receipt_no,
+      };
 
       reportData.push(obj);
     }
@@ -95,11 +92,11 @@ export default function Outwards() {
 
     let columnHeaders = getExcelColumnHeaders(headers);
 
-    let sheet = workbook.addWorksheet('Outwards', {
+    let sheet = workbook.addWorksheet("Outwards", {
       views: [{ state: "frozen", ySplit: 1 }],
     });
 
-    console.log("Headers", headers, "Column Headers", columnHeaders)
+    console.log("Headers", headers, "Column Headers", columnHeaders);
 
     sheet.columns = columnHeaders;
 
@@ -109,7 +106,7 @@ export default function Outwards() {
     // make the header bold
     sheet.getRow(1).font = { bold: true };
 
-    console.log("report", reportData)
+    console.log("report", reportData);
 
     // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
 
@@ -117,28 +114,26 @@ export default function Outwards() {
 
     let fileBuffer = await workbook.xlsx.writeBuffer();
 
-    const fileBlob = new Blob(
-      [fileBuffer],
-      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
-    );
+    const fileBlob = new Blob([fileBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-    const fileName = `${'Outwards'}_${new Date().toISOString()}.xlsx`;
+    const fileName = `${"Outwards"}_${new Date().toISOString()}.xlsx`;
 
     const url = URL.createObjectURL(fileBlob);
 
-    let link = document.createElement('a');
+    let link = document.createElement("a");
 
     link.href = url;
 
-    link.setAttribute('download', fileName);
+    link.setAttribute("download", fileName);
 
     document.body.appendChild(link);
 
     link.click();
 
-    URL.revokeObjectURL(url)
-
-  }
+    URL.revokeObjectURL(url);
+  };
 
   const getColumnHeaders = (columns, keys = []) => {
     const columnHeaders = [];
@@ -427,7 +422,7 @@ export default function Outwards() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by customer (delivered to)"
                 className={classes.searchInput}
-                sx={{ width: '700px' }}
+                sx={{ width: "700px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -439,22 +434,21 @@ export default function Outwards() {
               />
             </Grid>
 
-            <Grid item >
-            <IconButton  color="success"
-                // variant="contained"
-                sx={{marginLeft : '10px', marginTop : '10px'}}
-                // className={classes.newButton}
-                onClick={outwardsExcel}
-              >
+            <Grid
+              item
+              style={{
+                marginLeft: "auto",
+                marginTop: "auto",
+                marginBottom: "auto",
+              }}
+            >
+              <IconButton color="success" onClick={outwardsExcel}>
                 <DownloadIcon />
               </IconButton>
-            </Grid>
-            <Grid item>
               {user.role === "manager" && (
                 <Button
-                  // style={{ position: "absolute", right: "10px" }}
+                  style={{ marginLeft: "8px" }}
                   variant="outlined"
-                  sx={{marginLeft : '1px', marginTop : '10px' }}
                   startIcon={<AddIcon />}
                   className={classes.newButton}
                   onClick={handleAddModalOpen}
@@ -471,84 +465,84 @@ export default function Outwards() {
           </Grid>
         ) : (
           <>
-        <TblContainer>
-          <TblHead />
-          <TableBody>
-            {recordsAfterPagingAndSorting()?.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  {item.godown.location}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Capacity: " + item.godown.capacityInQuintals}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  {item.product.name}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Price: " + item.product.price}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Quantity: " + item.quantity}
-                  </Typography>
-                </TableCell>
-                <TableCell>{item.delivered_to}</TableCell>
-                <TableCell>{toSentenceCase(item.purpose)}</TableCell>
-                <TableCell>{item.supply_date}</TableCell>
-                <TableCell>{item.delivery_date}</TableCell>
-                <TableCell>
-                  {item.invoice.invoiceNo}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Bill value: " + item.invoice.billValue}
-                  </Typography>
-                </TableCell>
-                <TableCell>{item.receipt_no}</TableCell>
-                {user.role === "manager" && (
-                  <TableCell>
-                    <Button
-                      onClick={() => {
-                        handleEditModalOpen(item);
-                      }}
-                    >
-                      <EditOutlinedIcon fontSize="small" color="success" />
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setConfirmDialog({
-                          isOpen: true,
-                          title: "Are you sure to delete this record?",
-                          subTitle: "You can't undo this operation",
-                          onConfirm: () => {
-                            handleDelete(item.id);
-                          },
-                        });
-                      }}
-                    >
-                      <CloseIcon fontSize="small" color="error" />
-                    </Button>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </TblContainer>
-        <TblPagination />
-        </>
+            <TblContainer>
+              <TblHead />
+              <TableBody>
+                {recordsAfterPagingAndSorting()?.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      {item.godown.location}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Capacity: " + item.godown.capacityInQuintals}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {item.product.name}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Price: " + item.product.price}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Quantity: " + item.quantity}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{item.delivered_to}</TableCell>
+                    <TableCell>{toSentenceCase(item.purpose)}</TableCell>
+                    <TableCell>{item.supply_date}</TableCell>
+                    <TableCell>{item.delivery_date}</TableCell>
+                    <TableCell>
+                      {item.invoice.invoiceNo}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Bill value: " + item.invoice.billValue}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{item.receipt_no}</TableCell>
+                    {user.role === "manager" && (
+                      <TableCell>
+                        <Button
+                          onClick={() => {
+                            handleEditModalOpen(item);
+                          }}
+                        >
+                          <EditOutlinedIcon fontSize="small" color="success" />
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setConfirmDialog({
+                              isOpen: true,
+                              title: "Are you sure to delete this record?",
+                              subTitle: "You can't undo this operation",
+                              onConfirm: () => {
+                                handleDelete(item.id);
+                              },
+                            });
+                          }}
+                        >
+                          <CloseIcon fontSize="small" color="error" />
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </TblContainer>
+            <TblPagination />
+          </>
         )}
       </Paper>
 
