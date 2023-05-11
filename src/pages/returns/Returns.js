@@ -25,9 +25,8 @@ import {
   MenuItem,
   DialogActions,
   FormHelperText,
-  IconButton
-}
-  from "@mui/material";
+  IconButton,
+} from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
 import * as Yup from "yup";
@@ -61,28 +60,26 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Returns() {
-
   const returnsExcel = async () => {
-
     let reportData = [];
 
     for (let i = 0; i < returns.length; i++) {
       let item = returns[i];
 
       let obj = {
-        'Godown': item.godown == null ? null : item.godown.location,
-        'Godown Capacity (In Quintals)': item.godown.capacityInQuintals,
-        'Product Name': item.product.name,
-        'Product Qty': item.quantity,
-        'Product Price': item.product.price,
-        'Returned By': item.returned_by,
-        'Reason': item.reason,
-        'Delivery date': item.delivery_date,
-        'Return Date': item.return_date,
-        'Invoce Number': item.invoice.invoiceNo,
-        'Bill Value': item.invoice.billValue,
-        'Receipt Number': item.receipt_no,
-      }
+        Godown: item.godown == null ? null : item.godown.location,
+        "Godown Capacity (In Quintals)": item.godown.capacityInQuintals,
+        "Product Name": item.product.name,
+        "Product Qty": item.quantity,
+        "Product Price": item.product.price,
+        "Returned By": item.returned_by,
+        Reason: item.reason,
+        "Delivery date": item.delivery_date,
+        "Return Date": item.return_date,
+        "Invoce Number": item.invoice.invoiceNo,
+        "Bill Value": item.invoice.billValue,
+        "Receipt Number": item.receipt_no,
+      };
 
       reportData.push(obj);
     }
@@ -95,11 +92,11 @@ export default function Returns() {
 
     let columnHeaders = getExcelColumnHeaders(headers);
 
-    let sheet = workbook.addWorksheet('Returns', {
+    let sheet = workbook.addWorksheet("Returns", {
       views: [{ state: "frozen", ySplit: 1 }],
     });
 
-    console.log("Headers", headers, "Column Headers", columnHeaders)
+    console.log("Headers", headers, "Column Headers", columnHeaders);
 
     sheet.columns = columnHeaders;
 
@@ -109,36 +106,28 @@ export default function Returns() {
     // make the header bold
     sheet.getRow(1).font = { bold: true };
 
-    console.log("report", reportData)
-
-    // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
-
-    // fileBuffer = fileBuffer.toString('base64');
-
     let fileBuffer = await workbook.xlsx.writeBuffer();
 
-    const fileBlob = new Blob(
-      [fileBuffer],
-      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
-    );
+    const fileBlob = new Blob([fileBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-    const fileName = `${'Returns'}_${new Date().toISOString()}.xlsx`;
+    const fileName = `${"Returns"}_${new Date().toISOString()}.xlsx`;
 
     const url = URL.createObjectURL(fileBlob);
 
-    let link = document.createElement('a');
+    let link = document.createElement("a");
 
     link.href = url;
 
-    link.setAttribute('download', fileName);
+    link.setAttribute("download", fileName);
 
     document.body.appendChild(link);
 
     link.click();
 
-    URL.revokeObjectURL(url)
-
-  }
+    URL.revokeObjectURL(url);
+  };
 
   const getColumnHeaders = (columns, keys = []) => {
     const columnHeaders = [];
@@ -433,7 +422,7 @@ export default function Returns() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{ width: '680px' }}
+                sx={{ width: "680px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -460,7 +449,7 @@ export default function Returns() {
               {user.role === "manager" && (
                 <Button
                   variant="outlined"
-                  sx={{ marginLeft: '8px' }}
+                  sx={{ marginLeft: "8px" }}
                   startIcon={<AddIcon />}
                   className={classes.newButton}
                   onClick={handleAddModalOpen}
@@ -758,7 +747,7 @@ export default function Returns() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }

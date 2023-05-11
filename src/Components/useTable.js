@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     "& thead th": {
       fontWeight: "600",
-      // color: theme.palette.primary.main,
+
       backgroundColor: "#000000",
       color: "#FFFFFF",
     },

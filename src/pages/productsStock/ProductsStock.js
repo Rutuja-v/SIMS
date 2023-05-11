@@ -45,102 +45,117 @@ function ProductsStock({ godown }) {
   let children;
 
   if (godown === undefined || godown === null) {
-    children = <Grid item>Oops! You are not mapped to a godown yet.</Grid>
-  }
-  else if (productsStock !== null && productsStock.length === 0) {
+    children = <Grid item>Oops! You are not mapped to a godown yet.</Grid>;
+  } else if (productsStock !== null && productsStock.length === 0) {
     children = <Grid item>Oops! No products are in stock in this godown!</Grid>;
-  }
-  else {
-    children = productsStock && productsStock.map((productsStock) => (
-      <Grid item xs={12} sm={6} md={4} key={productsStock.product.id}>
-        <Card>
-          <CardMedia
-            style={{ height: "180px" }}
-            component="img"
-            image={productImage}
-            title="product image"
-          />
-          <CardContent
-            style={{
-              padding: "16px 24px",
-            }}
-          >
-            <Typography
-              gutterBottom
-              style={{ fontWeight: "bold" }}
-              variant="h6"
-              component="h4"
-            >
-              {productsStock.product.name}
-            </Typography>
-
-            <div
+  } else {
+    children =
+      productsStock &&
+      productsStock.map((productsStock) => (
+        <Grid item xs={12} sm={6} md={4} key={productsStock.product.id}>
+          <Card>
+            <CardMedia
+              style={{ height: "180px" }}
+              component="img"
+              image={productImage}
+              title="product image"
+            />
+            <CardContent
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "10px",
+                padding: "16px 24px",
               }}
             >
-              <div>
-                <Typography
-                  variant="caption"
-                  color="textSecondary"
-                  component="p"
-                >
-                  {"Price:"}
-                </Typography>
-                <Typography variant="body2" component="p">
-                  {productsStock.product.price}
-                </Typography>
-              </div>
+              <Typography
+                gutterBottom
+                style={{ fontWeight: "bold" }}
+                variant="h6"
+                component="h4"
+              >
+                {productsStock.product.name}
+              </Typography>
 
-              <div>
-                <Typography
-                  variant="caption"
-                  color="textSecondary"
-                  component="p"
-                >
-                  {"Stock:"}
-                </Typography>
-                <Typography variant="body2" component="p">
-                  {productsStock.stock}
-                </Typography>
-              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                }}
+              >
+                <div>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Price:"}
+                  </Typography>
+                  <Typography variant="body2" component="p">
+                    {productsStock.product.price}
+                  </Typography>
+                </div>
 
-              <div>
-                <Typography
-                  variant="caption"
-                  color="textSecondary"
-                  component="p"
-                >
-                  {"Weight (in quintals):"}
-                </Typography>
-                <Typography variant="body2" component="p">
-                  {productsStock.product.weight}
-                </Typography>
+                <div>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Stock:"}
+                  </Typography>
+                  <Typography variant="body2" component="p">
+                    {productsStock.stock}
+                  </Typography>
+                </div>
+
+                <div>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {"Weight (in quintals):"}
+                  </Typography>
+                  <Typography variant="body2" component="p">
+                    {productsStock.product.weight}
+                  </Typography>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Grid>
-    ));
+            </CardContent>
+          </Card>
+        </Grid>
+      ));
   }
 
   return (
     <div>
-      {(godown !== undefined || godown !== null) &&
+      {(godown !== undefined || godown !== null) && (
         <div style={{ textAlign: "end", marginBottom: "8px" }}>
           <Typography color="textSecondary">
             {"Current capacity/Total capacity: "}
           </Typography>
-          <Typography>{(currentCapacity !== null ? currentCapacity : "---") + "/" + (godown ? godown.capacityInQuintals : "---")}</Typography>
-          {currentCapacity !== null && <Typography color="textSecondary">
-            {"The godown is " + (godown ? parseFloat((currentCapacity / godown.capacityInQuintals * 100).toFixed(2)) : "--") + "% full"}
-          </Typography>}
+          <Typography>
+            {(currentCapacity !== null ? currentCapacity : "---") +
+              "/" +
+              (godown ? godown.capacityInQuintals : "---")}
+          </Typography>
+          {currentCapacity !== null && (
+            <Typography color="textSecondary">
+              {"The godown is " +
+                (godown
+                  ? parseFloat(
+                      (
+                        (currentCapacity / godown.capacityInQuintals) *
+                        100
+                      ).toFixed(2)
+                    )
+                  : "--") +
+                "% full"}
+            </Typography>
+          )}
         </div>
-      }
+      )}
       <Grid container spacing={6}>
         {children}
       </Grid>

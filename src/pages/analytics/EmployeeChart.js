@@ -1,7 +1,6 @@
-
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Bar } from 'react-chartjs-2';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Bar } from "react-chartjs-2";
 
 const EmployeeChart = () => {
   const [employees, setEmployees] = useState([]);
@@ -11,19 +10,19 @@ const EmployeeChart = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const { data } = await axios.get('http://localhost:8080/api/employees');
+        const { data } = await axios.get("http://localhost:8080/api/employees");
         setEmployees(data);
       } catch (error) {
-        console.error('Error fetching employees:', error);
+        console.error("Error fetching employees:", error);
       }
     };
 
     const fetchLocations = async () => {
       try {
-        const { data } = await axios.get('http://localhost:8080/api/godowns');
-        setLocations(data.filter(Boolean).map(godown => godown.location));
+        const { data } = await axios.get("http://localhost:8080/api/godowns");
+        setLocations(data.filter(Boolean).map((godown) => godown.location));
       } catch (error) {
-        console.error('Error fetching locations:', error);
+        console.error("Error fetching locations:", error);
       }
     };
 
@@ -42,23 +41,24 @@ const EmployeeChart = () => {
       return;
     }
 
-    const employeeCounts = locations.map(location => {
-      const count = employees.filter(employee => employee.godown && employee.godown.location === location).length;
+    const employeeCounts = locations.map((location) => {
+      const count = employees.filter(
+        (employee) => employee.godown && employee.godown.location === location
+      ).length;
       return count;
     });
-    
 
     const chartData = {
       labels: locations,
       datasets: [
         {
-          label: 'Employee Count',
+          label: "Employee Count",
           data: employeeCounts,
-          backgroundColor: 'rgba(54, 162, 235, 0.5)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: "rgba(54, 162, 235, 0.5)",
+          borderColor: "rgba(54, 162, 235, 1)",
           borderWidth: 1,
           barThickness: 30,
-          maxBarThickness: 50
+          maxBarThickness: 50,
         },
       ],
     };
@@ -68,42 +68,36 @@ const EmployeeChart = () => {
 
   return (
     <div>
-    <h6 style={{ textAlign: 'center' }}>Employees by Location</h6>
-  
-    {chartData ? (
-     <Bar
-     data={chartData}
-     options={{
-       indexAxis: "x",
-       scales: {
-         y: {
-           type: "linear",
-           ticks: {
-             precision: 0,
-           },
-           stepSize: 10,
-         },
-       },
-       plugins: {
-         legend: {
-           position: "right",
-         },
-         title: {
-           display: true,
-           text: "Employee Count",
-         },
-       },
-     }}
-     height={"100px"}
-   />
-   
-    
-    
-    ) : (
-      <p>Loading...</p>
-    )}
-  </div>
-  
+         
+      <strong>
+        <h7 style={{ marginLeft: "320px" }}>Employees by Location</h7>
+      </strong>
+      {chartData ? (
+        <Bar
+          data={chartData}
+          options={{
+            indexAxis: "x",
+            scales: {
+              y: {
+                type: "linear",
+                ticks: {
+                  precision: 0,
+                },
+                stepSize: 10,
+              },
+            },
+            plugins: {
+              legend: {
+                position: "right",
+              },
+            },
+          }}
+          height={"100px"}
+        />
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
   );
 };
 

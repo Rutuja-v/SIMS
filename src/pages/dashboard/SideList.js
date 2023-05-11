@@ -67,7 +67,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 const AppBar = styled(MuiAppBar, {
@@ -277,11 +276,6 @@ export default function SideList({ children }) {
             <Typography variant="h6" noWrap component="div">
               Smart Inventory Management System
             </Typography>
-            {/* <IconButton sx={{ display: { xs: 'flex', md: 'none' } }}
-            
-            >
-              <HomeIcon style={{color:"#000000"}}/>
-            </IconButton> */}
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -488,4 +482,3 @@ export default function SideList({ children }) {
     </>
   );
 }
-

@@ -110,14 +110,13 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
       formData["manager"] = {
         id: Number(managerId),
       };
-    }
-    else {
+    } else {
       formData["manager"] = {
         name: managerName,
         username: managerUsername,
         password: managerPassword,
         role: {
-          id: Number(managerRoleId)
+          id: Number(managerRoleId),
         },
       };
     }
@@ -130,9 +129,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
 
     await axios
       .put(`http://localhost:8080/api/godowns/${godown?.id}`, formData)
-      .then((response) => {
-
-      })
+      .then((response) => {})
       .catch((error) => {
         console.error(error);
       });
@@ -251,7 +248,9 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                       onChange={handleManagerPasswordChange}
                     />
                     <FormControl>
-                      <InputLabel id="managerRoleIdLabel">Manager role</InputLabel>
+                      <InputLabel id="managerRoleIdLabel">
+                        Manager role
+                      </InputLabel>
                       <Select
                         labelId="managerRoleIdLabel"
                         id="managerRoleId"

@@ -325,14 +325,6 @@ const Analytics = () => {
       >
           <EmployeeChart />
       </div>
-   
-      <br></br>
-      <br></br>
-      <Bar
-        height={"80px"}
-        data={productsData}
-        options={optionsForProductsData}
-      />
       <br></br>
       <br></br>
       <div
@@ -342,19 +334,30 @@ const Analytics = () => {
           padding: "20px",
         }}
       >
+        <Bar
+          height={"80px"}
+          data={productsData}
+          options={optionsForProductsData}
+        />
+      </div>
+      <br></br>
+      <br></br>
+      <div
+        style={{
+          marginBottom: "40px",
+          border: "1px solid gray",
+          padding: "20px",
+        }}
+      >
+               
         <strong>
-          <p
-            style={{
-              marginLeft: "535px",
-              fontSize: "13px",
-              color: "#656565",
-            }}
-            className="text-center"
-          >
+          <h7 style={{ marginLeft: "320px" }}>
+            {" "}
             Returns (Cancelled vs Damaged)
-          </p>
+          </h7>
         </strong>
-        <PieChart justify-content="center" width={800} height={300}>
+           
+        <PieChart justify-content="center" width={950} height={350}>
           <Pie
             data={pieDataForReturns}
             color="#000000"
@@ -384,16 +387,12 @@ const Analytics = () => {
             padding: "20px",
           }}
         >
+           
           <strong>
-            <p
-              style={{
-                // marginLeft: "535px",
-                fontSize: "13px",
-                color: "#656565",
-              }}
-            >
+            <h7 style={{ marginLeft: "320px" }}>
+              {" "}
               Godown Capacity by Location
-            </p>
+            </h7>
           </strong>
           <GodownsChart />
         </div>
@@ -406,16 +405,9 @@ const Analytics = () => {
             padding: "20px",
           }}
         >
+           
           <strong>
-            <p
-              style={{
-                marginLeft: "535px",
-                fontSize: "13px",
-                color: "#656565",
-              }}
-            >
-              Products Stock by Godown
-            </p>
+            <h7 style={{ marginLeft: "320px" }}> Products Stock by Godown</h7>
           </strong>
           <ProductsChart godownId={3} />
         </div>

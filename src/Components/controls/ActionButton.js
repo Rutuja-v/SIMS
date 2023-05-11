@@ -6,18 +6,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 0,
     margin: theme.spacing(0.5),
   },
-  // secondary: {
-  //     backgroundColor: theme.palette.secondary.light,
-  //     '& .MuiButton-label': {
-  //         color:
-  //     }
-  // },
-  // primary: {
-  //     // backgroundColor: theme.palette.primary.light,
-  //     '& .MuiButton-label': {
-  //         color: '#4BB543'
-  //     }
-  // },
 }));
 
 export default function ActionButton(props) {

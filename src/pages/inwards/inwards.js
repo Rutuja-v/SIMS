@@ -36,7 +36,6 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
-// import Grid from '@mui/material/Grid';
 import UpdateInwards from "./UpdateInwards";
 import { useMemo } from "react";
 import * as Yup from "yup";
@@ -104,12 +103,6 @@ export default function Inwards() {
 
     // make the header bold
     sheet.getRow(1).font = { bold: true };
-
-    console.log("report", reportData);
-
-    // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
-
-    // fileBuffer = fileBuffer.toString('base64');
 
     let fileBuffer = await workbook.xlsx.writeBuffer();
 
@@ -707,7 +700,7 @@ export default function Inwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }

@@ -65,7 +65,7 @@ function App() {
                   path="/reset-password"
                   element={<ForgotPassword />}
                 ></Route>
-                        <Route path="/register" exact element={<Register />}></Route>
+                <Route path="/register" exact element={<Register />}></Route>
               </Routes>
             </BrowserRouter>
           </div>

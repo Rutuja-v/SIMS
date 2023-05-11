@@ -33,7 +33,7 @@ import {
   ListItem,
   ListItemText,
   Badge,
-  Avatar
+  Avatar,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -46,7 +46,6 @@ import UpdateEmployee from "./UpdateEmployee";
 import { Form, Formik } from "formik";
 import { useFormik } from "formik";
 const Excel = require("exceljs");
-
 
 const useStyles = makeStyles((theme) => ({
   pageContent: {
@@ -74,21 +73,18 @@ const headCells = [
 ];
 
 export default function Employees() {
-
   const employeesExcel = async () => {
-
     let reportData = [];
 
     for (let i = 0; i < employees.length; i++) {
       let item = employees[i];
 
       let obj = {
-        'Employee Name': item.name,
-        'Employee Username': item.username,
-        'Employee Role': item.role == null ? null : item.role.role,
-        'Godown': item.godown == null ? null : item.godown.location,
-
-      }
+        "Employee Name": item.name,
+        "Employee Username": item.username,
+        "Employee Role": item.role == null ? null : item.role.role,
+        Godown: item.godown == null ? null : item.godown.location,
+      };
 
       reportData.push(obj);
     }
@@ -101,11 +97,11 @@ export default function Employees() {
 
     let columnHeaders = getExcelColumnHeaders(headers);
 
-    let sheet = workbook.addWorksheet('Employees', {
+    let sheet = workbook.addWorksheet("Employees", {
       views: [{ state: "frozen", ySplit: 1 }],
     });
 
-    console.log("Headers", headers, "Column Headers", columnHeaders)
+    console.log("Headers", headers, "Column Headers", columnHeaders);
 
     sheet.columns = columnHeaders;
 
@@ -115,36 +111,30 @@ export default function Employees() {
     // make the header bold
     sheet.getRow(1).font = { bold: true };
 
-    console.log("report", reportData)
-
-    // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
-
-    // fileBuffer = fileBuffer.toString('base64');
+    console.log("report", reportData);
 
     let fileBuffer = await workbook.xlsx.writeBuffer();
 
-    const fileBlob = new Blob(
-      [fileBuffer],
-      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
-    );
+    const fileBlob = new Blob([fileBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-    const fileName = `${'Employees'}_${new Date().toISOString()}.xlsx`;
+    const fileName = `${"Employees"}_${new Date().toISOString()}.xlsx`;
 
     const url = URL.createObjectURL(fileBlob);
 
-    let link = document.createElement('a');
+    let link = document.createElement("a");
 
     link.href = url;
 
-    link.setAttribute('download', fileName);
+    link.setAttribute("download", fileName);
 
     document.body.appendChild(link);
 
     link.click();
 
-    URL.revokeObjectURL(url)
-
-  }
+    URL.revokeObjectURL(url);
+  };
 
   const getColumnHeaders = (columns, keys = []) => {
     const columnHeaders = [];
@@ -264,7 +254,9 @@ export default function Employees() {
     axios
       .patch(`http://localhost:8080/api/employees/${id}/unlock`)
       .then((response) => {
-        setLockedEmployees(lockedEmployees.filter(employee => employee.id !== id));
+        setLockedEmployees(
+          lockedEmployees.filter((employee) => employee.id !== id)
+        );
         setNotify({
           isOpen: true,
           message: "Unlocked the account",
@@ -280,7 +272,9 @@ export default function Employees() {
     axios
       .delete(`http://localhost:8080/api/employees/${id}`)
       .then((response) => {
-        setLockedEmployees(lockedEmployees.filter(employee => employee.id !== id));
+        setLockedEmployees(
+          lockedEmployees.filter((employee) => employee.id !== id)
+        );
         setNotify({
           isOpen: true,
           message: "Deleted the account",
@@ -438,7 +432,7 @@ export default function Employees() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{ width: '680px' }}
+                sx={{ width: "680px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -450,17 +444,22 @@ export default function Employees() {
               />
             </Grid>
 
-            <Grid item
+            <Grid
+              item
               style={{
                 marginLeft: "auto",
                 marginTop: "auto",
                 marginBottom: "auto",
-              }}>
+              }}
+            >
               <IconButton color="success" onClick={employeesExcel}>
                 <DownloadIcon />
               </IconButton>
 
-              <IconButton color="success" onClick={() => setUnlockAccountsModalOpen(true)}>
+              <IconButton
+                color="success"
+                onClick={() => setUnlockAccountsModalOpen(true)}
+              >
                 <Badge badgeContent={lockedEmployees.length} color="primary">
                   <LockIcon />
                 </Badge>
@@ -468,7 +467,7 @@ export default function Employees() {
 
               <Button
                 variant="outlined"
-                sx={{ marginLeft: '8px' }}
+                sx={{ marginLeft: "8px" }}
                 startIcon={<AddIcon />}
                 className={classes.newButton}
                 onClick={handleAddModalOpen}
@@ -678,26 +677,35 @@ export default function Employees() {
           Unlock locked accounts
         </DialogTitle>
         <DialogContent>
-          {lockedEmployees.length === 0 ?
-            <Grid item style={{ padding: "36px 36px 0px 36px" }}>There are currently no locked accounts.</Grid>
-            : (<List>
+          {lockedEmployees.length === 0 ? (
+            <Grid item style={{ padding: "36px 36px 0px 36px" }}>
+              There are currently no locked accounts.
+            </Grid>
+          ) : (
+            <List>
               {lockedEmployees.map((employee, index) => (
                 <ListItem
                   key={index}
                   secondaryAction={
                     <div edge="end">
-                      <IconButton aria-label="unlock" color="primary" onClick={() => handleUnlockAccount(employee.id)}>
+                      <IconButton
+                        aria-label="unlock"
+                        color="primary"
+                        onClick={() => handleUnlockAccount(employee.id)}
+                      >
                         <LockOpenIcon />
                       </IconButton>
-                      <IconButton aria-label="unlock" color="error" onClick={() => handleLockedAccountDelete(employee.id)}>
+                      <IconButton
+                        aria-label="unlock"
+                        color="error"
+                        onClick={() => handleLockedAccountDelete(employee.id)}
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </div>
                   }
                 >
-                  <Avatar
-                    sx={{ mr: 1 }}
-                    src={profileIcon} />
+                  <Avatar sx={{ mr: 1 }} src={profileIcon} />
                   <ListItemText
                     style={{ marginRight: "96px" }}
                     primary={employee.name}
@@ -705,13 +713,19 @@ export default function Employees() {
                   />
                 </ListItem>
               ))}
-            </List>)}
+            </List>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => {
-            setUnlockAccountsModalOpen(false);
-            getData();
-          }}>Close</Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setUnlockAccountsModalOpen(false);
+              getData();
+            }}
+          >
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
 

@@ -8,8 +8,6 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-
-
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
@@ -149,7 +147,7 @@ function Products() {
       handleAddModalClose();
       setNotify({
         isOpen: true,
-        message: "Product Submitted Successfully",
+        message: "Product Added Successfully",
         type: "success",
       });
     },
@@ -203,7 +201,6 @@ function Products() {
                   }}
                 >
                   <TextField
-                    // autoFocus
                     id="name"
                     label="Name"
                     type="text"
@@ -241,18 +238,24 @@ function Products() {
                   />
                 </div>
 
-            <DialogActions>
-              <Button variant="outlined" onClick={() => setAddModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                disabled={!formik.isValid || !formik.dirty} type="submit" variant="contained" >
-                Add
-              </Button>
-            </DialogActions>
-          </form>
-        </DialogContent>
-      </Dialog>
+                <DialogActions>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setAddModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!formik.isValid || !formik.dirty}
+                    type="submit"
+                    variant="contained"
+                  >
+                    Add
+                  </Button>
+                </DialogActions>
+              </form>
+            </DialogContent>
+          </Dialog>
 
           <Grid container spacing={6}>
             {products.map((product) => (

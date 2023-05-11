@@ -8,12 +8,9 @@ import {
   TextField,
 } from "@mui/material";
 import { makeStyles } from "@material-ui/core/styles";
-
 import axios from "axios";
 import * as Yup from "yup";
-
 import { Formik, Form } from "formik";
-
 
 export const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
@@ -70,9 +67,7 @@ function UpdateProduct({ product, handleClose }) {
 
     await axios
       .put(`http://localhost:8080/api/products/${product?.id}`, formData)
-      .then((response) => {
-
-      })
+      .then((response) => {})
       .catch((error) => {
         console.error(error);
       });
@@ -119,7 +114,7 @@ function UpdateProduct({ product, handleClose }) {
                   id="price"
                   label="Price"
                   type="number"
-                  inputProps={{min:1}}
+                  inputProps={{ min: 1 }}
                   variant="outlined"
                   value={price}
                   onChange={handlePriceChange}

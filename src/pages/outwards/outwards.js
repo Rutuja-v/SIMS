@@ -106,12 +106,6 @@ export default function Outwards() {
     // make the header bold
     sheet.getRow(1).font = { bold: true };
 
-    console.log("report", reportData);
-
-    // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
-
-    // fileBuffer = fileBuffer.toString('base64');
-
     let fileBuffer = await workbook.xlsx.writeBuffer();
 
     const fileBlob = new Blob([fileBuffer], {
@@ -737,7 +731,7 @@ export default function Outwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }

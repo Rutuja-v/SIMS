@@ -26,12 +26,6 @@ import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
 import { Alert, Link } from "@mui/material";
 
-// const darkTheme = createTheme({
-//   palette: {
-//     mode: "dark",
-//   },
-// });
-
 const boxstyle = {
   mt: 4,
   mb: 4,
@@ -39,12 +33,6 @@ const boxstyle = {
   backgroundColor: "background.paper",
   boxShadow: 24,
 };
-
-// const center = {
-//   position: "relative",
-//   top: "50%",
-//   left: "30%",
-// };
 
 export default function Register() {
   const [open, setOpen] = useState(false);
@@ -71,10 +59,10 @@ export default function Register() {
 
     axios
       .post("http://localhost:8080/api/auth/signUp", formData)
-      .then(response => {
+      .then((response) => {
         setOpen(true);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
           setUsernameErrorText("This username already exists");
@@ -120,7 +108,8 @@ export default function Register() {
           TransitionComponent={TransitionLeft}
           sx={{ width: "100%" }}
         >
-          Your account has been created. Please wait until the superadmin approves your account.
+          Your account has been created. Please wait until the superadmin
+          approves your account.
         </Alert>
       </Snackbar>
       <div

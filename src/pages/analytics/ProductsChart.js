@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Pie } from 'react-chartjs-2';
-import { InputLabel, FormControl, MenuItem, Select } from '@mui/material';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Pie } from "react-chartjs-2";
+import { InputLabel, FormControl, MenuItem, Select } from "@mui/material";
 const ProductsChart = () => {
   const [products, setProducts] = useState([]);
   const [godowns, setGodowns] = useState([]);
@@ -104,8 +104,6 @@ const ProductsChart = () => {
 
   return (
     <div style={{ width: "400px", height: "auto", margin: "0 auto" }}>
-      {/* <h6 style={{ textAlign: 'center' }}>Godown Capacity by Location</h6> */}
-
       {isLoading ? (
         <p>Loading...</p>
       ) : (

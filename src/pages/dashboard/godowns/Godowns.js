@@ -192,9 +192,7 @@ function Godowns() {
       formData["manager"] = {
         name: values.managerName,
         username: values.managerUsername,
-        // password: managerPassword,
         role: {
-          // id: Number(managerRoleId)
           id: values.managerRoleId,
         },
       };
@@ -219,7 +217,7 @@ function Godowns() {
 
       setNotify({
         isOpen: true,
-        message: "Godown Submitted Successfully",
+        message: "Godown Added Successfully",
         type: "success",
       });
     },
@@ -345,25 +343,13 @@ function Godowns() {
                       formik.errors.managerUsername
                     }
                   />
-                  {/* <TextField
-                    id="managerPassword"
-                    label="Manager Password"
-                    type="text"
-                    variant="outlined"
-                    value={managerPassword}
-                    onChange={handleManagerPasswordChange}
-                  /> */}
+
                   <FormControl>
                     <InputLabel id="roleIdLabel">Manager role</InputLabel>
                     <Select
                       labelId="roleIdLabel"
                       id="roleId"
-                      // defaultValue={
-                      //   roles.find((role) => role.role === "manager")?.id
-                      // }
-                      // value={managerRoleId}
                       label="Manager role"
-                      // onChange={handleManagerRoleIdChange}
                       {...formik.getFieldProps("managerRoleId")}
                       error={
                         formik.touched.managerRoleId &&
@@ -400,7 +386,6 @@ function Godowns() {
                     type="submit"
                     variant="contained"
                     className={classes.actionButtons}
-                    // onClick={() => formik.handleSubmit()}
                   >
                     Add
                   </Button>

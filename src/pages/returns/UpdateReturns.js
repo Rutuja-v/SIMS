@@ -13,14 +13,11 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@material-ui/core/styles";
 import moment from "moment";
-
 import axios from "axios";
 import * as Yup from "yup";
-
 import { Formik, Form } from "formik";
 
 export const validationSchema = Yup.object().shape({});
-
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -53,14 +50,16 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
     setQuantity(returns?.quantity);
     setReturnedBy(returns?.returned_by);
 
-    const formattedDeliveryDate = moment(returns?.delivery_date, "DD/MM/YYYY").format(
-      "YYYY-MM-DD"
-    );
+    const formattedDeliveryDate = moment(
+      returns?.delivery_date,
+      "DD/MM/YYYY"
+    ).format("YYYY-MM-DD");
     setDeliveryDate(formattedDeliveryDate);
 
-    const formattedReturnDate = moment(returns?.return_date, "DD/MM/YYYY").format(
-      "YYYY-MM-DD"
-    );
+    const formattedReturnDate = moment(
+      returns?.return_date,
+      "DD/MM/YYYY"
+    ).format("YYYY-MM-DD");
     setReturnDate(formattedReturnDate);
 
     setInvoiceId(returns?.invoice.id);
@@ -131,20 +130,17 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
           id: billCheckedById,
         },
       };
-    }
-    else {
+    } else {
       formData["invoice"] = {
-        id: invoiceId
-      }
+        id: invoiceId,
+      };
     }
 
     console.log(formData);
 
     await axios
       .put(`http://localhost:8080/api/returns/${returns?.id}`, formData)
-      .then((response) => {
-
-      })
+      .then((response) => {})
       .catch((error) => {
         console.error(error);
       });
@@ -224,7 +220,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
                   id="quantity"
                   label="Quantity"
                   type="number"
-                  inputProps={{min:1}}
+                  inputProps={{ min: 1 }}
                   variant="outlined"
                   value={quantity}
                   onChange={handleQuantityChange}
@@ -277,7 +273,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
                   id="receiptNo"
                   label="Receipt number"
                   type="number"
-                  inputProps={{min:1}}
+                  inputProps={{ min: 1 }}
                   variant="outlined"
                   value={receiptNo}
                   onChange={handleReceiptNoChange}
@@ -292,9 +288,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
                     label="Invoice"
                     onChange={handleInvoiceIdChange}
                   >
-                    <MenuItem value={-1}>
-                      Add new invoice
-                    </MenuItem>
+                    <MenuItem value={-1}>Add new invoice</MenuItem>
                     <MenuItem value={returns?.invoice.id}>
                       {returns?.invoice.invoiceNo}
                     </MenuItem>
