@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import React, { useContext, useState } from "react";
 
-import { Alert, Button } from "@mui/material";
+import { Alert, Button, Link } from "@mui/material";
 
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
@@ -72,12 +72,10 @@ export default function Login() {
       .catch((error) => {
         if (error.response.data.code === "INVALID_USERNAME") {
           setUsernameErrorText("This username does not exist");
-        }
-        else if (error.response.data.code === "WRONG_PASSWORD") {
+        } else if (error.response.data.code === "WRONG_PASSWORD") {
           setPasswordErrorText("The entered password is wrong");
-        }
-        else {
-          setOpen(true)
+        } else if (error.response.data.code === "ACCOUNT_LOCKED") {
+          setOpen(true);
         }
       });
   };
@@ -107,7 +105,7 @@ export default function Login() {
           TransitionComponent={TransitionLeft}
           sx={{ width: "100%" }}
         >
-          Failed! Enter correct username and password.
+          Oops! Your account is locked. Please contact the superadmin.
         </Alert>
       </Snackbar>
       <div
@@ -141,12 +139,7 @@ export default function Login() {
                 color: "#f5f5f5",
               }}
             ></Grid>
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              lg={6}
-            >
+            <Grid item xs={12} sm={12} lg={6}>
               <form
                 onSubmit={handleSubmit}
                 style={{
@@ -165,7 +158,7 @@ export default function Login() {
 
                 <Box
                   style={{
-                    marginTop: "32px",
+                    marginTop: "16px",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -192,7 +185,7 @@ export default function Login() {
                     if (usernameErrorText !== null) {
                       setUsernameErrorText(null);
                     }
-                    setValues({ ...values, username: e.target.value })
+                    setValues({ ...values, username: e.target.value });
                   }}
                   error={usernameErrorText !== null}
                   helperText={usernameErrorText}
@@ -213,23 +206,20 @@ export default function Login() {
                     if (passwordErrorText !== null) {
                       setPasswordErrorText(null);
                     }
-                    setValues({ ...values, password: e.target.value })
+                    setValues({ ...values, password: e.target.value });
                   }}
                   error={passwordErrorText !== null}
                   helperText={passwordErrorText}
                 />
 
-                            <Typography
-                              variant="body1"
-                              component="span"
-                              onClick={() => {
-                                navigate("/reset-password");
-                              }}
-                              style={{ marginTop: "10px", cursor: "pointer" }}
-                            >
-                              Forgot password?
-                            </Typography>
-                          
+                <Link
+                  onClick={() => {
+                    navigate("/reset-password");
+                  }}
+                  style={{ marginTop: "16px", cursor: "pointer" }}
+                >
+                  Forgot password?
+                </Link>
 
                 <Button
                   type="submit"
@@ -240,6 +230,21 @@ export default function Login() {
                 >
                   Sign in
                 </Button>
+                <Typography
+                  variant="body1"
+                  component="span"
+                  style={{ marginTop: "20px" }}
+                >
+                  Not registered yet?{" "}
+                  <Link
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      navigate("/register");
+                    }}
+                  >
+                    Create an Account
+                  </Link>
+                </Typography>
               </form>
             </Grid>
           </Grid>

@@ -3,6 +3,8 @@ import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import * as Yup from "yup";
 import DownloadIcon from "@mui/icons-material/Download";
 import {
@@ -24,7 +26,10 @@ import {
   MenuItem,
   DialogActions,
   FormHelperText,
-  IconButton
+  IconButton,
+  List,
+  ListItem,
+  ListItemText
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -72,13 +77,13 @@ export default function Employees() {
 
     for (let i = 0; i < employees.length; i++) {
       let item = employees[i];
-      
+
       let obj = {
         'Employee Name': item.name,
         'Employee Username': item.username,
         'Employee Role': item.role == null ? null : item.role.role,
-        'Godown':  item.godown == null ? null : item.godown.location,
-        
+        'Godown': item.godown == null ? null : item.godown.location,
+
       }
 
       reportData.push(obj);
@@ -192,9 +197,12 @@ export default function Employees() {
 
   const [roles, setRoles] = useState([]);
   const [godowns, setGodowns] = useState([]);
+  const [lockedEmployees, setLockedEmployees] = useState([]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalItem, setEditModalItem] = useState(null);
+
+  const [unlockAccountsModalOpen, setUnlockAccountsModalOpen] = useState(null);
 
   const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
     useTable(employees, headCells, filterFn);
@@ -246,6 +254,22 @@ export default function Employees() {
       message: "Employee Deleted Successfully",
       type: "error",
     });
+  };
+
+  const handleUnlockAccount = (id) => {
+    axios
+      .patch(`http://localhost:8080/api/employees/${id}/unlock`)
+      .then((response) => {
+        setLockedEmployees(lockedEmployees.filter(employee => employee.id !== id));
+        setNotify({
+          isOpen: true,
+          message: "Unlocked the account",
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const validationSchema = Yup.object().shape({
@@ -341,6 +365,27 @@ export default function Employees() {
         setGodowns(res.data);
       })
       .catch((err) => console.log(err));
+
+    axios
+      .get("http://localhost:8080/api/employees/locked")
+      .then((res) => {
+        let rows = [];
+        for (let i = 0; i < res.data.length; i++) {
+          let item = res.data[i];
+          let obj = {
+            id: item.id,
+            name: item.name,
+            username: item.username,
+            // password: item.password,
+            role: item.role,
+            godown: item.godown,
+          };
+          rows.push(obj);
+        }
+        rows.sort((e1, e2) => e1.name.localeCompare(e2.name));
+        setLockedEmployees(rows);
+      })
+      .catch((err) => console.log(err));
   }
 
   useEffect(() => {
@@ -367,13 +412,13 @@ export default function Employees() {
     <>
       <Paper className={classes.pageContent}>
         <Toolbar>
-        <Grid container spacing={2} direction="row">
+          <Grid container spacing={2} direction="row">
             <Grid item>
               <TextField
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{width : '700px'}}
+                sx={{ width: '700px' }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -386,66 +431,78 @@ export default function Employees() {
             </Grid>
 
             <Grid item >
-            <IconButton sx={{marginTop:'8px'}} color="success" onClick={employeesExcel}>
+              <IconButton sx={{ marginTop: '8px' }} color="success" onClick={employeesExcel}>
                 <DownloadIcon />
               </IconButton>
             </Grid>
+            <Grid
+              item
+              style={{
+                marginLeft: "auto",
+                marginTop: "auto",
+                marginBottom: "auto",
+              }}
+            >
+              <IconButton color="success" onClick={() => setUnlockAccountsModalOpen(true)}>
+                <NotificationsIcon />
+              </IconButton>
+            </Grid>
             <Grid item>
-                <Button
-                  variant="outlined"
-                  sx={{marginLeft : '10px', marginTop : '10px' }}
-                  startIcon={<AddIcon />}
-                  className={classes.newButton}
-                  onClick={handleAddModalOpen}
-                >
-                  Add new
-                </Button>
+              <Button
+                variant="outlined"
+                sx={{ marginLeft: '10px', marginTop: '10px' }}
+                startIcon={<AddIcon />}
+                className={classes.newButton}
+                onClick={handleAddModalOpen}
+              >
+                Add new
+              </Button>
             </Grid>
           </Grid>
         </Toolbar>
- {recordsAfterPagingAndSorting()?.length === 0 ? (
+        {recordsAfterPagingAndSorting()?.length === 0 ? (
           <Grid sx={{ mt: 2, ml: 3 }}>
             There are currently 0 employees records.
           </Grid>
         ) : (
           <>
-        <TblContainer>
-          <TblHead />
-          <TableBody>
-            {recordsAfterPagingAndSorting()?.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.username}</TableCell>
-                <TableCell>{toSentenceCase(item.role.role)}</TableCell>
-                <TableCell>
-                  {item.godown === null ? "None" : item.godown.location}
-                </TableCell>
-                <TableCell>
-                  <Button onClick={() => handleEditModalOpen(item)}>
-                    <EditOutlinedIcon fontSize="small" />
-                  </Button>
+            <TblContainer>
+              <TblHead />
+              <TableBody>
+                {recordsAfterPagingAndSorting()?.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.username}</TableCell>
+                    <TableCell>{toSentenceCase(item.role.role)}</TableCell>
+                    <TableCell>
+                      {item.godown === null ? "None" : item.godown.location}
+                    </TableCell>
+                    <TableCell>
+                      <Button onClick={() => handleEditModalOpen(item)}>
+                        <EditOutlinedIcon fontSize="small" />
+                      </Button>
 
-                  <Button
-                    onClick={() => {
-                      setConfirmDialog({
-                        isOpen: true,
-                        title: "Are you sure to delete this record?",
-                        subTitle: "You can't undo this operation",
-                        onConfirm: () => {
-                          handleDelete(item.id);
-                        },
-                      });
-                    }}
-                  >
-                    <CloseIcon fontSize="small" color="error" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </TblContainer>
-        <TblPagination />
-        </>
+                      <Button
+                        onClick={() => {
+                          setConfirmDialog({
+                            isOpen: true,
+                            title: "Are you sure to delete this record?",
+                            subTitle: "You can't undo this operation",
+                            onConfirm: () => {
+                              handleDelete(item.id);
+                            },
+                          });
+                        }}
+                      >
+                        <CloseIcon fontSize="small" color="error" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </TblContainer>
+            <TblPagination />
+          </>
         )}
       </Paper>
 
@@ -590,6 +647,48 @@ export default function Employees() {
           </Formik>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={unlockAccountsModalOpen}
+        onClose={() => {
+          setUnlockAccountsModalOpen(false);
+          getData();
+        }}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title" className={classes.customTitle}>
+          Unlock locked accounts
+        </DialogTitle>
+        <DialogContent>
+          {lockedEmployees.length === 0 ?
+            <Grid item style={{ padding: "36px 36px 0px 36px" }}>There are currently no locked accounts.</Grid>
+            : (<List>
+              {lockedEmployees.map((employee, index) => (
+                <ListItem
+                  key={index}
+                  secondaryAction={
+                    <IconButton edge="end" aria-label="unlock" onClick={() => handleUnlockAccount(employee.id)}>
+                      <LockOpenIcon />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText
+                    style={{ marginRight: "96px" }}
+                    primary={employee.name}
+                    secondary={employee.username}
+                  />
+                </ListItem>
+              ))}
+            </List>)}
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={() => {
+            setUnlockAccountsModalOpen(false);
+            getData();
+          }}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
       <Notification notify={notify} setNotify={setNotify} />
       <ConfirmDialog
         confirmDialog={confirmDialog}

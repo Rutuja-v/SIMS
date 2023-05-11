@@ -12,6 +12,7 @@ import Outwards from "./pages/outwards/outwards";
 import Returns from "./pages/returns/Returns";
 import ForgotPassword from "./Components/ForgotPassword";
 import ProductsStock from "./pages/productsStock/ProductsStock";
+import Register from "./Components/Register";
 function App() {
   return (
     <ContextProvider>
@@ -64,6 +65,7 @@ function App() {
                   path="/reset-password"
                   element={<ForgotPassword />}
                 ></Route>
+                        <Route path="/register" exact element={<Register />}></Route>
               </Routes>
             </BrowserRouter>
           </div>

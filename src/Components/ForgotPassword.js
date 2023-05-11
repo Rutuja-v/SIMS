@@ -9,17 +9,12 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { MenuItem,InputLabel,Select,
-FormControl } from "@mui/material";
+import { MenuItem, InputLabel, Select, FormControl, Link } from "@mui/material";
 import { useState, forwardRef } from "react";
 import Snackbar from "@mui/material/Snackbar";
-
+import Stack from "@mui/material/Stack";
 import Slide from "@mui/material/Slide";
 import { useNavigate } from "react-router-dom";
-
-// const Alert = forwardRef(function Alert(props, ref) {
-//   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-// });
 
 const darkTheme = createTheme({
   palette: {
@@ -28,25 +23,19 @@ const darkTheme = createTheme({
 });
 
 const boxstyle = {
- mt: 4,
+  mt: 4,
   mb: 4,
   width: "75%",
   backgroundColor: "background.paper",
   boxShadow: 24,
 };
 
-// const center = {
-//   position: "relative",
-//   top: "50%",
-//   left: "30%",
-// };
-
 export default function ForgotPassword() {
-  const [question1, setQuestion1] = useState('');
-  const [question2, setQuestion2] = useState('');
-  const [submissionMessage, setSubmissionMessage] = useState('');
+  const [answer, setAnswer] = useState("");
+  const [question2, setQuestion2] = useState("");
+  const [submissionMessage, setSubmissionMessage] = useState("");
   const [open, setOpen] = useState(false);
-  
+
   const vertical = "top";
   const horizontal = "right";
   const navigate = useNavigate();
@@ -76,166 +65,137 @@ export default function ForgotPassword() {
         onClose={handleClose}
         TransitionComponent={TransitionLeft}
         anchorOrigin={{ vertical, horizontal }}
-      >
-       
-      </Snackbar>
+      ></Snackbar>
       <div
         style={{
           backgroundImage: `url(${stock})`,
           backgroundSize: "cover",
           height: "100%",
           minHeight: "100vh",
-          color: "#f5f5f5",
+          // color: "#f5f5f5",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
         <Box sx={boxstyle}>
-          <Grid container
+          <Grid
+            container
             style={{
               display: "flex",
               alignItems: "stretch",
             }}
           >
-          
-            <Grid item xs={12} sm={12} lg={6}
-            
-                style={{
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              lg={6}
+              style={{
                 backgroundImage: `url(${signin})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 color: "#f5f5f5",
-                }}
-              >
-            </Grid>
+              }}
+            ></Grid>
             <Grid item xs={12} sm={12} lg={6}>
               <Box
                 style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
                   backgroundSize: "cover",
                   height: "70vh",
                   minHeight: "500px",
-                  backgroundColor: "#339999",
+                  backgroundColor: "#E8E8E8",
                 }}
               >
-                <ThemeProvider theme={darkTheme}>
+                {/* <ThemeProvider theme={darkTheme}> */}
                 <Typography style={{ textAlign: "center" }} variant="h5">
-                    Smart Inventory Management System
-                  </Typography>
+                  Smart Inventory Management System
+                </Typography>
                 <Box
-                    style={{
-                      marginTop: "32px",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "5px",
-                    }}
-                  >
-                      <Avatar
-                        sx={{ bgcolor: "#ffffff" }}
-                      >
-                        <LockOutlinedIcon />
-                      </Avatar>
-                      <Typography component="h1" variant="h6">
-                        Reset Password
-                      </Typography>
-                    </Box>
-                    {/* <Box
-                      component="form"
-                      noValidate
-                      onSubmit={handleSubmit}
-                      sx={{ mt: 2 }}
-                    >
-        
-                          <TextField
-                           sx={{
-                            mt: 2,
-                            width: "75%",
-                          }}
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email"
-                            name="email"
-                            autoComplete="email"
-                          />
-                          </Box> */}
-                           <FormControl fullWidth>
-          <InputLabel id="question1-label">Question 1</InputLabel>
-          <Select
-            labelId="question1-label"
-            id="question1"
-            value={question1}
-            onChange={(e) => setQuestion1(e.target.value)}
-          >
-            <MenuItem value="q1-option1">Question 1 Option 1</MenuItem>
-            <MenuItem value="q1-option2">Question 1 Option 2</MenuItem>
-            <MenuItem value="q1-option3">Question 1 Option 3</MenuItem>
-          </Select>
-        </FormControl>
-                           {/* <TextField
-          sx={{
-            mt: 2,
-            width: '75%',
-          }}
-          required
-          fullWidth
-          id="Answer"
-          label="Answer "
-          value={Answer}
-          onChange={(e) => setQuestion1(e.target.value)}
-        /> */}
-        {/* <TextField
-          sx={{
-            mt: 2,
-            width: '75%',
-          }}
-          required
-          fullWidth
-          id="question2"
-          label="Question 2"
-          value={question2}
-          onChange={(e) => setQuestion2(e.target.value)}
-        /> */}
-                     </ThemeProvider>  
-                      <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    mt: 2,
+                  style={{
+                    marginTop: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "5px",
                   }}
                 >
-                  Send resend link
-                </Button>
-                        {/* <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
-                          <Stack direction="row" spacing={2}>
-                            <Typography
-                              variant="body1"
-                              component="span"
-                              style={{ marginTop: "10px" }}
-                            >
-                              Login to your Account.
-                              <span
-                                style={{ color: "#beb4fb", cursor: "pointer" }}
-                                onClick={() => {
-                                  navigate("/");
-                                }}
-                              >
-                                {" "}Sign In
-                              </span>
-                            </Typography>
-                          </Stack>
-                        </Grid> */}
-                     
-                    
+                  <Avatar sx={{ bgcolor: "#000000" }}>
+                    <LockOutlinedIcon />
+                  </Avatar>
+                  <Typography component="h1" variant="h6">
+                    Reset Password
+                  </Typography>
+                </Box>
 
-                   
-                     </Box>
+                <Grid
+                  container
+                  spacing={1}
+                  style={{
+                    marginTop: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
+                    <FormControl fullWidth>
+                      <InputLabel id="questionLabel">Question</InputLabel>
+                      <Select
+                        labelId="questionLabel"
+                        id="question"
+                        label="Question"
+                      >
+                        <MenuItem value={1}>
+                          What is the name of the place you were born at?
+                        </MenuItem>
+                        <MenuItem value={2}>
+                          What is the first school you attended?
+                        </MenuItem>
+                        <MenuItem value={3}>
+                          What is your favourite food item?
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      sx={{ mt: 2 }}
+                      required
+                      fullWidth
+                      id="answer"
+                      label="Answer"
+                      name="answer"
+                      value={answer}
+                      onChange={(e) => setAnswer(e.target.value)}
+                    />
+                  </Grid>
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      mt: 3,
+                    }}
+                  >
+                    Reset Password
+                  </Button>
+                  <Link
+                    style={{ cursor: "pointer" }}
+                    sx={{ mt: 1 }}
+                    onClick={() => {
+                      navigate("/");
+                    }}
+                  >
+                    Go back
+                  </Link>
+                </Grid>
+              </Box>
             </Grid>
-           
-         </Grid>
-      
-      </Box>
+          </Grid>
+        </Box>
       </div>
     </>
   );

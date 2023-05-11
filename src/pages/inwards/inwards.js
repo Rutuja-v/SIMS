@@ -4,6 +4,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   Paper,
   TableBody,
@@ -24,6 +25,7 @@ import {
   DialogActions,
   FormHelperText,
   Grid,
+  IconButton,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -59,26 +61,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Inwards() {
-
   const inwardsExcel = async () => {
-
     let reportData = [];
 
     for (let i = 0; i < inwards.length; i++) {
       let item = inwards[i];
 
       let obj = {
-        'Godown': item.godown.location,
-        'Godown Capacity': item.godown.capacityInQuintals,
-        'Product Name': item.product.name,
-        'Product Price': item.product.price,
-        'Product Qty': item.quantity,
-        'Supplier Name': item.supplier.name,
-        'Supply Date': item.supply_date,
-        'Invoice No.': item.invoice.invoiceNo,
-        'Bill Value': item.invoice.billValue,
-        'Receipt No.': item.receipt_no
-      }
+        Godown: item.godown.location,
+        "Godown Capacity": item.godown.capacityInQuintals,
+        "Product Name": item.product.name,
+        "Product Price": item.product.price,
+        "Product Qty": item.quantity,
+        "Supplier Name": item.supplier.name,
+        "Supply Date": item.supply_date,
+        "Invoice No.": item.invoice.invoiceNo,
+        "Bill Value": item.invoice.billValue,
+        "Receipt No.": item.receipt_no,
+      };
 
       reportData.push(obj);
     }
@@ -91,11 +91,11 @@ export default function Inwards() {
 
     let columnHeaders = getExcelColumnHeaders(headers);
 
-    let sheet = workbook.addWorksheet('Inwards', {
+    let sheet = workbook.addWorksheet("Inwards", {
       views: [{ state: "frozen", ySplit: 1 }],
     });
 
-    console.log("Headers", headers, "Column Headers", columnHeaders)
+    console.log("Headers", headers, "Column Headers", columnHeaders);
 
     sheet.columns = columnHeaders;
 
@@ -105,7 +105,7 @@ export default function Inwards() {
     // make the header bold
     sheet.getRow(1).font = { bold: true };
 
-    console.log("report", reportData)
+    console.log("report", reportData);
 
     // console.log("fileBuffer", fileBuffer, fileBuffer.toString('base64'));
 
@@ -113,28 +113,26 @@ export default function Inwards() {
 
     let fileBuffer = await workbook.xlsx.writeBuffer();
 
-    const fileBlob = new Blob(
-      [fileBuffer],
-      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
-    );
+    const fileBlob = new Blob([fileBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-    const fileName = `${'Inwards'}_${new Date().toISOString()}.xlsx`;
+    const fileName = `${"Inwards"}_${new Date().toISOString()}.xlsx`;
 
     const url = URL.createObjectURL(fileBlob);
 
-    let link = document.createElement('a');
+    let link = document.createElement("a");
 
     link.href = url;
 
-    link.setAttribute('download', fileName);
+    link.setAttribute("download", fileName);
 
     document.body.appendChild(link);
 
     link.click();
 
-    URL.revokeObjectURL(url)
-
-  }
+    URL.revokeObjectURL(url);
+  };
 
   const getColumnHeaders = (columns, keys = []) => {
     const columnHeaders = [];
@@ -412,7 +410,7 @@ export default function Inwards() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{width : '700px'}}
+                sx={{ width: "700px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -424,21 +422,21 @@ export default function Inwards() {
               />
             </Grid>
 
-            <Grid item >
-              <Button
-                variant="contained"
-                sx={{marginLeft : '110px', marginTop : '10px' }}
-                className={classes.newButton}
-                onClick={inwardsExcel}
-              >
-                Download Report
-              </Button>
-            </Grid>
-            <Grid item>
+            <Grid
+              item
+              style={{
+                marginLeft: "auto",
+                marginTop: "auto",
+                marginBottom: "auto",
+              }}
+            >
+              <IconButton color="success" onClick={inwardsExcel}>
+                <DownloadIcon />
+              </IconButton>
               {user.role === "manager" && (
                 <Button
+                  style={{ marginLeft: "8px" }}
                   variant="outlined"
-                  sx={{marginLeft : '10px', marginTop : '10px' }}
                   startIcon={<AddIcon />}
                   className={classes.newButton}
                   onClick={handleAddModalOpen}
@@ -448,92 +446,91 @@ export default function Inwards() {
               )}
             </Grid>
           </Grid>
-
         </Toolbar>
         {recordsAfterPagingAndSorting()?.length === 0 ? (
           <Grid sx={{ mt: 2, ml: 3 }}>
-            There are currently 0 outwards records.
+            There are currently 0 inwards records.
           </Grid>
         ) : (
           <>
-        <TblContainer>
-          <TblHead />
-          <TableBody>
-            {recordsAfterPagingAndSorting()?.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  {item.godown.location}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Capacity: " + item.godown.capacityInQuintals}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  {item.product.name}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Price: " + item.product.price}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Quantity: " + item.quantity}
-                  </Typography>
-                </TableCell>
-                <TableCell>{item.supplier.name}</TableCell>
-                <TableCell>{item.supply_date}</TableCell>
-                <TableCell>
-                  {item.invoice.invoiceNo}
-                  <Typography
-                    variant="caption"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {"Bill value: " + item.invoice.billValue}
-                  </Typography>
-                </TableCell>
-                <TableCell>{item.receipt_no}</TableCell>
-                {user.role === "manager" && (
-                  <TableCell>
-                    <Button
-                      onClick={() => {
-                        handleEditModalOpen(item);
-                      }}
-                    >
-                      <EditOutlinedIcon fontSize="small" color="success" />
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setConfirmDialog({
-                          isOpen: true,
-                          title: "Are you sure to delete this record?",
-                          subTitle: "You can't undo this operation",
-                          onConfirm: () => {
-                            handleDelete(item.id);
-                          },
-                        });
-                      }}
-                    >
-                      <CloseIcon fontSize="small" color="error" />
-                    </Button>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </TblContainer>
-        <TblPagination />
-        </>
+            <TblContainer>
+              <TblHead />
+              <TableBody>
+                {recordsAfterPagingAndSorting()?.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      {item.godown.location}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Capacity: " + item.godown.capacityInQuintals}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {item.product.name}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Price: " + item.product.price}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Quantity: " + item.quantity}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{item.supplier.name}</TableCell>
+                    <TableCell>{item.supply_date}</TableCell>
+                    <TableCell>
+                      {item.invoice.invoiceNo}
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {"Bill value: " + item.invoice.billValue}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{item.receipt_no}</TableCell>
+                    {user.role === "manager" && (
+                      <TableCell>
+                        <Button
+                          onClick={() => {
+                            handleEditModalOpen(item);
+                          }}
+                        >
+                          <EditOutlinedIcon fontSize="small" color="success" />
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setConfirmDialog({
+                              isOpen: true,
+                              title: "Are you sure to delete this record?",
+                              subTitle: "You can't undo this operation",
+                              onConfirm: () => {
+                                handleDelete(item.id);
+                              },
+                            });
+                          }}
+                        >
+                          <CloseIcon fontSize="small" color="error" />
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </TblContainer>
+            <TblPagination />
+          </>
         )}
-      </Paper >
+      </Paper>
       <Dialog
         open={addModalOpen}
         onClose={handleAddModalClose}
