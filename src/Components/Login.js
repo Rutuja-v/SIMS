@@ -74,7 +74,7 @@ export default function Login() {
           setUsernameErrorText("This username does not exist");
         } else if (error.response.data.code === "WRONG_PASSWORD") {
           setPasswordErrorText("The entered password is wrong");
-        } else {
+        } else if (error.response.data.code === "ACCOUNT_LOCKED") {
           setOpen(true);
         }
       });
@@ -105,7 +105,7 @@ export default function Login() {
           TransitionComponent={TransitionLeft}
           sx={{ width: "100%" }}
         >
-          Failed! Enter correct username and password.
+          Oops! Your account is locked. Please contact the superadmin.
         </Alert>
       </Snackbar>
       <div

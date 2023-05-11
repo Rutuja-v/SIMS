@@ -135,9 +135,9 @@ function ProductsStock({ godown }) {
           <Typography color="textSecondary">
             {"Current capacity/Total capacity: "}
           </Typography>
-          <Typography>{(currentCapacity !== null ? currentCapacity : "---") + "/" + godown.capacityInQuintals}</Typography>
+          <Typography>{(currentCapacity !== null ? currentCapacity : "---") + "/" + (godown ? godown.capacityInQuintals : "---")}</Typography>
           {currentCapacity !== null && <Typography color="textSecondary">
-            {"The godown is " + parseFloat((currentCapacity / godown.capacityInQuintals * 100).toFixed(2)) + "% full"}
+            {"The godown is " + (godown ? parseFloat((currentCapacity / godown.capacityInQuintals * 100).toFixed(2)) : "--") + "% full"}
           </Typography>}
         </div>
       }

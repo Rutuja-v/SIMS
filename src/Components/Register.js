@@ -24,7 +24,7 @@ import Slide from "@mui/material/Slide";
 
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
-import { Link } from "@mui/material";
+import { Alert, Link } from "@mui/material";
 
 // const darkTheme = createTheme({
 //   palette: {
@@ -53,10 +53,46 @@ export default function Register() {
   const horizontal = "right";
   const navigate = useNavigate();
 
+  const [name, setName] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
+
+  const [usernameErrorText, setUsernameErrorText] = useState(null);
+
   const handleSubmit = async (event) => {
-    setOpen(true);
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const formData = {};
+
+    formData["name"] = name;
+    formData["username"] = username;
+    formData["password"] = password;
+
+    console.log(formData);
+
+    axios
+      .post("http://localhost:8080/api/auth/signUp", formData)
+      .then(response => {
+        setOpen(true);
+      })
+      .catch(error => {
+        console.log(error);
+        if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+          setUsernameErrorText("This username already exists");
+        }
+      });
+  };
+
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
+  const handleUsernameChange = (event) => {
+    if (usernameErrorText !== null) {
+      setUsernameErrorText(null);
+    }
+    setUsername(event.target.value);
+  };
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
   };
 
   const handleClose = (event, reason) => {
@@ -78,7 +114,15 @@ export default function Register() {
         onClose={handleClose}
         TransitionComponent={TransitionLeft}
         anchorOrigin={{ vertical, horizontal }}
-      ></Snackbar>
+      >
+        <Alert
+          severity="success"
+          TransitionComponent={TransitionLeft}
+          sx={{ width: "100%" }}
+        >
+          Your account has been created. Please wait until the superadmin approves your account.
+        </Alert>
+      </Snackbar>
       <div
         style={{
           backgroundImage: `url(${stock})`,
@@ -159,30 +203,45 @@ export default function Register() {
                         mt: 1,
                       }}
                       required
-                      id="email"
-                      label="Username"
-                      name="email"
-                      autoComplete="email"
+                      id="name"
+                      label="Name"
+                      name="name"
+                      type="text"
+                      autoComplete="name"
+                      value={name}
+                      onChange={handleNameChange}
                     />
                   </Grid>
                   <Grid item sx={{ ml: "3em", mr: "3em" }}>
                     <TextField
+                      sx={{
+                        mt: 1,
+                      }}
+                      required
+                      name="username"
+                      label="Username"
+                      type="text"
+                      id="username"
+                      autoComplete="username"
+                      value={username}
+                      onChange={handleUsernameChange}
+                      error={usernameErrorText !== null}
+                      helperText={usernameErrorText}
+                    />
+                  </Grid>
+                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
+                    <TextField
+                      sx={{
+                        mt: 1,
+                      }}
                       required
                       name="password"
                       label="Password"
                       type="password"
                       id="password"
-                      autoComplete="new-password"
-                    />
-                  </Grid>
-                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
-                    <TextField
-                      required
-                      name="confirmpassword"
-                      label="Confirm Password"
-                      type="password"
-                      id="confirmpassword"
-                      autoComplete="new-password"
+                      autoComplete="password"
+                      value={password}
+                      onChange={handlePasswordChange}
                     />
                   </Grid>
                   <Button
@@ -191,6 +250,7 @@ export default function Register() {
                     sx={{
                       mt: 2,
                     }}
+                    onClick={handleSubmit}
                   >
                     Register
                   </Button>
