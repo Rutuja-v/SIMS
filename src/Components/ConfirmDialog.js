@@ -1,6 +1,5 @@
 import React from 'react'
-import { makeStyles } from '@material-ui/core';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles } from '@material-ui/core'
 import Controls from "./controls/Controls";
 // import NotListedLocationIcon from '@material-ui/icons/NotListedLocation';
 

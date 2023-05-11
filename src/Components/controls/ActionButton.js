@@ -1,6 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core";
-import { Button } from "@mui/material";
+import { Button, makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {

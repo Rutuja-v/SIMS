@@ -32,7 +32,7 @@ import Controls from "../../Components/controls/Controls";
 import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import CloseIcon from "@material-ui/icons/Close";
+import DeleteIcon from "@material-ui/icons/Delete";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
@@ -410,7 +410,7 @@ export default function Inwards() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{ width: "700px" }}
+                sx={{ width: "680px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -519,7 +519,7 @@ export default function Inwards() {
                             });
                           }}
                         >
-                          <CloseIcon fontSize="small" color="error" />
+                          <DeleteIcon fontSize="small" color="error" />
                         </Button>
                       </TableCell>
                     )}
@@ -704,7 +704,7 @@ export default function Inwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                        formik.errors.billCheckedById
+                          formik.errors.billCheckedById
                           ? true
                           : false
                       }

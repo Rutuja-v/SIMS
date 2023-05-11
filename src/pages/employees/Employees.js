@@ -3,8 +3,10 @@ import axios from "axios";
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import profileIcon from "../../Components/assets/profile.svg";
+import DeleteIcon from "@mui/icons-material/Delete";
 import * as Yup from "yup";
 import DownloadIcon from "@mui/icons-material/Download";
 import {
@@ -29,7 +31,9 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
+  Badge,
+  Avatar
 } from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
@@ -272,6 +276,22 @@ export default function Employees() {
       });
   };
 
+  const handleLockedAccountDelete = (id) => {
+    axios
+      .delete(`http://localhost:8080/api/employees/${id}`)
+      .then((response) => {
+        setLockedEmployees(lockedEmployees.filter(employee => employee.id !== id));
+        setNotify({
+          isOpen: true,
+          message: "Deleted the account",
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     username: Yup.string()
@@ -418,7 +438,7 @@ export default function Employees() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{ width: '700px' }}
+                sx={{ width: '680px' }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -430,27 +450,25 @@ export default function Employees() {
               />
             </Grid>
 
-            <Grid item >
-              <IconButton sx={{ marginTop: '8px' }} color="success" onClick={employeesExcel}>
-                <DownloadIcon />
-              </IconButton>
-            </Grid>
-            <Grid
-              item
+            <Grid item
               style={{
                 marginLeft: "auto",
                 marginTop: "auto",
                 marginBottom: "auto",
-              }}
-            >
-              <IconButton color="success" onClick={() => setUnlockAccountsModalOpen(true)}>
-                <NotificationsIcon />
+              }}>
+              <IconButton color="success" onClick={employeesExcel}>
+                <DownloadIcon />
               </IconButton>
-            </Grid>
-            <Grid item>
+
+              <IconButton color="success" onClick={() => setUnlockAccountsModalOpen(true)}>
+                <Badge badgeContent={lockedEmployees.length} color="primary">
+                  <LockIcon />
+                </Badge>
+              </IconButton>
+
               <Button
                 variant="outlined"
-                sx={{ marginLeft: '10px', marginTop: '10px' }}
+                sx={{ marginLeft: '8px' }}
                 startIcon={<AddIcon />}
                 className={classes.newButton}
                 onClick={handleAddModalOpen}
@@ -494,7 +512,7 @@ export default function Employees() {
                           });
                         }}
                       >
-                        <CloseIcon fontSize="small" color="error" />
+                        <DeleteIcon fontSize="small" color="error" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -667,11 +685,19 @@ export default function Employees() {
                 <ListItem
                   key={index}
                   secondaryAction={
-                    <IconButton edge="end" aria-label="unlock" onClick={() => handleUnlockAccount(employee.id)}>
-                      <LockOpenIcon />
-                    </IconButton>
+                    <div edge="end">
+                      <IconButton aria-label="unlock" color="primary" onClick={() => handleUnlockAccount(employee.id)}>
+                        <LockOpenIcon />
+                      </IconButton>
+                      <IconButton aria-label="unlock" color="error" onClick={() => handleLockedAccountDelete(employee.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </div>
                   }
                 >
+                  <Avatar
+                    sx={{ mr: 1 }}
+                    src={profileIcon} />
                   <ListItemText
                     style={{ marginRight: "96px" }}
                     primary={employee.name}

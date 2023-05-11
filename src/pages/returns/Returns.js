@@ -26,15 +26,15 @@ import {
   DialogActions,
   FormHelperText,
   IconButton
-} 
-from "@mui/material";
+}
+  from "@mui/material";
 import useTable from "../../Components/useTable";
 import Controls from "../../Components/controls/Controls";
 import * as Yup from "yup";
 import { Search } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import CloseIcon from "@material-ui/icons/Close";
+import DeleteIcon from "@material-ui/icons/Delete";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik, useFormik } from "formik";
 import moment from "moment";
@@ -71,7 +71,7 @@ export default function Returns() {
 
       let obj = {
         'Godown': item.godown == null ? null : item.godown.location,
-        'Godown Capacity (In Quintals)':item.godown.capacityInQuintals,
+        'Godown Capacity (In Quintals)': item.godown.capacityInQuintals,
         'Product Name': item.product.name,
         'Product Qty': item.quantity,
         'Product Price': item.product.price,
@@ -429,7 +429,7 @@ export default function Returns() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{ width: '700px' }}
+                sx={{ width: '680px' }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -441,21 +441,29 @@ export default function Returns() {
               />
             </Grid>
 
-            <Grid item >
-            <IconButton sx={{marginTop:'8px'}} color="success" onClick={returnsExcel}>
+            <Grid
+              item
+              style={{
+                marginLeft: "auto",
+                marginTop: "auto",
+                marginBottom: "auto",
+              }}
+            >
+              <IconButton color="success" onClick={returnsExcel}>
                 <DownloadIcon />
               </IconButton>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                sx={{ marginLeft: '10px', marginTop: '10px' }}
-                startIcon={<AddIcon />}
-                className={classes.newButton}
-                onClick={handleAddModalOpen}
-              >
-                Add new
-              </Button>
+
+              {user.role === "manager" && (
+                <Button
+                  variant="outlined"
+                  sx={{ marginLeft: '8px' }}
+                  startIcon={<AddIcon />}
+                  className={classes.newButton}
+                  onClick={handleAddModalOpen}
+                >
+                  Add new
+                </Button>
+              )}
             </Grid>
           </Grid>
         </Toolbar>
@@ -529,7 +537,7 @@ export default function Returns() {
                             });
                           }}
                         >
-                          <CloseIcon fontSize="small" color="error" />
+                          <DeleteIcon fontSize="small" color="error" />
                         </Button>
                       </TableCell>
                     )}
