@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Pie } from "react-chartjs-2";
-
-const GodownsChart = () => {
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Pie } from 'react-chartjs-2';
+import { InputLabel, FormControl, MenuItem, Select } from '@mui/material';
+const ProductsChart = () => {
+  const [products, setProducts] = useState([]);
   const [godowns, setGodowns] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [remainingCapacity, setRemainingCapacity] = useState({});

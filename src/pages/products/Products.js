@@ -13,7 +13,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -241,24 +241,18 @@ function Products() {
                   />
                 </div>
 
-                <DialogActions>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setAddModalOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    disabled={!formik.isValid || !formik.dirty}
-                    type="submit"
-                    variant="contained"
-                  >
-                    Add
-                  </Button>
-                </DialogActions>
-              </form>
-            </DialogContent>
-          </Dialog>
+            <DialogActions>
+              <Button variant="outlined" onClick={() => setAddModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                disabled={!formik.isValid || !formik.dirty} type="submit" variant="contained" >
+                Add
+              </Button>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
 
           <Grid container spacing={6}>
             {products.map((product) => (

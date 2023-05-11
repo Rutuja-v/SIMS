@@ -1,13 +1,13 @@
 import React, { useState } from "react";
+import { makeStyles } from "@material-ui/core";
 import {
   Table,
   TableHead,
   TableRow,
   TableCell,
-  makeStyles,
-  TablePagination,
   TableSortLabel,
-} from "@material-ui/core";
+} from "@mui/material";
+import { TablePagination } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -18,12 +18,24 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "#000000",
       color: "#FFFFFF",
     },
+    "& thead th span": {
+      color: "#FFFFFF !important",
+    },
+    "& thead th span:hover": {
+      color: "#D3D3D3 !important",
+    },
+    "& thead th span svg": {
+      color: "#FFFFFF !important",
+      opacity: "0.5",
+    },
+    "& thead th span svg:hover": {
+      opacity: "0.3 !important",
+    },
     "& tbody td": {
       fontWeight: "300",
     },
     "& tbody tr:hover": {
       backgroundColor: "#fffbf2",
-      cursor: "pointer",
     },
   },
 }));
@@ -91,7 +103,7 @@ export default function useTable(records, headCells, filterFn) {
       page={page}
       rowsPerPageOptions={pages}
       rowsPerPage={rowsPerPage}
-      count={records?.length}
+      count={records ? records.length : 0}
       onChangePage={handleChangePage}
       onChangeRowsPerPage={handleChangeRowsPerPage}
     />

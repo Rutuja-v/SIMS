@@ -28,8 +28,8 @@ export default function Popup(props) {
                     </Typography>
                     <Controls.ActionButton
                         // color="secondary"
-                        
-                        onClick={()=>{setOpenPopup(false)}}>
+
+                        onClick={() => { setOpenPopup(false) }}>
                         <CloseIcon />
                     </Controls.ActionButton>
                 </div>

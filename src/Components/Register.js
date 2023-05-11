@@ -156,7 +156,8 @@ export default function Register() {
             ></Grid>
 
             <Grid item xs={12} sm={12} lg={6}>
-              <Box
+              <form
+                onSubmit={handleSubmit}
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -188,93 +189,75 @@ export default function Register() {
                   </Typography>
                 </Box>
 
-                <Grid
-                  container
-                  spacing={1}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
+                <TextField
+                  sx={{
+                    mt: 2,
+                    width: "75%",
+                  }}
+                  required
+                  id="name"
+                  label="Name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  value={name}
+                  onChange={handleNameChange}
+                />
+                <TextField
+                  sx={{
+                    mt: 2,
+                    width: "75%",
+                  }}
+                  required
+                  name="username"
+                  label="Username"
+                  type="text"
+                  id="username"
+                  autoComplete="username"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  error={usernameErrorText !== null}
+                  helperText={usernameErrorText}
+                />
+                <TextField
+                  sx={{
+                    mt: 2,
+                    width: "75%",
+                  }}
+                  required
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    mt: 2,
                   }}
                 >
-                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
-                    <TextField
-                      sx={{
-                        mt: 1,
-                      }}
-                      required
-                      id="name"
-                      label="Name"
-                      name="name"
-                      type="text"
-                      autoComplete="name"
-                      value={name}
-                      onChange={handleNameChange}
-                    />
-                  </Grid>
-                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
-                    <TextField
-                      sx={{
-                        mt: 1,
-                      }}
-                      required
-                      name="username"
-                      label="Username"
-                      type="text"
-                      id="username"
-                      autoComplete="username"
-                      value={username}
-                      onChange={handleUsernameChange}
-                      error={usernameErrorText !== null}
-                      helperText={usernameErrorText}
-                    />
-                  </Grid>
-                  <Grid item sx={{ ml: "3em", mr: "3em" }}>
-                    <TextField
-                      sx={{
-                        mt: 1,
-                      }}
-                      required
-                      name="password"
-                      label="Password"
-                      type="password"
-                      id="password"
-                      autoComplete="password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
-                  </Grid>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      mt: 2,
+                  Register
+                </Button>
+                <Typography
+                  variant="body1"
+                  component="span"
+                  style={{ marginTop: "10px" }}
+                >
+                  Already have an account?{" "}
+                  <Link
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      navigate("/");
                     }}
-                    onClick={handleSubmit}
                   >
-                    Register
-                  </Button>
-                  <Grid item sx={{ mt: 1, ml: "3em", mr: "3em" }}>
-                    <Typography
-                      variant="body1"
-                      component="span"
-                      style={{ marginTop: "10px" }}
-                    >
-                      Already have an Account?{" "}
-                      <Link
-                        style={{ cursor: "pointer" }}
-                        onClick={() => {
-                          navigate("/");
-                        }}
-                      >
-                        Sign In
-                      </Link>
-                    </Typography>
-                  </Grid>
-
-                  <Grid></Grid>
-                </Grid>
-              </Box>
+                    Sign In
+                  </Link>
+                </Typography>
+              </form>
             </Grid>
           </Grid>
         </Box>
