@@ -1,5 +1,6 @@
 import React from 'react'
-import { Dialog, DialogTitle, DialogContent, makeStyles, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, Typography } from '@mui/material';
 import Controls from "./controls/Controls";
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -28,8 +29,8 @@ export default function Popup(props) {
                     </Typography>
                     <Controls.ActionButton
                         // color="secondary"
-                        
-                        onClick={()=>{setOpenPopup(false)}}>
+
+                        onClick={() => { setOpenPopup(false) }}>
                         <CloseIcon />
                     </Controls.ActionButton>
                 </div>

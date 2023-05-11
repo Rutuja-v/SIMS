@@ -1,5 +1,6 @@
 import React from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material'
 import Controls from "./controls/Controls";
 // import NotListedLocationIcon from '@material-ui/icons/NotListedLocation';
 
@@ -40,7 +41,7 @@ export default function ConfirmDialog(props) {
     return (
         <Dialog open={confirmDialog.isOpen} classes={{ paper: classes.dialog }}>
             <DialogTitle className={classes.dialogTitle}>
-              
+
             </DialogTitle>
             <DialogContent className={classes.dialogContent}>
                 <Typography variant="h6">
