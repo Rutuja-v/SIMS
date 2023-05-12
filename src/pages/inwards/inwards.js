@@ -239,7 +239,7 @@ export default function Inwards() {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards/${id}`)
+      .delete(`http://localhost:8080/api/inwards/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -313,7 +313,7 @@ export default function Inwards() {
       console.log(formData);
 
       axios
-        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards", formData)
+        .post("http://localhost:8080/api/inwards", formData)
         .then((response) => {
           handleAddModalClose();
           setNotify({
@@ -329,13 +329,22 @@ export default function Inwards() {
             message: "Oops! An error occurred while performing this operation.",
             type: "error",
           });
+          if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+            const field = error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            if (field === "receiptNo") {
+              formik.setFieldError(field, "This receipt number already exists");
+            }
+            else if (field === "invoiceNo") {
+              formik.setFieldError(field, "This invoice number already exists");
+            }
+          }
           console.error(error);
         });
     },
   });
 
   function getData() {
-    let inwardsEndpoint = "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards";
+    let inwardsEndpoint = "http://localhost:8080/api/inwards";
 
     if (user.role !== "superadmin") {
       inwardsEndpoint = inwardsEndpoint + `?godownId=${user.godown?.id}`;
@@ -368,28 +377,28 @@ export default function Inwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${user.godown?.id}`)
+      .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products`)
+      .get(`http://localhost:8080/api/products`)
       .then((res) => {
         setProducts(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/suppliers")
+      .get("http://localhost:8080/api/suppliers")
       .then((res) => {
         setSuppliers(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees?godownId=${user.godown?.id}`)
+      .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })

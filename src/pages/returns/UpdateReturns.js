@@ -44,6 +44,9 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
   const [invoiceNo, setInvoiceNo] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
 
+  const [receiptNoErrorText, setReceiptNoErrorText] = useState(null);
+  const [invoiceNoErrorText, setInvoiceNoErrorText] = useState(null);
+
   useEffect(() => {
     setGodownId(returns?.godown.id);
     setProductId(returns?.product.id);
@@ -89,9 +92,15 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
     setInvoiceId(event.target.value);
   };
   const handleInvoiceNoChange = (event) => {
+    if (invoiceNoErrorText != null) {
+      setInvoiceNoErrorText(null);
+    }
     setInvoiceNo(event.target.value);
   };
   const handleReceiptNoChange = (event) => {
+    if (receiptNoErrorText != null) {
+      setReceiptNoErrorText(null);
+    }
     setReceiptNo(event.target.value);
   };
   const handleReasonChange = (event) => {
@@ -139,7 +148,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
     console.log(formData);
 
     await axios
-      .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/returns/${returns?.id}`, formData)
+      .put(`http://localhost:8080/api/returns/${returns?.id}`, formData)
       .then((response) => {
         setGodownId("");
         setProductId("");
@@ -155,6 +164,14 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
         handleClose();
       })
       .catch((error) => {
+        if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+          if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "receiptNo") {
+            setReceiptNoErrorText("This receipt number already exists");
+          }
+          else if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "invoiceNo") {
+            setInvoiceNoErrorText("This invoice number already exists");
+          }
+        }
         console.error(error);
       });
   };
@@ -277,6 +294,8 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
                   variant="outlined"
                   value={receiptNo}
                   onChange={handleReceiptNoChange}
+                  error={receiptNoErrorText != null}
+                  helperText={receiptNoErrorText}
                 />
                 <FormControl>
                   <InputLabel id="invoiceIdLabel">Invoice</InputLabel>
@@ -304,6 +323,8 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
                       value={invoiceNo}
                       onChange={handleInvoiceNoChange}
                       inputProps={{ maxLength: 12 }}
+                      error={invoiceNoErrorText != null}
+                      helperText={invoiceNoErrorText}
                     />
                     <FormControl>
                       <InputLabel id="billCheckedByIdLabel">

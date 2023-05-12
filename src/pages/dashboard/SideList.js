@@ -208,7 +208,7 @@ export default function SideList({ children }) {
       console.log(formData);
       axios
         .patch(
-          `http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${user?.id}/password`,
+          `http://localhost:8080/api/employees/${user?.id}/password`,
           formData
         )
         .then((response) => {

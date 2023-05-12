@@ -88,7 +88,7 @@ function Godowns() {
   }, []);
   const getData = () => {
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns")
+      .get("http://localhost:8080/api/godowns")
       .then((response) => {
         response.data.sort((g1, g2) => {
           if (g1.location < g2.location) {
@@ -106,7 +106,7 @@ function Godowns() {
       });
 
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees")
+      .get("http://localhost:8080/api/employees")
       .then((response) => {
         setManagers(
           response.data.filter((employee) => employee.role.role === "manager")
@@ -117,7 +117,7 @@ function Godowns() {
       });
 
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employeeRoles")
+      .get("http://localhost:8080/api/employeeRoles")
       .then((response) => {
         setRoles(response.data.filter((role) => role.role === "manager"));
       })
@@ -144,7 +144,7 @@ function Godowns() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${id}`)
+      .delete(`http://localhost:8080/api/godowns/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -209,7 +209,7 @@ function Godowns() {
       console.log(formData);
 
       axios
-        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns", formData)
+        .post("http://localhost:8080/api/godowns", formData)
         .then((response) => {
           resetForm();
           setAddModalOpen(false);

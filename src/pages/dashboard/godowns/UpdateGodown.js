@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormHelperText,
   TextField,
 } from "@mui/material";
 import { makeStyles } from "@material-ui/core/styles";
@@ -64,6 +65,8 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
   const [managerPassword, setManagerPassword] = useState("");
   const [managerRoleId, setManagerRoleId] = useState("");
 
+  const [managerIdErrorText, setManagerIdErrorText] = useState("");
+
   useEffect(() => {
     setLocation(godown?.location);
     setCapacity(godown?.capacityInQuintals);
@@ -86,6 +89,9 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
     setDate(event.target.value);
   };
   const handleManagerIdChange = (event) => {
+    if (managerIdErrorText != null) {
+      setManagerIdErrorText(null);
+    }
     setManagerId(event.target.value);
   };
   const handleManagerNameChange = (event) => {
@@ -128,7 +134,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
     console.log(formData);
 
     await axios
-      .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${godown?.id}`, formData)
+      .put(`http://localhost:8080/api/godowns/${godown?.id}`, formData)
       .then((response) => {
         setLocation("");
         setCapacity("");
@@ -141,6 +147,11 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
         handleClose();
       })
       .catch((error) => {
+        if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+          if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "managerId") {
+            setManagerIdErrorText("This manager is mapped to another godown");
+          }
+        }
         console.error(error);
       });
   };
@@ -210,6 +221,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                     value={managerId}
                     label="Manager"
                     onChange={handleManagerIdChange}
+                    error={managerIdErrorText != null}
                   >
                     <MenuItem key={0} value={-1}>
                       Add new manager
@@ -220,6 +232,11 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                       </MenuItem>
                     ))}
                   </Select>
+                  {managerIdErrorText && (
+                    <FormHelperText error>
+                      {managerIdErrorText}
+                    </FormHelperText>
+                  )}
                 </FormControl>
                 {managerId == -1 && (
                   <>

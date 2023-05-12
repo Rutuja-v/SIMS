@@ -53,7 +53,7 @@ export default function Login() {
     e.preventDefault();
 
     axios
-      .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/auth/login", {
+      .post("http://localhost:8080/api/auth/login", {
         username: values.username,
         password: values.password,
       })

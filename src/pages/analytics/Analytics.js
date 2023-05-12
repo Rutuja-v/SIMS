@@ -140,11 +140,11 @@ const Analytics = () => {
   useEffect(() => {
     const fetchData = async () => {
       let outwards =
-        "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards";
+        "http://localhost:8080/api/outwards";
       let inwards =
-        "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards";
+        "http://localhost:8080/api/inwards";
       let returns =
-        "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/returns";
+        "http://localhost:8080/api/returns";
       if (user.role !== "superadmin") {
         returns = returns + `?godownId=${user.godown?.id}`;
         inwards = inwards + `?godownId=${user.godown?.id}`;
@@ -227,7 +227,7 @@ const Analytics = () => {
               let i = 0;
               i <
               dataSetForInwardsProducts.length -
-                dataSetForOutwardsProducts.length;
+              dataSetForOutwardsProducts.length;
               i++
             ) {
               dataSetForOutwardsProducts.push(0);

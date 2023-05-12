@@ -46,6 +46,8 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
   const [invoiceId, setInvoiceId] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
 
+  const [receiptNoErrorText, setReceiptNoErrorText] = useState(null);
+
   useEffect(() => {
     setGodownId(outwards?.godown.id);
     setProductId(outwards?.product.id);
@@ -93,6 +95,9 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
     setDeliveryDate(event.target.value);
   };
   const handleReceiptNoChange = (event) => {
+    if (receiptNoErrorText != null) {
+      setReceiptNoErrorText(null);
+    }
     setReceiptNo(event.target.value);
   };
   const handleInvoiceIdChange = (event) => {
@@ -140,7 +145,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
     console.log(formData);
 
     await axios
-      .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards/${outwards?.id}`, formData)
+      .put(`http://localhost:8080/api/outwards/${outwards?.id}`, formData)
       .then((response) => {
         setGodownId("");
         setProductId("");
@@ -155,6 +160,11 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
         handleClose();
       })
       .catch((error) => {
+        if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+          if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "receiptNo") {
+            setReceiptNoErrorText("This receipt number already exists");
+          }
+        }
         console.error(error);
       });
   };
@@ -277,6 +287,8 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                   variant="outlined"
                   value={receiptNo}
                   onChange={handleReceiptNoChange}
+                  error={receiptNoErrorText != null}
+                  helperText={receiptNoErrorText}
                 />
                 <FormControl>
                   <InputLabel id="invoiceIdLabel">Invoice</InputLabel>

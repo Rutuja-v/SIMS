@@ -40,6 +40,8 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
   const [roleId, setRoleId] = useState(null);
   const [godownId, setGodownId] = useState(null);
 
+  const [usernameErrorText, setUsernameErrorText] = useState(null);
+
   useEffect(() => {
     setName(employee?.name);
     setUsername(employee?.username);
@@ -51,6 +53,9 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
     setName(event.target.value);
   };
   const handleUsernameChange = (event) => {
+    if (usernameErrorText != null) {
+      setUsernameErrorText(null);
+    }
     setUsername(event.target.value);
   };
   const handlePasswordChange = (event) => {
@@ -83,7 +88,7 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
     console.log(formData);
 
     await axios
-      .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${employee?.id}`, formData)
+      .put(`http://localhost:8080/api/employees/${employee?.id}`, formData)
       .then((response) => {
         setName(null);
         setUsername(null);
@@ -93,6 +98,11 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
         handleClose();
       })
       .catch((error) => {
+        if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+          if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "username") {
+            setUsernameErrorText("This username already exists");
+          }
+        }
         console.error(error);
       });
   };
@@ -136,6 +146,8 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
                   variant="outlined"
                   value={username}
                   onChange={handleUsernameChange}
+                  error={usernameErrorText != null}
+                  helperText={usernameErrorText}
                 />
                 <TextField
                   id="password"

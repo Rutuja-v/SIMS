@@ -231,7 +231,7 @@ export default function Employees() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}`)
+      .delete(`http://localhost:8080/api/employees/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -257,7 +257,7 @@ export default function Employees() {
 
   const handleUnlockAccount = (id) => {
     axios
-      .patch(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}/unlock`)
+      .patch(`http://localhost:8080/api/employees/${id}/unlock`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -280,7 +280,7 @@ export default function Employees() {
 
   const handleLockedAccountDelete = (id) => {
     axios
-      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}`)
+      .delete(`http://localhost:8080/api/employees/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -310,7 +310,7 @@ export default function Employees() {
     //   .required("Password is required")
     //   .min(6, "Password must be at least 8 characters"),
     roleId: Yup.number().required("Role is required"),
-    godownId: Yup.number().nullable(),
+    godownId: Yup.number().required("Godown is required"),
   });
 
   const formik = useFormik({
@@ -340,7 +340,7 @@ export default function Employees() {
       console.log(formData);
 
       axios
-        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees", formData)
+        .post("http://localhost:8080/api/employees", formData)
         .then((response) => {
           resetForm();
           setAddModalOpen(false);
@@ -357,6 +357,12 @@ export default function Employees() {
             message: "Oops! An error occurred while performing this operation.",
             type: "error",
           });
+          if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+            const field = error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            if (field === "username") {
+              formik.setFieldError(field, "This username already exists");
+            }
+          }
           console.error(error);
         });
     },
@@ -364,7 +370,7 @@ export default function Employees() {
 
   function getData() {
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees", {})
+      .get("http://localhost:8080/api/employees", {})
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {
@@ -385,21 +391,21 @@ export default function Employees() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employeeRoles")
+      .get("http://localhost:8080/api/employeeRoles")
       .then((res) => {
         setRoles(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns")
+      .get("http://localhost:8080/api/godowns")
       .then((res) => {
         setGodowns(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/locked")
+      .get("http://localhost:8080/api/employees/locked")
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {

@@ -60,7 +60,7 @@ function Products() {
 
   const getData = () => {
     axios
-      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products")
+      .get("http://localhost:8080/api/products")
       .then((response) => {
         response.data.sort((p1, p2) => {
           if (p1.name < p2.name) {
@@ -97,7 +97,7 @@ function Products() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products/${id}`)
+      .delete(`http://localhost:8080/api/products/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -141,7 +141,7 @@ function Products() {
       console.log(formData);
 
       axios
-        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products", formData)
+        .post("http://localhost:8080/api/products", formData)
         .then((response) => {
           resetForm();
           handleAddModalClose();
@@ -158,6 +158,9 @@ function Products() {
             message: "Oops! An error occurred while performing this operation.",
             type: "error",
           });
+          if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+            formik.setFieldError(error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()), "This product already exists");
+          }
           console.error(error);
         });
     },

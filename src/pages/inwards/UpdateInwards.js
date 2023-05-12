@@ -53,6 +53,9 @@ function UpdateInwards({
   const [invoiceNo, setInvoiceNo] = useState("");
   const [billCheckedById, setBillCheckedById] = useState("");
 
+  const [receiptNoErrorText, setReceiptNoErrorText] = useState(null);
+  const [invoiceNoErrorText, setInvoiceNoErrorText] = useState(null);
+
   useEffect(() => {
     setGodownId(inwards?.godown.id);
     setProductId(inwards?.product.id);
@@ -85,12 +88,18 @@ function UpdateInwards({
     setSupplyDate(event.target.value);
   };
   const handleReceiptNoChange = (event) => {
+    if (receiptNoErrorText != null) {
+      setReceiptNoErrorText(null);
+    }
     setReceiptNo(event.target.value);
   };
   const handleInvoiceIdChange = (event) => {
     setInvoiceId(event.target.value);
   };
   const handleInvoiceNoChange = (event) => {
+    if (invoiceNoErrorText != null) {
+      setInvoiceNoErrorText(null);
+    }
     setInvoiceNo(event.target.value);
   };
   const handleBillCheckedByIdChange = (event) => {
@@ -132,7 +141,7 @@ function UpdateInwards({
     console.log(formData);
 
     await axios
-      .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards/${inwards?.id}`, formData)
+      .put(`http://localhost:8080/api/inwards/${inwards?.id}`, formData)
       .then((response) => {
         setGodownId("");
         setProductId("");
@@ -146,6 +155,14 @@ function UpdateInwards({
         handleClose();
       })
       .catch((error) => {
+        if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
+          if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "receiptNo") {
+            setReceiptNoErrorText("This receipt number already exists");
+          }
+          else if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "invoiceNo") {
+            setInvoiceNoErrorText("This invoice number already exists");
+          }
+        }
         console.error(error);
       });
   };
@@ -252,6 +269,8 @@ function UpdateInwards({
                   variant="outlined"
                   value={receiptNo}
                   onChange={handleReceiptNoChange}
+                  error={receiptNoErrorText != null}
+                  helperText={receiptNoErrorText}
                 />
                 <FormControl>
                   <InputLabel id="invoiceIdLabel">Invoice</InputLabel>
@@ -278,6 +297,8 @@ function UpdateInwards({
                       variant="outlined"
                       value={invoiceNo}
                       onChange={handleInvoiceNoChange}
+                      error={invoiceNoErrorText != null}
+                      helperText={invoiceNoErrorText}
                     />
                     <FormControl>
                       <InputLabel id="billCheckedByIdLabel">
