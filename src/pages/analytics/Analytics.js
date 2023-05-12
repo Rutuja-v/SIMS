@@ -141,9 +141,9 @@ const Analytics = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      let outwards = "http://localhost:8080/api/outwards";
-      let inwards = "http://localhost:8080/api/inwards";
-      let returns = "http://localhost:8080/api/returns";
+      let outwards = "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards";
+      let inwards = "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards";
+      let returns = "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/returns";
       if (user.role !== "superadmin") {
         returns = returns + `?godownId=${user.godown?.id}`;
         inwards = inwards + `?godownId=${user.godown?.id}`;
@@ -226,7 +226,7 @@ const Analytics = () => {
               let i = 0;
               i <
               dataSetForInwardsProducts.length -
-                dataSetForOutwardsProducts.length;
+              dataSetForOutwardsProducts.length;
               i++
             ) {
               dataSetForOutwardsProducts.push(0);
@@ -313,9 +313,9 @@ const Analytics = () => {
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-    
+
       <br></br>
-      <br></br> 
+      <br></br>
       <div
         style={{
           marginBottom: "40px",
@@ -323,7 +323,7 @@ const Analytics = () => {
           padding: "20px",
         }}
       >
-          <EmployeeChart />
+        <EmployeeChart />
       </div>
       <br></br>
       <br></br>
@@ -349,14 +349,14 @@ const Analytics = () => {
           padding: "20px",
         }}
       >
-               
+
         <strong>
           <h7 style={{ marginLeft: "320px" }}>
             {" "}
             Returns (Cancelled vs Damaged)
           </h7>
         </strong>
-           
+
         <PieChart justify-content="center" width={950} height={350}>
           <Pie
             data={pieDataForReturns}
@@ -387,7 +387,7 @@ const Analytics = () => {
             padding: "20px",
           }}
         >
-           
+
           <strong>
             <h7 style={{ marginLeft: "320px" }}>
               {" "}
@@ -405,7 +405,7 @@ const Analytics = () => {
             padding: "20px",
           }}
         >
-           
+
           <strong>
             <h7 style={{ marginLeft: "320px" }}> Products Stock by Godown</h7>
           </strong>

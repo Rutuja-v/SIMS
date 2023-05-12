@@ -24,7 +24,7 @@ function ProductsStock({ godown }) {
     }
 
     axios
-      .get(`http://localhost:8080/api/godowns/${godown?.id}/stock`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${godown?.id}/stock`)
       .then((response) => {
         setProductsStock(response.data);
       })
@@ -33,7 +33,7 @@ function ProductsStock({ godown }) {
       });
 
     axios
-      .get(`http://localhost:8080/api/godowns/${godown?.id}/currentCapacity`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${godown?.id}/currentCapacity`)
       .then((response) => {
         setCurrentCapacity(response.data);
       })
@@ -145,11 +145,11 @@ function ProductsStock({ godown }) {
               {"The godown is " +
                 (godown
                   ? parseFloat(
-                      (
-                        (currentCapacity / godown.capacityInQuintals) *
-                        100
-                      ).toFixed(2)
-                    )
+                    (
+                      (currentCapacity / godown.capacityInQuintals) *
+                      100
+                    ).toFixed(2)
+                  )
                   : "--") +
                 "% full"}
             </Typography>

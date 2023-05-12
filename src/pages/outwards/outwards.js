@@ -242,7 +242,7 @@ export default function Outwards() {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`http://localhost:8080/api/outwards/${id}`)
+      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards/${id}`)
       .then((response) => {
         setOutwards(outwards.filter((record) => record.id !== id));
       })
@@ -316,7 +316,7 @@ export default function Outwards() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/outwards", formData)
+        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards", formData)
         .then((response) => {
           getData();
         })
@@ -334,7 +334,7 @@ export default function Outwards() {
   });
 
   function getData() {
-    let outwardsEndpoint = "http://localhost:8080/api/outwards";
+    let outwardsEndpoint = "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards";
 
     if (user.role !== "superadmin") {
       outwardsEndpoint = outwardsEndpoint + `?godownId=${user.godown?.id}`;
@@ -368,21 +368,21 @@ export default function Outwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/products?godownId=${user.godown?.id}`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products?godownId=${user.godown?.id}`)
       .then((res) => {
         setProducts(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })
@@ -731,7 +731,7 @@ export default function Outwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                        formik.errors.billCheckedById
+                          formik.errors.billCheckedById
                           ? true
                           : false
                       }

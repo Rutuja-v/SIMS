@@ -208,7 +208,7 @@ export default function SideList({ children }) {
       console.log(formData);
       axios
         .patch(
-          `http://localhost:8080/api/employees/${user?.id}/password`,
+          `http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${user?.id}/password`,
           formData
         )
         .then((response) => {
@@ -362,8 +362,8 @@ export default function SideList({ children }) {
           <List>
             {links.map((link, index) =>
               user.role !== "superadmin" &&
-              (link.label === "Godowns" ||
-                link.label === "Employees") ? null : (
+                (link.label === "Godowns" ||
+                  link.label === "Employees") ? null : (
                 <NavLink
                   key={index}
                   to={link.path}
@@ -437,7 +437,7 @@ export default function SideList({ children }) {
                     {...formik.getFieldProps("currentPassword")}
                     error={
                       formik.touched.currentPassword &&
-                      formik.errors.currentPassword
+                        formik.errors.currentPassword
                         ? true
                         : false
                     }

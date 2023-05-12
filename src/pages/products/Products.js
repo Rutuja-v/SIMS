@@ -60,7 +60,7 @@ function Products() {
 
   const getData = () => {
     axios
-      .get("http://localhost:8080/api/products")
+      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products")
       .then((response) => {
         response.data.sort((p1, p2) => {
           if (p1.name < p2.name) {
@@ -97,7 +97,7 @@ function Products() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/products/${id}`)
+      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products/${id}`)
       .then((response) => {
         setProducts(products.filter((product) => product.id !== id));
       })
@@ -136,7 +136,7 @@ function Products() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/products", formData)
+        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products", formData)
         .then((response) => {
           getData();
         })

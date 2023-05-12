@@ -58,7 +58,7 @@ export default function Register() {
     console.log(formData);
 
     axios
-      .post("http://localhost:8080/api/auth/signUp", formData)
+      .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/auth/signUp", formData)
       .then((response) => {
         setOpen(true);
       })

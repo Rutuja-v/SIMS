@@ -231,7 +231,7 @@ export default function Employees() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/employees/${id}`)
+      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}`)
       .then((response) => {
         setEmployees(employees.filter((record) => record.id !== id));
       })
@@ -252,7 +252,7 @@ export default function Employees() {
 
   const handleUnlockAccount = (id) => {
     axios
-      .patch(`http://localhost:8080/api/employees/${id}/unlock`)
+      .patch(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}/unlock`)
       .then((response) => {
         setLockedEmployees(
           lockedEmployees.filter((employee) => employee.id !== id)
@@ -270,7 +270,7 @@ export default function Employees() {
 
   const handleLockedAccountDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/employees/${id}`)
+      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}`)
       .then((response) => {
         setLockedEmployees(
           lockedEmployees.filter((employee) => employee.id !== id)
@@ -325,7 +325,7 @@ export default function Employees() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/employees", formData)
+        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees", formData)
         .then((response) => {
           getData();
         })
@@ -346,7 +346,7 @@ export default function Employees() {
 
   function getData() {
     axios
-      .get("http://localhost:8080/api/employees", {})
+      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees", {})
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {
@@ -367,21 +367,21 @@ export default function Employees() {
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/employeeRoles")
+      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employeeRoles")
       .then((res) => {
         setRoles(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/godowns")
+      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns")
       .then((res) => {
         setGodowns(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/employees/locked")
+      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/locked")
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {

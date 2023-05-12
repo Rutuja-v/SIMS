@@ -139,8 +139,8 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
     console.log(formData);
 
     await axios
-      .put(`http://localhost:8080/api/returns/${returns?.id}`, formData)
-      .then((response) => {})
+      .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/returns/${returns?.id}`, formData)
+      .then((response) => { })
       .catch((error) => {
         console.error(error);
       });

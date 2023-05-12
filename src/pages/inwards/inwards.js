@@ -239,7 +239,7 @@ export default function Inwards() {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`http://localhost:8080/api/inwards/${id}`)
+      .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards/${id}`)
       .then((response) => {
         setInwards(inwards.filter((record) => record.id !== id));
       })
@@ -307,7 +307,7 @@ export default function Inwards() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/inwards", formData)
+        .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards", formData)
         .then((response) => {
           getData();
         })
@@ -325,7 +325,7 @@ export default function Inwards() {
   });
 
   function getData() {
-    let inwardsEndpoint = "http://localhost:8080/api/inwards";
+    let inwardsEndpoint = "http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards";
 
     if (user.role !== "superadmin") {
       inwardsEndpoint = inwardsEndpoint + `?godownId=${user.godown?.id}`;
@@ -358,28 +358,28 @@ export default function Inwards() {
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/products`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products`)
       .then((res) => {
         setProducts(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get("http://localhost:8080/api/suppliers")
+      .get("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/suppliers")
       .then((res) => {
         setSuppliers(res.data);
       })
       .catch((err) => console.log(err));
 
     axios
-      .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
+      .get(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })
@@ -700,7 +700,7 @@ export default function Inwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                        formik.errors.billCheckedById
+                          formik.errors.billCheckedById
                           ? true
                           : false
                       }
