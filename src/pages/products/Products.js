@@ -99,16 +99,21 @@ function Products() {
     axios
       .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products/${id}`)
       .then((response) => {
+        setNotify({
+          isOpen: true,
+          message: "Product deleted successfully",
+          type: "success",
+        });
         setProducts(products.filter((product) => product.id !== id));
       })
       .catch((error) => {
+        setNotify({
+          isOpen: true,
+          message: "Oops! An error occurred while performing this operation.",
+          type: "error",
+        });
         console.error(error);
       });
-    setNotify({
-      isOpen: true,
-      message: "Product Deleted Successfully",
-      type: "error",
-    });
   };
 
   const formik = useFormik({
@@ -138,18 +143,23 @@ function Products() {
       axios
         .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products", formData)
         .then((response) => {
+          resetForm();
+          handleAddModalClose();
+          setNotify({
+            isOpen: true,
+            message: "Product added successfully",
+            type: "success",
+          });
           getData();
         })
         .catch((error) => {
+          setNotify({
+            isOpen: true,
+            message: "Oops! An error occurred while performing this operation.",
+            type: "error",
+          });
           console.error(error);
         });
-      resetForm();
-      handleAddModalClose();
-      setNotify({
-        isOpen: true,
-        message: "Product Added Successfully",
-        type: "success",
-      });
     },
   });
   function toSentenceCase(str) {

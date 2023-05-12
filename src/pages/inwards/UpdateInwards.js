@@ -133,21 +133,21 @@ function UpdateInwards({
 
     await axios
       .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/inwards/${inwards?.id}`, formData)
-      .then((response) => { })
+      .then((response) => {
+        setGodownId("");
+        setProductId("");
+        setQuantity("");
+        setSupplierId("");
+        setSupplyDate("");
+        setReceiptNo("");
+        setInvoiceId("");
+        setInvoiceNo("");
+        setBillCheckedById("");
+        handleClose();
+      })
       .catch((error) => {
         console.error(error);
       });
-
-    setGodownId("");
-    setProductId("");
-    setQuantity("");
-    setSupplierId("");
-    setSupplyDate("");
-    setReceiptNo("");
-    setInvoiceId("");
-    setInvoiceNo("");
-    setBillCheckedById("");
-    handleClose();
   };
 
   return (

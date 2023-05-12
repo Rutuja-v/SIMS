@@ -140,23 +140,23 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
 
     await axios
       .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/returns/${returns?.id}`, formData)
-      .then((response) => { })
+      .then((response) => {
+        setGodownId("");
+        setProductId("");
+        setQuantity("");
+        setReturnedBy("");
+        setReason("");
+        setDeliveryDate("");
+        setReturnDate("");
+        setReceiptNo("");
+        setInvoiceId("");
+        setInvoiceNo("");
+        setBillCheckedById("");
+        handleClose();
+      })
       .catch((error) => {
         console.error(error);
       });
-
-    setGodownId("");
-    setProductId("");
-    setQuantity("");
-    setReturnedBy("");
-    setReason("");
-    setDeliveryDate("");
-    setReturnDate("");
-    setReceiptNo("");
-    setInvoiceId("");
-    setInvoiceNo("");
-    setBillCheckedById("");
-    handleClose();
   };
 
   return (

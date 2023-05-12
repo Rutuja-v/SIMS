@@ -84,17 +84,17 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
 
     await axios
       .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${employee?.id}`, formData)
-      .then((response) => { })
+      .then((response) => {
+        setName(null);
+        setUsername(null);
+        setPassword(null);
+        setRoleId(null);
+        setGodownId(null);
+        handleClose();
+      })
       .catch((error) => {
         console.error(error);
       });
-
-    setName(null);
-    setUsername(null);
-    setPassword(null);
-    setRoleId(null);
-    setGodownId(null);
-    handleClose();
   };
 
   return (

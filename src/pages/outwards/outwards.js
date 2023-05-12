@@ -244,17 +244,22 @@ export default function Outwards() {
     await axios
       .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards/${id}`)
       .then((response) => {
+        setNotify({
+          isOpen: true,
+          message: "Record deleted successfully",
+          type: "success",
+        });
         setOutwards(outwards.filter((record) => record.id !== id));
       })
       .catch((error) => {
+        setNotify({
+          isOpen: true,
+          message: "Oops! An error occurred while performing this operation.",
+          type: "error",
+        });
         console.error(error);
       });
 
-    setNotify({
-      isOpen: true,
-      message: "Record Deleted Successfully",
-      type: "error",
-    });
     setConfirmDialog({
       ...confirmDialog,
       isOpen: false,
@@ -318,18 +323,22 @@ export default function Outwards() {
       axios
         .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards", formData)
         .then((response) => {
+          handleAddModalClose();
+          setNotify({
+            isOpen: true,
+            message: "Record submitted successfully",
+            type: "success",
+          });
           getData();
         })
         .catch((error) => {
+          setNotify({
+            isOpen: true,
+            message: "Oops! An error occurred while performing this operation.",
+            type: "error",
+          });
           console.error(error);
         });
-
-      handleAddModalClose();
-      setNotify({
-        isOpen: true,
-        message: "Record Submitted Successfully",
-        type: "success",
-      });
     },
   });
 

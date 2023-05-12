@@ -233,9 +233,19 @@ export default function Employees() {
     axios
       .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}`)
       .then((response) => {
+        setNotify({
+          isOpen: true,
+          message: "Employee deleted successfully",
+          type: "success",
+        });
         setEmployees(employees.filter((record) => record.id !== id));
       })
       .catch((error) => {
+        setNotify({
+          isOpen: true,
+          message: "Oops! An error occurred while performing this operation.",
+          type: "success",
+        });
         console.error(error);
       });
 
@@ -243,27 +253,27 @@ export default function Employees() {
       ...confirmDialog,
       isOpen: false,
     });
-    setNotify({
-      isOpen: true,
-      message: "Employee Deleted Successfully",
-      type: "error",
-    });
   };
 
   const handleUnlockAccount = (id) => {
     axios
       .patch(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}/unlock`)
       .then((response) => {
-        setLockedEmployees(
-          lockedEmployees.filter((employee) => employee.id !== id)
-        );
         setNotify({
           isOpen: true,
           message: "Unlocked the account",
           type: "success",
         });
+        setLockedEmployees(
+          lockedEmployees.filter((employee) => employee.id !== id)
+        );
       })
       .catch((error) => {
+        setNotify({
+          isOpen: true,
+          message: "Oops! An error occurred while performing this operation.",
+          type: "error",
+        });
         console.error(error);
       });
   };
@@ -272,16 +282,21 @@ export default function Employees() {
     axios
       .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees/${id}`)
       .then((response) => {
-        setLockedEmployees(
-          lockedEmployees.filter((employee) => employee.id !== id)
-        );
         setNotify({
           isOpen: true,
           message: "Deleted the account",
           type: "success",
         });
+        setLockedEmployees(
+          lockedEmployees.filter((employee) => employee.id !== id)
+        );
       })
       .catch((error) => {
+        setNotify({
+          isOpen: true,
+          message: "Oops! An error occurred while performing this operation.",
+          type: "error",
+        });
         console.error(error);
       });
   };
@@ -327,20 +342,23 @@ export default function Employees() {
       axios
         .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/employees", formData)
         .then((response) => {
+          resetForm();
+          setAddModalOpen(false);
+          setNotify({
+            isOpen: true,
+            message: "Employee added successfully",
+            type: "success",
+          });
           getData();
         })
         .catch((error) => {
+          setNotify({
+            isOpen: true,
+            message: "Oops! An error occurred while performing this operation.",
+            type: "error",
+          });
           console.error(error);
         });
-
-      resetForm();
-
-      setAddModalOpen(false);
-      setNotify({
-        isOpen: true,
-        message: "Employee Added Successfully",
-        type: "success",
-      });
     },
   });
 

@@ -67,15 +67,15 @@ function UpdateProduct({ product, handleClose }) {
 
     await axios
       .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/products/${product?.id}`, formData)
-      .then((response) => { })
+      .then((response) => {
+        setName("");
+        setPrice("");
+        setWeight("");
+        handleClose();
+      })
       .catch((error) => {
         console.error(error);
       });
-
-    setName("");
-    setPrice("");
-    setWeight("");
-    handleClose();
   };
 
   return (

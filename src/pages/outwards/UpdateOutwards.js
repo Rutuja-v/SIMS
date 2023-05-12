@@ -142,23 +142,21 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
     await axios
       .put(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/outwards/${outwards?.id}`, formData)
       .then((response) => {
-
+        setGodownId("");
+        setProductId("");
+        setQuantity("");
+        setDeliveredTo("");
+        setPurpose("");
+        setSupplyDate("");
+        setDeliveryDate("");
+        setReceiptNo("");
+        setInvoiceId("");
+        setBillCheckedById("");
+        handleClose();
       })
       .catch((error) => {
         console.error(error);
       });
-
-    setGodownId("");
-    setProductId("");
-    setQuantity("");
-    setDeliveredTo("");
-    setPurpose("");
-    setSupplyDate("");
-    setDeliveryDate("");
-    setReceiptNo("");
-    setInvoiceId("");
-    setBillCheckedById("");
-    handleClose();
   };
 
   return (

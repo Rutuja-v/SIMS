@@ -146,16 +146,21 @@ function Godowns() {
     axios
       .delete(`http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns/${id}`)
       .then((response) => {
+        setNotify({
+          isOpen: true,
+          message: "Godown deleted Successfully",
+          type: "success",
+        });
         setGodowns(godowns.filter((user) => user.id !== id));
       })
       .catch((error) => {
+        setNotify({
+          isOpen: true,
+          message: "Oops! An error occurred while performing this operation.",
+          type: "error",
+        });
         console.error(error);
       });
-    setNotify({
-      isOpen: true,
-      message: "Godown Deleted Successfully",
-      type: "error",
-    });
   };
 
   const handleClickSeeStock = (godown) => {
@@ -206,20 +211,24 @@ function Godowns() {
       axios
         .post("http://ec2-13-232-253-161.ap-south-1.compute.amazonaws.com:8080/api/godowns", formData)
         .then((response) => {
+          resetForm();
+          setAddModalOpen(false);
+
+          setNotify({
+            isOpen: true,
+            message: "Godown added Successfully",
+            type: "success",
+          });
           getData();
         })
         .catch((error) => {
+          setNotify({
+            isOpen: true,
+            message: "Oops! An error occurred while performing this operation.",
+            type: "error",
+          });
           console.error(error);
         });
-
-      resetForm();
-      setAddModalOpen(false);
-
-      setNotify({
-        isOpen: true,
-        message: "Godown Added Successfully",
-        type: "success",
-      });
     },
   });
   useEffect(() => {
