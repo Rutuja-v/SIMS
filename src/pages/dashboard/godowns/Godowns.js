@@ -200,6 +200,7 @@ function Godowns() {
         role: {
           id: values.managerRoleId,
         },
+        isLocked: false,
       };
 
       const startDateObj = new Date(values.startDate);
