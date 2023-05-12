@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
 import { Chart } from "chart.js/auto";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import moment from "moment";
-import GodownsChart from "./GodownsChart";
 import ProductsChart from "./ProductsChart";
 import { useContext } from "react";
 import { Context } from "../../context/ContextProvider";
@@ -313,7 +311,6 @@ const Analytics = () => {
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-
       <br></br>
       <br></br>
       <div
@@ -379,24 +376,7 @@ const Analytics = () => {
           <Legend />
         </PieChart>
       </div>
-      <>
-        <div
-          style={{
-            marginBottom: "40px",
-            border: "1px solid gray",
-            padding: "20px",
-          }}
-        >
-
-          <strong>
-            <h7 style={{ marginLeft: "320px" }}>
-              {" "}
-              Godown Capacity by Location
-            </h7>
-          </strong>
-          <GodownsChart />
-        </div>
-      </>
+      <>{/*  */}</>
       <>
         <div
           style={{
