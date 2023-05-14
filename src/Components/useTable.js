@@ -5,9 +5,9 @@ import {
   TableHead,
   TableRow,
   TableCell,
+  TablePagination,
   TableSortLabel,
 } from "@mui/material";
-import { TablePagination } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -38,6 +38,11 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "#fffbf2",
     },
   },
+  tablePagination: {
+    "& div p": {
+      margin: 0,
+    }
+  }
 }));
 
 export default function useTable(records, headCells, filterFn) {
@@ -88,24 +93,25 @@ export default function useTable(records, headCells, filterFn) {
     );
   };
 
-  const handleChangePage = (event, newPage) => {
+  const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   const TblPagination = () => (
     <TablePagination
+      className={classes.tablePagination}
       component="div"
       page={page}
       rowsPerPageOptions={pages}
       rowsPerPage={rowsPerPage}
       count={records ? records.length : 0}
-      onChangePage={handleChangePage}
-      onChangeRowsPerPage={handleChangeRowsPerPage}
+      onPageChange={handlePageChange}
+      onRowsPerPageChange={handleRowsPerPageChange}
     />
   );
 

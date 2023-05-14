@@ -132,7 +132,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
     formData["returnDate"] = formattedReturnDate;
 
     formData["receiptNo"] = receiptNo;
-    if (invoiceId == -1) {
+    if (invoiceId === -1) {
       formData["invoice"] = {
         invoiceNo: invoiceNo,
         billCheckedBy: {
@@ -172,7 +172,7 @@ function UpdateReturns({ returns, godowns, products, employees, handleClose }) {
             setInvoiceNoErrorText("This invoice number already exists");
           }
         }
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 

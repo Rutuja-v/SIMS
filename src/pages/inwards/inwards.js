@@ -28,11 +28,10 @@ import {
   IconButton,
 } from "@mui/material";
 import useTable from "../../Components/useTable";
-import Controls from "../../Components/controls/Controls";
-import { Search } from "@material-ui/icons";
-import AddIcon from "@material-ui/icons/Add";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import DeleteIcon from "@material-ui/icons/Delete";
+import { Search } from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik } from "formik";
 import moment from "moment";
@@ -147,7 +146,7 @@ export default function Inwards() {
         header: headers[i].header,
         key: headers[i].key,
         width:
-          headers[i].header == "Message" ? 50 : headers[i].header.length + 10,
+          headers[i].header === "Message" ? 50 : headers[i].header.length + 10,
         style: {
           alignment: {
             vertical: "middle",
@@ -174,13 +173,14 @@ export default function Inwards() {
     []
   );
 
+  const [user] = useContext(Context);
+
   useEffect(() => {
     if (user.role === "manager") {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
-  }, []);
+  }, [user]);
 
-  const [user] = useContext(Context);
   const classes = useStyles();
   const [inwards, setInwards] = useState(null);
   const [filterFn, setFilterFn] = useState({
@@ -254,7 +254,7 @@ export default function Inwards() {
           message: "Oops! An error occurred while performing this operation.",
           type: "error",
         });
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
 
     setConfirmDialog({
@@ -338,7 +338,7 @@ export default function Inwards() {
               formik.setFieldError(field, "This invoice number already exists");
             }
           }
-          console.error(error);
+          console.error({ data: error.response.data, status: error.response.status });
         });
     },
   });
@@ -374,35 +374,35 @@ export default function Inwards() {
         );
         setInwards(rows);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
       .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
       .get(`http://localhost:8080/api/products`)
       .then((res) => {
         setProducts(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
       .get("http://localhost:8080/api/suppliers")
       .then((res) => {
         setSuppliers(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
       .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
   }
 
   useEffect(() => {
@@ -520,7 +520,7 @@ export default function Inwards() {
                             handleEditModalOpen(item);
                           }}
                         >
-                          <EditOutlinedIcon fontSize="small" color="success" />
+                          <EditIcon fontSize="small" />
                         </Button>
                         <Button
                           onClick={() => {

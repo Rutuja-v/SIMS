@@ -1,19 +1,16 @@
 import React from "react";
+import { makeStyles } from "@material-ui/core";
 import {
+  Button,
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Typography,
-  makeStyles,
-} from "@material-ui/core";
-import Controls from "./controls/Controls";
+} from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
     padding: theme.spacing(2),
-    position: "absolute",
-    top: theme.spacing(5),
   },
   dialogTitle: {
     textAlign: "center",
@@ -43,22 +40,19 @@ export default function ConfirmDialog(props) {
 
   return (
     <Dialog open={confirmDialog.isOpen} classes={{ paper: classes.dialog }}>
-      <DialogTitle className={classes.dialogTitle}></DialogTitle>
       <DialogContent className={classes.dialogContent}>
         <Typography variant="h6">{confirmDialog.title}</Typography>
         <Typography variant="subtitle2">{confirmDialog.subTitle}</Typography>
       </DialogContent>
       <DialogActions className={classes.dialogAction}>
-        <Controls.Button
-          text="No"
-          color="default"
-          onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
-        />
-        <Controls.Button
-          text="Yes"
-          color="primary"
-          onClick={confirmDialog.onConfirm}
-        />
+        <Button
+          variant="outlined"
+          onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}>
+          No</Button>
+        <Button
+          variant="contained"
+          onClick={confirmDialog.onConfirm}>
+          Yes</Button>
       </DialogActions>
     </Dialog>
   );

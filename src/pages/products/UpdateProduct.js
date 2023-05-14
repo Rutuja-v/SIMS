@@ -74,7 +74,7 @@ function UpdateProduct({ product, handleClose }) {
         handleClose();
       })
       .catch((error) => {
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 
