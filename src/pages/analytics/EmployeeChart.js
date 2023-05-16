@@ -69,9 +69,9 @@ const EmployeeChart = () => {
   return (
     <div>
 
-      <strong>
-        <h7 style={{ marginLeft: "320px" }}>Employees by Location</h7>
-      </strong>
+      {/* <strong>
+        <p style={{ marginLeft: "535px", color: '#777777', fontSize : '15px' }}>Employees by Location</p>
+      </strong> */}
       {chartData ? (
         <Bar
           data={chartData}
@@ -89,6 +89,10 @@ const EmployeeChart = () => {
             plugins: {
               legend: {
                 position: "right",
+              },
+              title: {
+                display: true,
+                text: "Employees by Location"
               },
             },
           }}
