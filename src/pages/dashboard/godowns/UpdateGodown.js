@@ -62,10 +62,9 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
   const [managerId, setManagerId] = useState("");
   const [managerName, setManagerName] = useState("");
   const [managerUsername, setManagerUsername] = useState("");
-  const [managerPassword, setManagerPassword] = useState("");
   const [managerRoleId, setManagerRoleId] = useState("");
 
-  const [managerIdErrorText, setManagerIdErrorText] = useState("");
+  const [managerIdErrorText, setManagerIdErrorText] = useState(null);
 
   useEffect(() => {
     setLocation(godown?.location);
@@ -100,9 +99,6 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
   const handleManagerUsernameChange = (event) => {
     setManagerUsername(event.target.value);
   };
-  const handleManagerPasswordChange = (event) => {
-    setManagerPassword(event.target.value);
-  };
   const handleManagerRoleIdChange = (event) => {
     setManagerRoleId(event.target.value);
   };
@@ -120,7 +116,6 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
       formData["manager"] = {
         name: managerName,
         username: managerUsername,
-        password: managerPassword,
         role: {
           id: Number(managerRoleId),
         },
@@ -142,7 +137,6 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
         setManagerId("");
         setManagerName("");
         setManagerUsername("");
-        setManagerPassword("");
         setManagerRoleId("");
         handleClose();
       })
@@ -152,7 +146,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
             setManagerIdErrorText("This manager is mapped to another godown");
           }
         }
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 
@@ -226,8 +220,11 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                     <MenuItem key={0} value={-1}>
                       Add new manager
                     </MenuItem>
+                    <MenuItem key={1} value={godown?.manager.id}>
+                      {godown?.manager.name}
+                    </MenuItem>
                     {managers.map((manager, index) => (
-                      <MenuItem key={index + 1} value={manager.id}>
+                      <MenuItem key={index + 2} value={manager.id}>
                         {manager.name}
                       </MenuItem>
                     ))}
@@ -255,14 +252,6 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
                       variant="outlined"
                       value={managerUsername}
                       onChange={handleManagerUsernameChange}
-                    />
-                    <TextField
-                      id="managerPassword"
-                      label="Manager Password"
-                      type="text"
-                      variant="outlined"
-                      value={managerPassword}
-                      onChange={handleManagerPasswordChange}
                     />
                     <FormControl>
                       <InputLabel id="managerRoleIdLabel">

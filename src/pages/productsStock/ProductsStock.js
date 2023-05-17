@@ -29,7 +29,7 @@ function ProductsStock({ godown }) {
         setProductsStock(response.data);
       })
       .catch((error) => {
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
 
     axios
@@ -38,7 +38,7 @@ function ProductsStock({ godown }) {
         setCurrentCapacity(response.data);
       })
       .catch((error) => {
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 

@@ -103,7 +103,7 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
             setUsernameErrorText("This username already exists");
           }
         }
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 
@@ -178,7 +178,7 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
                     </Select>
                   </FormControl>
                 )}
-                {employee?.role.role !== "superadmin" && (
+                {employee?.role.role !== "superadmin" && employee?.id !== employee?.godown.manager.id && (
                   <FormControl>
                     <InputLabel id="godownIdLabel">Godown</InputLabel>
                     <Select

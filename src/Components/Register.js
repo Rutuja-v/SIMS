@@ -63,7 +63,7 @@ export default function Register() {
         setOpen(true);
       })
       .catch((error) => {
-        console.log(error);
+        console.error({ data: error.response.data, status: error.response.status });
         if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
           setUsernameErrorText("This username already exists");
         }

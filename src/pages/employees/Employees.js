@@ -9,7 +9,6 @@ import profileIcon from "../../Components/assets/profile.svg";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as Yup from "yup";
 import DownloadIcon from "@mui/icons-material/Download";
-import EditIcon from "@mui/icons-material/Edit";
 
 import {
   Grid,
@@ -37,17 +36,13 @@ import {
   Badge,
   Avatar,
 } from "@mui/material";
-import useTable from "../../Components/useTable";
-import Controls from "../../Components/controls/Controls";
-import { Search } from "@material-ui/icons";
-import AddIcon from "@material-ui/icons/Add";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import CloseIcon from "@material-ui/icons/Close";
+import { Search } from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import ConfirmDialog from "../../Components/ConfirmDialog";
 import UpdateEmployee from "./UpdateEmployee";
 import { Form, Formik } from "formik";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 const Excel = require("exceljs");
 
 const useStyles = makeStyles((theme) => ({
@@ -159,7 +154,7 @@ export default function Employees() {
         header: headers[i].header,
         key: headers[i].key,
         width:
-          headers[i].header == "Message" ? 50 : headers[i].header.length + 10,
+          headers[i].header === "Message" ? 50 : headers[i].header.length + 10,
         style: {
           alignment: {
             vertical: "middle",
@@ -244,12 +239,25 @@ export default function Employees() {
         setEmployees(employees.filter((record) => record.id !== id));
       })
       .catch((error) => {
-        setNotify({
-          isOpen: true,
-          message: "Oops! An error occurred while performing this operation.",
-          type: "success",
+        if (error.response.data.code === "RESOURCE_STILL_REFERENCED") {
+          setNotify({
+            isOpen: true,
+            message:
+              "Oops! This employee is a manager of a godown and cannot be deleted.",
+            type: "error",
+          });
+        } else {
+          setNotify({
+            isOpen: true,
+            message: "Oops! An error occurred while performing this operation.",
+            type: "error",
+          });
+        }
+
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
         });
-        console.error(error);
       });
 
     setConfirmDialog({
@@ -277,7 +285,10 @@ export default function Employees() {
           message: "Oops! An error occurred while performing this operation.",
           type: "error",
         });
-        console.error(error);
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        });
       });
   };
 
@@ -300,7 +311,10 @@ export default function Employees() {
           message: "Oops! An error occurred while performing this operation.",
           type: "error",
         });
-        console.error(error);
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        });
       });
   };
 
@@ -334,7 +348,7 @@ export default function Employees() {
       formData["role"] = {
         id: values.roleId,
       };
-      if (values.godownId != -1) {
+      if (values.godownId !== -1) {
         formData["godown"] = {
           id: values.godownId,
         };
@@ -368,7 +382,10 @@ export default function Employees() {
               formik.setFieldError(field, "This username already exists");
             }
           }
-          console.error(error);
+          console.error({
+            data: error.response.data,
+            status: error.response.status,
+          });
         });
     },
   });
@@ -393,21 +410,36 @@ export default function Employees() {
         rows.sort((e1, e2) => e1.name.localeCompare(e2.name));
         setEmployees(rows);
       })
-      .catch((err) => console.log(err));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get("http://localhost:8080/api/employeeRoles")
       .then((res) => {
         setRoles(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get("http://localhost:8080/api/godowns")
       .then((res) => {
         setGodowns(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get("http://localhost:8080/api/employees/locked")
@@ -428,7 +460,12 @@ export default function Employees() {
         rows.sort((e1, e2) => e1.name.localeCompare(e2.name));
         setLockedEmployees(rows);
       })
-      .catch((err) => console.log(err));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
   }
 
   useEffect(() => {
@@ -600,20 +637,22 @@ export default function Employees() {
                       >
                         <EditIcon />
                       </IconButton>
-                      <IconButton
-                        onClick={() => {
-                          setConfirmDialog({
-                            isOpen: true,
-                            title: "Are you sure to delete this record?",
-                            subTitle: "You can't undo this operation",
-                            onConfirm: () => {
-                              handleDelete(item.id);
-                            },
-                          });
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" color="error" />
-                      </IconButton>
+                      {item.role.role !== "superadmin" && (
+                        <IconButton
+                          onClick={() => {
+                            setConfirmDialog({
+                              isOpen: true,
+                              title: "Are you sure to delete this record?",
+                              subTitle: "You can't undo this operation",
+                              onConfirm: () => {
+                                handleDelete(item.id);
+                              },
+                            });
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" color="error" />
+                        </IconButton>
+                      )}
                     </div>
                   </CardActions>
                 </Card>

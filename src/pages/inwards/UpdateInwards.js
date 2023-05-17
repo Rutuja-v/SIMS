@@ -125,7 +125,7 @@ function UpdateInwards({
     formData["supplyDate"] = formattedSupplyDate;
 
     formData["receiptNo"] = receiptNo;
-    if (invoiceId == -1) {
+    if (invoiceId === -1) {
       formData["invoice"] = {
         invoiceNo: invoiceNo,
         billCheckedBy: {
@@ -163,7 +163,7 @@ function UpdateInwards({
             setInvoiceNoErrorText("This invoice number already exists");
           }
         }
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 

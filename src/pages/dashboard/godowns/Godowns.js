@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 import * as Yup from "yup";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useFormik } from "formik";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import moment from "moment";
 import Notification from "../../../Components/Notification";
 import UpdateGodown from "./UpdateGodown";
@@ -33,14 +33,6 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-export const initialValues = {
-  id: "",
-  location: "",
-  managerId: "",
-  capacity: "",
-  date: "",
-};
-
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -51,22 +43,6 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
 }));
-
-function formatDate(date) {
-  // Extract the year, month, and day values from the Date object
-  const year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
-
-  // Convert the month and day to double digits if necessary
-  month = month.toString().padStart(2, "0");
-  day = day.toString().padStart(2, "0");
-
-  // Format the date string
-  const formattedDate = `${day}/${month}/${year}`;
-
-  return formattedDate;
-}
 
 function Godowns() {
   const classes = useStyles();
@@ -102,18 +78,18 @@ function Godowns() {
         setGodowns(response.data);
       })
       .catch((error) => {
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
 
     axios
       .get("http://localhost:8080/api/employees")
       .then((response) => {
         setManagers(
-          response.data.filter((employee) => employee.role.role === "manager")
+          response.data.filter((employee) => employee.role.role === "manager" && employee.id !== employee.godown.manager.id)
         );
       })
       .catch((error) => {
-        console.log(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
 
     axios
@@ -122,13 +98,13 @@ function Godowns() {
         setRoles(response.data.filter((role) => role.role === "manager"));
       })
       .catch((error) => {
-        console.log(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
+
   const handleClickAddModalOpen = () => {
     setAddModalOpen(true);
   };
-
   const handleAddModalClose = () => {
     setAddModalOpen(false);
   };
@@ -136,7 +112,6 @@ function Godowns() {
   const handleClickEditModalOpen = (godown) => {
     setEditModalOpen(godown);
   };
-
   const handleEditModalClose = () => {
     setEditModalOpen(null);
     getData();
@@ -148,7 +123,7 @@ function Godowns() {
       .then((response) => {
         setNotify({
           isOpen: true,
-          message: "Godown deleted Successfully",
+          message: "Godown deleted successfully",
           type: "success",
         });
         setGodowns(godowns.filter((user) => user.id !== id));
@@ -159,7 +134,7 @@ function Godowns() {
           message: "Oops! An error occurred while performing this operation.",
           type: "error",
         });
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 
@@ -173,10 +148,10 @@ function Godowns() {
       .typeError("Capacity must be a number")
       .required("Capacity is required")
       .min(1, "Capacity must be at least 1"),
-
     startDate: Yup.date().required("Date is required"),
-    managerName: Yup.string().required("Manager Name is required"),
-    managerUsername: Yup.string().required("This field is required"),
+    // managerId: Yup.number().required("Manager is required"),
+    managerName: Yup.string().required("Manager name is required"),
+    managerUsername: Yup.string().required("Username is required"),
     managerRoleId: Yup.number().required("This field is required"),
   });
   const formik = useFormik({
@@ -184,6 +159,7 @@ function Godowns() {
       location: null,
       capacity: null,
       startDate: null,
+      // managerId: null,
       managerName: null,
       managerUsername: null,
       managerRoleId: null,
@@ -194,14 +170,20 @@ function Godowns() {
       let formData = {};
       formData["location"] = values.location;
       formData["capacityInQuintals"] = values.capacity;
+      // if (values.managerId !== -1) {
+      //   formData["manager"] = {
+      //     id: Number(values.managerId),
+      //   };
+      // }
+      // else {
       formData["manager"] = {
         name: values.managerName,
         username: values.managerUsername,
         role: {
           id: values.managerRoleId,
         },
-        isLocked: false,
       };
+      // }
 
       const startDateObj = new Date(values.startDate);
       const formattedDate = moment(startDateObj).format("DD/MM/YYYY");
@@ -217,7 +199,7 @@ function Godowns() {
 
           setNotify({
             isOpen: true,
-            message: "Godown added Successfully",
+            message: "Godown added successfully",
             type: "success",
           });
           getData();
@@ -228,10 +210,11 @@ function Godowns() {
             message: "Oops! An error occurred while performing this operation.",
             type: "error",
           });
-          console.error(error);
+          console.error({ data: error.response.data, status: error.response.status });
         });
     },
   });
+
   useEffect(() => {
     if (!addModalOpen) {
       formik.resetForm();
@@ -321,6 +304,37 @@ function Godowns() {
                       shrink: true,
                     }}
                   />
+                  {/* <FormControl>
+                    <InputLabel id="managerIdLabel">Manager</InputLabel>
+                    <Select
+                      labelId="managerIdLabel"
+                      id="managerId"
+                      label="Manager"
+                      {...formik.getFieldProps("managerId")}
+                      error={
+                        formik.touched.managerId &&
+                          formik.errors.managerId
+                          ? true
+                          : false
+                      }
+                    >
+                      <MenuItem key={0} value={-1}>
+                        Add new manager
+                      </MenuItem>
+                      {managers.map((manager, index) => (
+                        <MenuItem key={index + 1} value={manager.id}>
+                          {manager.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched.managerId &&
+                      formik.errors.managerId && (
+                        <FormHelperText error>
+                          {formik.touched.managerId &&
+                            formik.errors.managerId}
+                        </FormHelperText>
+                      )}
+                  </FormControl> */}
                   <TextField
                     id="managerName"
                     label="Manager name"
@@ -353,7 +367,6 @@ function Godowns() {
                       formik.errors.managerUsername
                     }
                   />
-
                   <FormControl>
                     <InputLabel id="roleIdLabel">Manager role</InputLabel>
                     <Select
@@ -487,7 +500,7 @@ function Godowns() {
               >
                 <div>
                   <IconButton
-                    color="success"
+                    color="primary"
                     aria-label="edit"
                     onClick={() => handleClickEditModalOpen(godown)}
                   >

@@ -9,7 +9,6 @@ import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -42,7 +41,9 @@ import axios from "axios";
 import * as Yup from "yup";
 import { makeStyles } from "@material-ui/core";
 import Notification from "../../Components/Notification";
+
 const drawerWidth = 200;
+
 const openedMixin = (theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create("width", {
@@ -51,6 +52,7 @@ const openedMixin = (theme) => ({
   }),
   overflowX: "hidden",
 });
+
 const closedMixin = (theme) => ({
   transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
@@ -62,6 +64,7 @@ const closedMixin = (theme) => ({
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
 });
+
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -69,6 +72,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
 }));
+
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -86,6 +90,7 @@ const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
+
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -102,6 +107,7 @@ const Drawer = styled(MuiDrawer, {
     "& .MuiDrawer-paper": closedMixin(theme),
   }),
 }));
+
 const useStyles = makeStyles((theme) => ({
   customTitle: {
     margin: 0,
@@ -111,6 +117,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
 }));
+
 export default function SideList({ children }) {
   const [user] = useContext(Context);
   const classes = useStyles();
@@ -222,7 +229,7 @@ export default function SideList({ children }) {
           handleLogout();
         })
         .catch((error) => {
-          console.error(error);
+          console.error({ data: error.response.data, status: error.response.status });
           if (error.response.data.code === "WRONG_PASSWORD") {
             setFieldError("currentPassword", "Entered password is wrong");
           }
@@ -334,7 +341,7 @@ export default function SideList({ children }) {
                 </Typography>
               )}
               <Button
-                sx={{ mt: open ? 1 : 2, mb: 1 }}
+                sx={{ mt: open ? 1 : 0, mb: 1 }}
                 variant={open ? "contained" : null}
                 size="small"
                 onClick={handleLogout}
@@ -469,7 +476,7 @@ export default function SideList({ children }) {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" variant="contained">
+                  <Button type="submit" variant="contained" disabled={!formik.isValid || !formik.dirty}>
                     Submit
                   </Button>
                 </DialogActions>

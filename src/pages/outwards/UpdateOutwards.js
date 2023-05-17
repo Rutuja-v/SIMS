@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UpdateOutwards({ outwards, godowns, products, employees, handleClose }) {
+function UpdateOutwards({ outwards, godowns, productsStock, employees, handleClose }) {
   const classes = useStyles();
 
   const [godownId, setGodownId] = useState("");
@@ -68,8 +68,8 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
     setInvoiceId(outwards?.invoice.id);
     setReceiptNo(outwards?.receipt_no);
 
-    if ((outwards?.product !== undefined && outwards?.product !== null) && !products.find(product => product.id == outwards?.product.id)) {
-      products.push(outwards?.product);
+    if ((outwards?.product !== undefined && outwards?.product !== null) && !productsStock.find(productStock => productStock.product.id === outwards?.product.id)) {
+      productsStock.push(outwards?.product);
     }
   }, [outwards]);
 
@@ -129,7 +129,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
     formData["deliveryDate"] = formattedDeliveryDate;
 
     formData["receiptNo"] = receiptNo;
-    if (invoiceId == -1) {
+    if (invoiceId === -1) {
       formData["invoice"] = {
         billCheckedBy: {
           id: billCheckedById,
@@ -165,7 +165,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
             setReceiptNoErrorText("This receipt number already exists");
           }
         }
-        console.error(error);
+        console.error({ data: error.response.data, status: error.response.status });
       });
   };
 
@@ -219,9 +219,9 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                     label="Product"
                     onChange={handleProductIdChange}
                   >
-                    {products.map((product, index) => (
-                      <MenuItem key={index} value={product.id}>
-                        {product.name}
+                    {productsStock.map((productStock, index) => (
+                      <MenuItem key={index} value={productStock.product.id}>
+                        {productStock.product.name}
                       </MenuItem>
                     ))}
                   </Select>
@@ -230,7 +230,7 @@ function UpdateOutwards({ outwards, godowns, products, employees, handleClose })
                   id="quantity"
                   label="Quantity"
                   type="number"
-                  inputProps={{ min: 1 }}
+                  inputProps={{ min: 1, max: productsStock.find(productStock => productStock.product.id === productId)?.stock }}
                   variant="outlined"
                   value={quantity}
                   onChange={handleQuantityChange}
