@@ -9,13 +9,15 @@ import profileIcon from "../../Components/assets/profile.svg";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as Yup from "yup";
 import DownloadIcon from "@mui/icons-material/Download";
+import EditIcon from "@mui/icons-material/Edit";
+
 import {
   Grid,
-  Paper,
-  TableBody,
-  TableRow,
-  TableCell,
+  Card,
+  CardActions,
+  Typography,
   Toolbar,
+  CardContent,
   InputAdornment,
   Button,
   TextField,
@@ -45,6 +47,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import UpdateEmployee from "./UpdateEmployee";
 import { Form, Formik } from "formik";
 import { useFormik } from "formik";
+import { useMemo } from "react";
 const Excel = require("exceljs");
 
 const useStyles = makeStyles((theme) => ({
@@ -198,8 +201,8 @@ export default function Employees() {
 
   const [unlockAccountsModalOpen, setUnlockAccountsModalOpen] = useState(null);
 
-  const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
-    useTable(employees, headCells, filterFn);
+  // const { TblContainer, TblHead, TblPagination, recordsAfterPagingAndSorting } =
+  //   useTable(employees, headCells, filterFn);
 
   const handleAddModalOpen = () => {
     setAddModalOpen(true);
@@ -358,7 +361,9 @@ export default function Employees() {
             type: "error",
           });
           if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
-            const field = error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            const field = error.response.data.field.replace(/_([a-z])/g, (g) =>
+              g[1].toUpperCase()
+            );
             if (field === "username") {
               formik.setFieldError(field, "This username already exists");
             }
@@ -448,82 +453,154 @@ export default function Employees() {
 
   return (
     <>
-      <Paper className={classes.pageContent}>
-        <Toolbar>
-          <Grid container spacing={2} direction="row">
-            <Grid item>
-              <TextField
-                disabled={recordsAfterPagingAndSorting()?.length === 0}
-                label="Search by supplier name"
-                className={classes.searchInput}
-                sx={{ width: "680px" }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-                onChange={handleSearch}
-              />
-            </Grid>
-
-            <Grid
-              item
-              style={{
-                marginLeft: "auto",
-                marginTop: "auto",
-                marginBottom: "auto",
+      {/* <Paper className={classes.pageContent}> */}
+      <Toolbar>
+        <Grid container spacing={2} direction="row">
+          <Grid item>
+            <TextField
+              disabled={employees?.length === 0}
+              label="Search by employee name"
+              className={classes.searchInput}
+              sx={{ width: "680px" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
               }}
+              onChange={handleSearch}
+            />
+          </Grid>
+
+          <Grid
+            item
+            style={{
+              marginLeft: "auto",
+              marginTop: "auto",
+              marginBottom: "auto",
+            }}
+          >
+            <IconButton color="success" onClick={employeesExcel}>
+              <DownloadIcon />
+            </IconButton>
+
+            <IconButton
+              color="success"
+              onClick={() => setUnlockAccountsModalOpen(true)}
             >
-              <IconButton color="success" onClick={employeesExcel}>
-                <DownloadIcon />
-              </IconButton>
+              <Badge badgeContent={lockedEmployees.length} color="primary">
+                <LockIcon />
+              </Badge>
+            </IconButton>
 
-              <IconButton
-                color="success"
-                onClick={() => setUnlockAccountsModalOpen(true)}
-              >
-                <Badge badgeContent={lockedEmployees.length} color="primary">
-                  <LockIcon />
-                </Badge>
-              </IconButton>
-
-              <Button
-                variant="outlined"
-                sx={{ marginLeft: "8px" }}
-                startIcon={<AddIcon />}
-                className={classes.newButton}
-                onClick={handleAddModalOpen}
-              >
-                Add new
-              </Button>
-            </Grid>
+            <Button
+              variant="outlined"
+              sx={{ marginLeft: "8px" }}
+              startIcon={<AddIcon />}
+              className={classes.newButton}
+              onClick={handleAddModalOpen}
+              name="testThis"
+            >
+              Add new
+            </Button>
           </Grid>
-        </Toolbar>
-        {recordsAfterPagingAndSorting()?.length === 0 ? (
-          <Grid sx={{ mt: 2, ml: 3 }}>
-            There are currently 0 employees records.
-          </Grid>
-        ) : (
-          <>
-            <TblContainer>
-              <TblHead />
-              <TableBody>
-                {recordsAfterPagingAndSorting()?.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.username}</TableCell>
-                    <TableCell>{toSentenceCase(item.role.role)}</TableCell>
-                    <TableCell>
-                      {item.godown === null ? "None" : item.godown.location}
-                    </TableCell>
-                    <TableCell>
-                      <Button onClick={() => handleEditModalOpen(item)}>
-                        <EditOutlinedIcon fontSize="small" />
-                      </Button>
-
-                      <Button
+        </Grid>
+      </Toolbar>
+      {employees?.length === 0 ? (
+        <Grid sx={{ mt: 2, ml: 3 }}>
+          There are currently 0 employees records.
+        </Grid>
+      ) : (
+        <>
+          <Grid
+            container
+            spacing={3}
+            mt={0}
+            justifyContent="center"
+            alignItems="center"
+          >
+            {filterFn.fn(employees)?.map((item) => (
+              <Grid item style={{ width: "300px" }} key={item.id}>
+                <Card
+                  style={{
+                    padding: "16px 24px",
+                  }}
+                >
+                  <CardContent
+                    style={{
+                      padding: "0px",
+                    }}
+                  >
+                    <Typography
+                      gutterBottom
+                      style={{ marginBottom: 0, fontWeight: "bold" }}
+                      variant="h6"
+                      component="h4"
+                    >
+                      {item.name}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="textSecondary"
+                      component="p"
+                      style={{ marginTop: "-4px" }}
+                    >
+                      {toSentenceCase(item.role.role)}
+                    </Typography>
+                    <div
+                      style={{
+                        marginTop: "16px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: "10px",
+                      }}
+                    >
+                      <div>
+                        <Typography
+                          variant="caption"
+                          color="textSecondary"
+                          component="p"
+                        >
+                          {"Username:"}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                          {item.username}
+                        </Typography>
+                      </div>
+                      <div>
+                        <Typography
+                          variant="caption"
+                          color="textSecondary"
+                          component="p"
+                        >
+                          {"Location:"}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                          {item.godown === null ? "None" : item.godown.location}
+                        </Typography>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardActions
+                    style={{
+                      marginTop: "8px",
+                      padding: "0px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div>
+                      <IconButton
+                        color="success"
+                        aria-label="edit"
+                        onClick={() => handleEditModalOpen(item)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
                         onClick={() => {
                           setConfirmDialog({
                             isOpen: true,
@@ -536,16 +613,16 @@ export default function Employees() {
                         }}
                       >
                         <DeleteIcon fontSize="small" color="error" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </TblContainer>
-            <TblPagination />
-          </>
-        )}
-      </Paper>
+                      </IconButton>
+                    </div>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </>
+      )}
+      {/* </Paper> */}
 
       <Dialog
         open={addModalOpen}
@@ -595,21 +672,7 @@ export default function Employees() {
                       formik.touched.username && formik.errors.username
                     }
                   />
-                  {/* <TextField
-                    id="password"
-                    label="Password"
-                    type="password"
-                    variant="outlined"
-                    {...formik.getFieldProps("password")}
-                    error={
-                      formik.touched.password && formik.errors.password
-                        ? true
-                        : false
-                    }
-                    helperText={
-                      formik.touched.password && formik.errors.password
-                    }
-                  /> */}
+
                   <FormControl>
                     <InputLabel id="roleIdLabel">Role</InputLabel>
                     <Select
@@ -678,6 +741,7 @@ export default function Employees() {
                     disabled={!formik.isValid || !formik.dirty}
                     type="submit"
                     variant="contained"
+                    name="Addtest"
                     className={classes.actionButtons}
                   >
                     Add

@@ -344,7 +344,7 @@ function Godowns() {
                     {...formik.getFieldProps("managerUsername")}
                     error={
                       formik.touched.managerUsername &&
-                        formik.errors.managerUsername
+                      formik.errors.managerUsername
                         ? true
                         : false
                     }
@@ -363,7 +363,7 @@ function Godowns() {
                       {...formik.getFieldProps("managerRoleId")}
                       error={
                         formik.touched.managerRoleId &&
-                          formik.errors.managerRoleId
+                        formik.errors.managerRoleId
                           ? true
                           : false
                       }
@@ -479,6 +479,7 @@ function Godowns() {
               </CardContent>
               <CardActions
                 style={{
+                  marginTop: "8px",
                   padding: "0px",
                   display: "flex",
                   justifyContent: "space-between",
