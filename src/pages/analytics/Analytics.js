@@ -65,7 +65,27 @@ const optionsForProductsData = {
   },
 };
 
-const COLORS = ["#8884d8", "#82ca9d"];
+const optionsForSupplierData = {
+  indexAxis: "y",
+  elements: {
+    bar: {
+      borderWidth: 2,
+    },
+  },
+  responsive: true,
+  plugins: {
+    legend: {
+      position: "right",
+    },
+    title: {
+      display: true,
+      text: "Supplier Vs Quantity (Inwards)",
+    },
+  },
+};
+
+const COLORS = ["#FF6384", "#36A2EB"];
+const COLORS_1 = ["#FFCE56", "#4BC0C0"];
 
 const CustomTooltip = ({ active, payload, label }) => {
   console.log("Pay", payload);
@@ -126,6 +146,17 @@ const Analytics = () => {
     ],
   });
 
+  const [supplierData, setSupplierData] = useState({
+    datasets: [
+      {
+        label: "Dataset 1",
+        data: [],
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(25, 90, 13, 0.5)",
+      }
+    ],
+  });
+
   const [pieDataForReturns, setPieDataForReturns] = useState([
     {
       name: "Cancelled",
@@ -136,6 +167,18 @@ const Analytics = () => {
       value: 0,
     },
   ]);
+
+  const [pieDataForSalesAndService, setPieDataForSalesAndService] = useState([
+    {
+      name: "Service",
+      value: 0,
+    },
+    {
+      name: "Sales",
+      value: 0,
+    },
+  ]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -158,6 +201,9 @@ const Analytics = () => {
       let labelSetForProductsData = [];
       let dataSetForInwardsProducts = [];
       let dataSetForOutwardsProducts = [];
+
+      let labelSetForSupplierData = [];
+      let dataSetForInwardsSupplier = [];
 
       await fetch(outwards)
         .then((data) => {
@@ -182,6 +228,16 @@ const Analytics = () => {
               labelSetForProductsData.push(val.product.name);
               dataSetForOutwardsProducts.push(val.quantity);
             }
+
+            if (val.purpose == "service") {
+              pieDataForSalesAndService[0].value =
+                Number(pieDataForSalesAndService[0].value) + Number(val.quantity);
+            } else if (val.purpose == "sales") {
+              pieDataForSalesAndService[1].value =
+                Number(pieDataForSalesAndService[1].value) + Number(val.quantity);
+            }
+
+            setPieDataForSalesAndService(pieDataForSalesAndService);
             // labelSet.push(val.name)
           }
           console.log(
@@ -216,6 +272,17 @@ const Analytics = () => {
             } else {
               labelSetForProductsData.push(val.product.name);
               dataSetForInwardsProducts.push(val.quantity);
+            }
+
+            if (labelSetForSupplierData.includes(val.supplier.name)) {
+              let idx = labelSetForSupplierData.findIndex(
+                (item) => item == val.supplier.name
+              );
+              dataSetForInwardsSupplier[idx] =
+                Number(dataSetForInwardsSupplier[idx]) + Number(val.quantity);
+            } else {
+              labelSetForSupplierData.push(val.supplier.name);
+              dataSetForInwardsSupplier.push(val.quantity);
             }
             // labelSet.push(val.name)
           }
@@ -307,6 +374,18 @@ const Analytics = () => {
           },
         ],
       });
+
+      setSupplierData({
+        labels: labelSetForSupplierData,
+        datasets: [
+          {
+            label: "Inwards",
+            data: dataSetForInwardsSupplier,
+            borderColor: "#495057",
+            backgroundColor: "#6c757d;",
+          }
+        ],
+      });
     };
 
     fetchData();
@@ -353,14 +432,29 @@ const Analytics = () => {
           padding: "20px",
         }}
       >
+        <Bar
+          height={"80px"}
+          data={supplierData}
+          options={optionsForSupplierData}
+        />
+      </div>
+      <br></br>
+      <br></br>
+      <div
+        style={{
+          marginBottom: "40px",
+          border: "1px solid gray",
+          padding: "20px",
+        }}
+      >
         <strong>
-          <h7 style={{ marginLeft: "320px" }}>
+          <p style={{ marginLeft: "505px", color: '#777777', fontSize : '15px' }}>
             {" "}
             Returns (Cancelled vs Damaged)
-          </h7>
+          </p>
         </strong>
 
-        <PieChart justify-content="center" width={950} height={350}>
+        <PieChart justify-content="center" width={1250} height={350}>
           <Pie
             data={pieDataForReturns}
             color="#000000"
@@ -383,6 +477,43 @@ const Analytics = () => {
         </PieChart>
       </div>
       <>{/*  */}</>
+      <div
+        style={{
+          marginBottom: "40px",
+          border: "1px solid gray",
+          padding: "20px",
+          justifyContent : 'center'
+        }}
+      >
+        <strong>
+          <p style={{ marginLeft: "520px", color: '#777777', fontSize : '15px' }}>
+            {" "}
+            Sales vs Service (Outwards)
+          </p>
+        </strong>
+
+        <PieChart width={1250} height={350} fill="#8884d8">
+          <Pie
+            data={pieDataForSalesAndService}
+            color="#000000"
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={120}
+            fill="#8884d8"
+          >
+            {pieDataForSalesAndService.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS_1[index % COLORS_1.length]}
+              />
+            ))}
+          </Pie>
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+        </PieChart>
+      </div>
       {user.role === "superadmin" && (
         <>
           <div
@@ -393,7 +524,7 @@ const Analytics = () => {
             }}
           >
             <strong>
-              <h7 style={{ marginLeft: "320px" }}> Products Stock by Godown</h7>
+              <p style={{ marginLeft: "525px", color: '#777777', fontSize : '15px' }}> Products Stock by Godown</p>
             </strong>
             <ProductsChart godownId={3} />
           </div>
