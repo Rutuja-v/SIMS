@@ -37,7 +37,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik, useFormik } from "formik";
 import moment from "moment";
 import UpdateOutwards from "./UpdateOutwards";
-import ImportButton from "../../Components/importButton";
+// import ImportButton from "../../Components/importButton";
 const Excel = require("exceljs");
 
 const useStyles = makeStyles((theme) => ({
@@ -179,7 +179,7 @@ export default function Outwards() {
   const [user] = useContext(Context);
 
   useEffect(() => {
-    if (user.role === "manager"  && headCells.length == 8) {
+    if (user.role === "manager" && headCells.length == 8) {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
   }, [user.role]);
@@ -256,7 +256,10 @@ export default function Outwards() {
           message: "Oops! An error occurred while performing this operation.",
           type: "error",
         });
-        console.error({ data: error.response.data, status: error.response.status });
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        });
       });
 
     setConfirmDialog({
@@ -337,12 +340,17 @@ export default function Outwards() {
             type: "error",
           });
           if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
-            const field = error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            const field = error.response.data.field.replace(/_([a-z])/g, (g) =>
+              g[1].toUpperCase()
+            );
             if (field === "receiptNo") {
               formik.setFieldError(field, "This receipt number already exists");
             }
           }
-          console.error({ data: error.response.data, status: error.response.status });
+          console.error({
+            data: error.response.data,
+            status: error.response.status,
+          });
         });
     },
   });
@@ -379,28 +387,48 @@ export default function Outwards() {
         );
         setOutwards(rows);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get(`http://localhost:8080/api/godowns/${user.godown?.id}/stock`)
       .then((res) => {
         setProducts(res.data);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
   }
 
   useEffect(() => {
@@ -430,7 +458,7 @@ export default function Outwards() {
           <Grid container spacing={2} direction="row">
             <Grid item>
               <TextField
-                disabled={recordsAfterPagingAndSorting()?.length === 0}
+                disabled={outwards?.length === 0}
                 label="Search by customer (delivered to)"
                 className={classes.searchInput}
                 sx={{ width: "480px" }}
@@ -445,7 +473,11 @@ export default function Outwards() {
               />
             </Grid>
             <Grid item>
-              <ImportButton getData={getData} setNotify={setNotify} tableId='outwards' />
+              {/* <ImportButton
+                getData={getData}
+                setNotify={setNotify}
+                tableId="outwards"
+              /> */}
             </Grid>
             <Grid
               item
@@ -472,7 +504,7 @@ export default function Outwards() {
             </Grid>
           </Grid>
         </Toolbar>
-        {recordsAfterPagingAndSorting()?.length === 0 ? (
+        {outwards?.length === 0 ? (
           <Grid sx={{ mt: 2, ml: 3 }}>
             There are currently 0 outwards records.
           </Grid>
@@ -635,7 +667,13 @@ export default function Outwards() {
                     id="quantity"
                     label="Quantity"
                     type="number"
-                    inputProps={{ min: 1, max: productsStock.find(productStock => productStock.product.id === formik.values.productId)?.stock }}
+                    inputProps={{
+                      min: 1,
+                      max: productsStock.find(
+                        (productStock) =>
+                          productStock.product.id === formik.values.productId
+                      )?.stock,
+                    }}
                     variant="outlined"
                     {...formik.getFieldProps("quantity")}
                     error={
@@ -747,7 +785,7 @@ export default function Outwards() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }

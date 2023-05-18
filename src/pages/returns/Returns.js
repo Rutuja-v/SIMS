@@ -39,7 +39,7 @@ import moment from "moment";
 import UpdateReturns from "./UpdateReturns";
 import { useContext } from "react";
 import { useMemo } from "react";
-import ImportButton from "../../Components/importButton";
+// import ImportButton from "../../Components/importButton";
 const Excel = require("exceljs");
 
 const useStyles = makeStyles((theme) => ({
@@ -258,7 +258,10 @@ export default function Returns() {
           message: "Oops! An error occurred while performing this operation.",
           type: "error",
         });
-        console.error({ data: error.response.data, status: error.response.status });
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        });
       });
 
     setConfirmDialog({
@@ -342,15 +345,19 @@ export default function Returns() {
             type: "error",
           });
           if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
-            const field = error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            const field = error.response.data.field.replace(/_([a-z])/g, (g) =>
+              g[1].toUpperCase()
+            );
             if (field === "receiptNo") {
               formik.setFieldError(field, "This receipt number already exists");
-            }
-            else if (field === "invoiceNo") {
+            } else if (field === "invoiceNo") {
               formik.setFieldError(field, "This invoice number already exists");
             }
           }
-          console.error({ data: error.response.data, status: error.response.status });
+          console.error({
+            data: error.response.data,
+            status: error.response.status,
+          });
         });
     },
   });
@@ -388,28 +395,48 @@ export default function Returns() {
         );
         setReturns(rows);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get(`http://localhost:8080/api/products`) //?godownId=${user.godown?.id}`)
       .then((res) => {
         setProducts(res.data);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
 
     axios
       .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })
-      .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
+      .catch((error) =>
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        })
+      );
   }
 
   useEffect(() => {
@@ -439,7 +466,7 @@ export default function Returns() {
           <Grid container spacing={2} direction="row">
             <Grid item>
               <TextField
-                disabled={recordsAfterPagingAndSorting()?.length === 0}
+                disabled={returns?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
                 sx={{ width: "480px" }}
@@ -454,7 +481,11 @@ export default function Returns() {
               />
             </Grid>
             <Grid item>
-              <ImportButton getData={getData} setNotify={setNotify} tableId='returns' />
+              {/* <ImportButton
+                getData={getData}
+                setNotify={setNotify}
+                tableId="returns"
+              /> */}
             </Grid>
             <Grid
               item
@@ -482,7 +513,7 @@ export default function Returns() {
             </Grid>
           </Grid>
         </Toolbar>
-        {recordsAfterPagingAndSorting()?.length === 0 ? (
+        {returns?.length === 0 ? (
           <Grid sx={{ mt: 2, ml: 3 }}>
             There are currently 0 returns records.
           </Grid>
@@ -769,7 +800,7 @@ export default function Returns() {
                       {...formik.getFieldProps("billCheckedById")}
                       error={
                         formik.touched.billCheckedById &&
-                          formik.errors.billCheckedById
+                        formik.errors.billCheckedById
                           ? true
                           : false
                       }
