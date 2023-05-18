@@ -334,11 +334,21 @@ export default function Outwards() {
           getData();
         })
         .catch((error) => {
-          setNotify({
-            isOpen: true,
-            message: "Oops! An error occurred while performing this operation.",
-            type: "error",
-          });
+          if (error.response.data.code === "OUT_OF_CAPACITY") {
+            setNotify({
+              isOpen: true,
+              message:
+                "Oops! This godown will become out of capacity if this is added.",
+              type: "error",
+            });
+          } else {
+            setNotify({
+              isOpen: true,
+              message:
+                "Oops! An error occurred while performing this operation.",
+              type: "error",
+            });
+          }
           if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
             const field = error.response.data.field.replace(/_([a-z])/g, (g) =>
               g[1].toUpperCase()
