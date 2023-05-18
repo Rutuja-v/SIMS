@@ -27,12 +27,14 @@ import {
   Grid,
   IconButton,
 } from "@mui/material";
+import Stack from "@mui/material/Stack";
 import useTable from "../../Components/useTable";
 import { Search } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ConfirmDialog from "../../Components/ConfirmDialog";
+import ImportButton from "../../Components/importButton";
 import { Form, Formik } from "formik";
 import moment from "moment";
 import UpdateInwards from "./UpdateInwards";
@@ -176,10 +178,10 @@ export default function Inwards() {
   const [user] = useContext(Context);
 
   useEffect(() => {
-    if (user.role === "manager") {
+    if (user.role === "manager" && headCells.length == 6) {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
-  }, [user]);
+  }, [user.role]);
 
   const classes = useStyles();
   const [inwards, setInwards] = useState(null);
@@ -419,13 +421,13 @@ export default function Inwards() {
     <>
       <Paper className={classes.pageContent}>
         <Toolbar>
-          <Grid container spacing={2} direction="row">
+          <Grid container spacing={2} direction="row" >
             <Grid item>
               <TextField
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{ width: "680px" }}
+                sx={{ width: "480px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -436,7 +438,9 @@ export default function Inwards() {
                 onChange={handleSearch}
               />
             </Grid>
-
+            <Grid item >
+              <ImportButton getData={getData} setNotify={setNotify} tableId='inwards' />
+            </Grid>
             <Grid
               item
               style={{

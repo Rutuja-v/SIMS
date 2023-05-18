@@ -635,7 +635,7 @@ export default function Employees() {
                         aria-label="edit"
                         onClick={() => handleEditModalOpen(item)}
                       >
-                        <EditIcon />
+                        <EditIcon fontSize="small" color="primary" />
                       </IconButton>
                       {item.role.role !== "superadmin" && (
                         <IconButton

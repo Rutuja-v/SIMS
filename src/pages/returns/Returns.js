@@ -39,6 +39,7 @@ import moment from "moment";
 import UpdateReturns from "./UpdateReturns";
 import { useContext } from "react";
 import { useMemo } from "react";
+import ImportButton from "../../Components/importButton";
 const Excel = require("exceljs");
 
 const useStyles = makeStyles((theme) => ({
@@ -179,10 +180,10 @@ export default function Returns() {
   const [user] = useContext(Context);
 
   useEffect(() => {
-    if (user.role === "manager") {
+    if (user.role === "manager" && headCells.length == 8) {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
-  }, [user]);
+  }, [user.role]);
 
   const classes = useStyles();
   const [returns, setReturns] = useState(null);
@@ -441,7 +442,7 @@ export default function Returns() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by supplier name"
                 className={classes.searchInput}
-                sx={{ width: "680px" }}
+                sx={{ width: "480px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -452,7 +453,9 @@ export default function Returns() {
                 onChange={handleSearch}
               />
             </Grid>
-
+            <Grid item>
+              <ImportButton getData={getData} setNotify={setNotify} tableId='returns' />
+            </Grid>
             <Grid
               item
               style={{
