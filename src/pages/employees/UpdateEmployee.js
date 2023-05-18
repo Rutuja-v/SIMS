@@ -99,11 +99,18 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
       })
       .catch((error) => {
         if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
-          if (error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()) === "username") {
+          if (
+            error.response.data.field.replace(/_([a-z])/g, (g) =>
+              g[1].toUpperCase()
+            ) === "username"
+          ) {
             setUsernameErrorText("This username already exists");
           }
         }
-        console.error({ data: error.response.data, status: error.response.status });
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        });
       });
   };
 
@@ -178,30 +185,31 @@ function UpdateEmployee({ employee, roles, godowns, handleClose }) {
                     </Select>
                   </FormControl>
                 )}
-                {employee?.role.role !== "superadmin" && employee?.id !== employee?.godown.manager.id && (
-                  <FormControl>
-                    <InputLabel id="godownIdLabel">Godown</InputLabel>
-                    <Select
-                      labelId="godownIdLabel"
-                      id="godownId"
-                      defaultValue={
-                        employee?.godown == null ? -1 : employee?.godown.id
-                      }
-                      value={godownId}
-                      label="Godown"
-                      onChange={handleGodownIdChange}
-                    >
-                      <MenuItem key={0} value={-1}>
-                        None
-                      </MenuItem>
-                      {godowns.map((godown, index) => (
-                        <MenuItem key={index + 1} value={godown.id}>
-                          {godown.location}
+                {employee?.role.role !== "superadmin" &&
+                  employee?.id !== employee?.godown?.manager.id && (
+                    <FormControl>
+                      <InputLabel id="godownIdLabel">Godown</InputLabel>
+                      <Select
+                        labelId="godownIdLabel"
+                        id="godownId"
+                        defaultValue={
+                          employee?.godown == null ? -1 : employee?.godown.id
+                        }
+                        value={godownId}
+                        label="Godown"
+                        onChange={handleGodownIdChange}
+                      >
+                        <MenuItem key={0} value={-1}>
+                          None
                         </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )}
+                        {godowns.map((godown, index) => (
+                          <MenuItem key={index + 1} value={godown.id}>
+                            {godown.location}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
               </div>
 
               <DialogActions>
