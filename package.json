@@ -17,6 +17,7 @@
     "enzyme-adapter-react-16": "^1.15.7",
     "enzyme-to-json": "^3.6.2",
     "exceljs": "^4.3.0",
+    "firebase": "^9.22.0",
     "formik": "^2.2.9",
     "jest": "^27.5.1",
     "json-server": "^0.17.3",

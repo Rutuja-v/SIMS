@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../../context/ContextProvider";
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -75,7 +76,10 @@ function Products() {
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error({ data: error.response.data, status: error.response.status });
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        });
         setIsLoading(false);
       });
   };
@@ -112,7 +116,10 @@ function Products() {
           message: "Oops! An error occurred while performing this operation.",
           type: "error",
         });
-        console.error({ data: error.response.data, status: error.response.status });
+        console.error({
+          data: error.response.data,
+          status: error.response.status,
+        });
       });
   };
 
@@ -159,9 +166,17 @@ function Products() {
             type: "error",
           });
           if (error.response.data.code === "UNIQUE_CONSTRAINT_VIOLATION") {
-            formik.setFieldError(error.response.data.field.replace(/_([a-z])/g, g => g[1].toUpperCase()), "This product already exists");
+            formik.setFieldError(
+              error.response.data.field.replace(/_([a-z])/g, (g) =>
+                g[1].toUpperCase()
+              ),
+              "This product already exists"
+            );
           }
-          console.error({ data: error.response.data, status: error.response.status });
+          console.error({
+            data: error.response.data,
+            status: error.response.status,
+          });
         });
     },
   });
@@ -174,6 +189,7 @@ function Products() {
 
   return (
     <>
+      <Box sx={{ width: "100%" }}>{isLoading && <CircularProgress />}</Box>
       {isLoading ? (
         <p>Loading...</p>
       ) : (
@@ -364,4 +380,4 @@ function Products() {
   );
 }
 
- export default Products;
+export default Products;
