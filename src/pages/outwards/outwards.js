@@ -179,7 +179,7 @@ export default function Outwards() {
   const [user] = useContext(Context);
 
   useEffect(() => {
-    if (user.role === "manager"  && headCells.length == 8) {
+    if (user.role === "manager" && headCells.length == 8) {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
   }, [user]);
@@ -444,9 +444,11 @@ export default function Outwards() {
                 onChange={handleSearch}
               />
             </Grid>
-            <Grid item>
-              <ImportButton getData={getData} setNotify={setNotify} tableId='outwards' />
-            </Grid>
+            {user.role === "manager" &&
+              <Grid item>
+                <ImportButton getData={getData} setNotify={setNotify} tableId='outwards' />
+              </Grid>
+            }
             <Grid
               item
               style={{

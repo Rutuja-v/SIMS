@@ -438,9 +438,11 @@ export default function Inwards() {
                 onChange={handleSearch}
               />
             </Grid>
-            <Grid item >
-              <ImportButton getData={getData} setNotify={setNotify} tableId='inwards' />
-            </Grid>
+            {user.role === "manager" &&
+              <Grid item >
+                <ImportButton getData={getData} setNotify={setNotify} tableId='inwards' />
+              </Grid>
+            }
             <Grid
               item
               style={{
