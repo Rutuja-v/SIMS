@@ -453,9 +453,11 @@ export default function Returns() {
                 onChange={handleSearch}
               />
             </Grid>
-            <Grid item>
-              <ImportButton getData={getData} setNotify={setNotify} tableId='returns' />
-            </Grid>
+            {user.role === "manager" &&
+              <Grid item>
+                <ImportButton getData={getData} setNotify={setNotify} tableId='returns' />
+              </Grid>
+            }
             <Grid
               item
               style={{
