@@ -4,7 +4,7 @@ import stock from "./assets/stock.jpeg";
 
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import  { useContext, useState } from "react";
+import { useContext, useState } from "react";
 
 import { Alert, Button, Link } from "@mui/material";
 
@@ -53,7 +53,7 @@ export default function Login() {
     e.preventDefault();
 
     axios
-      .post("http://localhost:8080/api/auth/login", {
+      .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/auth/login", {
         username: values.username,
         password: values.password,
       })
@@ -261,6 +261,6 @@ export default function Login() {
 
 
 
-export {Login as LoginTest}
+export { Login as LoginTest }
 
 

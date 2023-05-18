@@ -10,7 +10,7 @@ const EmployeeChart = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const { data } = await axios.get("http://localhost:8080/api/employees");
+        const { data } = await axios.get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees");
         setEmployees(data);
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -19,7 +19,7 @@ const EmployeeChart = () => {
 
     const fetchLocations = async () => {
       try {
-        const { data } = await axios.get("http://localhost:8080/api/godowns");
+        const { data } = await axios.get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns");
         setLocations(data.filter(Boolean).map((godown) => godown.location));
       } catch (error) {
         console.error("Error fetching locations:", error);

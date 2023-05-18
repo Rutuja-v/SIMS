@@ -243,7 +243,7 @@ export default function Returns() {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`http://localhost:8080/api/returns/${id}`)
+      .delete(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/returns/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -325,7 +325,7 @@ export default function Returns() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/returns", formData)
+        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/returns", formData)
         .then((response) => {
           handleAddModalClose();
           setNotify({
@@ -356,7 +356,7 @@ export default function Returns() {
   });
 
   function getData() {
-    let returnsEndpoint = "http://localhost:8080/api/returns";
+    let returnsEndpoint = "http://ec2-100-26-21-150.compute-1.amazonaws.com/api/returns";
 
     if (user.role !== "superadmin") {
       returnsEndpoint = returnsEndpoint + `?godownId=${user.godown?.id}`;
@@ -391,21 +391,21 @@ export default function Returns() {
       .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
-      .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
       .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
-      .get(`http://localhost:8080/api/products`) //?godownId=${user.godown?.id}`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/products`) //?godownId=${user.godown?.id}`)
       .then((res) => {
         setProducts(res.data);
       })
       .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
-      .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })

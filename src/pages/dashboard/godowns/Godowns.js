@@ -64,7 +64,7 @@ function Godowns() {
   }, []);
   const getData = () => {
     axios
-      .get("http://localhost:8080/api/godowns")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns")
       .then((response) => {
         response.data.sort((g1, g2) => {
           if (g1.location < g2.location) {
@@ -82,7 +82,7 @@ function Godowns() {
       });
 
     axios
-      .get("http://localhost:8080/api/employees")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees")
       .then((response) => {
         setManagers(
           response.data.filter((employee) => employee.role.role === "manager" && employee.id !== employee.godown.manager.id)
@@ -93,7 +93,7 @@ function Godowns() {
       });
 
     axios
-      .get("http://localhost:8080/api/employeeRoles")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employeeRoles")
       .then((response) => {
         setRoles(response.data.filter((role) => role.role === "manager"));
       })
@@ -119,7 +119,7 @@ function Godowns() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/godowns/${id}`)
+      .delete(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -192,7 +192,7 @@ function Godowns() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/godowns", formData)
+        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns", formData)
         .then((response) => {
           resetForm();
           setAddModalOpen(false);
@@ -358,7 +358,7 @@ function Godowns() {
                     {...formik.getFieldProps("managerUsername")}
                     error={
                       formik.touched.managerUsername &&
-                      formik.errors.managerUsername
+                        formik.errors.managerUsername
                         ? true
                         : false
                     }
@@ -376,7 +376,7 @@ function Godowns() {
                       {...formik.getFieldProps("managerRoleId")}
                       error={
                         formik.touched.managerRoleId &&
-                        formik.errors.managerRoleId
+                          formik.errors.managerRoleId
                           ? true
                           : false
                       }

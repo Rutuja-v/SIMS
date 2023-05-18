@@ -129,7 +129,7 @@ function UpdateGodown({ godown, managers, roles, handleClose }) {
     console.log(formData);
 
     await axios
-      .put(`http://localhost:8080/api/godowns/${godown?.id}`, formData)
+      .put(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns/${godown?.id}`, formData)
       .then((response) => {
         setLocation("");
         setCapacity("");

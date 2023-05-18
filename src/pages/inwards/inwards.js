@@ -241,7 +241,7 @@ export default function Inwards() {
 
   const handleDelete = async (id) => {
     await axios
-      .delete(`http://localhost:8080/api/inwards/${id}`)
+      .delete(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/inwards/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -315,7 +315,7 @@ export default function Inwards() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/inwards", formData)
+        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/inwards", formData)
         .then((response) => {
           handleAddModalClose();
           setNotify({
@@ -346,7 +346,7 @@ export default function Inwards() {
   });
 
   function getData() {
-    let inwardsEndpoint = "http://localhost:8080/api/inwards";
+    let inwardsEndpoint = "http://ec2-100-26-21-150.compute-1.amazonaws.com/api/inwards";
 
     if (user.role !== "superadmin") {
       inwardsEndpoint = inwardsEndpoint + `?godownId=${user.godown?.id}`;
@@ -379,28 +379,28 @@ export default function Inwards() {
       .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
-      .get(`http://localhost:8080/api/godowns/${user.godown?.id}`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns/${user.godown?.id}`)
       .then((res) => {
         setGodowns([res.data]);
       })
       .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
-      .get(`http://localhost:8080/api/products`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/products`)
       .then((res) => {
         setProducts(res.data);
       })
       .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
-      .get("http://localhost:8080/api/suppliers")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/suppliers")
       .then((res) => {
         setSuppliers(res.data);
       })
       .catch((error) => console.error({ data: error.response.data, status: error.response.status }));
 
     axios
-      .get(`http://localhost:8080/api/employees?godownId=${user.godown?.id}`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees?godownId=${user.godown?.id}`)
       .then((res) => {
         setEmployees(res.data);
       })

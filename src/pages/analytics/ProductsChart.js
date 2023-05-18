@@ -10,7 +10,7 @@ const ProductsChart = () => {
 
   useEffect(() => {
     const fetchGodowns = async () => {
-      const response = await axios.get("http://localhost:8080/api/godowns");
+      const response = await axios.get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns");
       setGodowns(response.data);
       setIsLoading(false);
     };
@@ -23,7 +23,7 @@ const ProductsChart = () => {
       const remainingCapacityData = {};
       for (const godown of godowns) {
         const response = await axios.get(
-          `http://localhost:8080/api/godowns/${godown.id}/stock`
+          `http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns/${godown.id}/stock`
         );
         const usedCapacity = response.data.reduce(
           (total, item) => total + item.stock * item.product.weight,

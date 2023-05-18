@@ -12,7 +12,7 @@ const ContextProvider = ({ children }) => {
   useEffect(() => {
     if (state !== null) {
       axios
-        .get(`http://localhost:8080/api/employees/${state.id}`)
+        .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees/${state.id}`)
         .then(response => {
           const loginUser = {
             id: response.data.id,

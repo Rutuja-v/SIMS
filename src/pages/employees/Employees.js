@@ -229,7 +229,7 @@ export default function Employees() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/employees/${id}`)
+      .delete(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -268,7 +268,7 @@ export default function Employees() {
 
   const handleUnlockAccount = (id) => {
     axios
-      .patch(`http://localhost:8080/api/employees/${id}/unlock`)
+      .patch(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees/${id}/unlock`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -294,7 +294,7 @@ export default function Employees() {
 
   const handleLockedAccountDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/employees/${id}`)
+      .delete(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -357,7 +357,7 @@ export default function Employees() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/employees", formData)
+        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees", formData)
         .then((response) => {
           resetForm();
           setAddModalOpen(false);
@@ -392,7 +392,7 @@ export default function Employees() {
 
   function getData() {
     axios
-      .get("http://localhost:8080/api/employees", {})
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees", {})
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {
@@ -418,7 +418,7 @@ export default function Employees() {
       );
 
     axios
-      .get("http://localhost:8080/api/employeeRoles")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employeeRoles")
       .then((res) => {
         setRoles(res.data);
       })
@@ -430,7 +430,7 @@ export default function Employees() {
       );
 
     axios
-      .get("http://localhost:8080/api/godowns")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns")
       .then((res) => {
         setGodowns(res.data);
       })
@@ -442,7 +442,7 @@ export default function Employees() {
       );
 
     axios
-      .get("http://localhost:8080/api/employees/locked")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/employees/locked")
       .then((res) => {
         let rows = [];
         for (let i = 0; i < res.data.length; i++) {

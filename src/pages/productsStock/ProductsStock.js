@@ -24,7 +24,7 @@ function ProductsStock({ godown }) {
     }
 
     axios
-      .get(`http://localhost:8080/api/godowns/${godown?.id}/stock`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns/${godown?.id}/stock`)
       .then((response) => {
         setProductsStock(response.data);
       })
@@ -33,7 +33,7 @@ function ProductsStock({ godown }) {
       });
 
     axios
-      .get(`http://localhost:8080/api/godowns/${godown?.id}/currentCapacity`)
+      .get(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/godowns/${godown?.id}/currentCapacity`)
       .then((response) => {
         setCurrentCapacity(response.data);
       })

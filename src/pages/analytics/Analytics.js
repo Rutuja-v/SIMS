@@ -178,16 +178,16 @@ const Analytics = () => {
       value: 0,
     },
   ]);
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
       let outwards =
-        "http://localhost:8080/api/outwards";
+        "http://ec2-100-26-21-150.compute-1.amazonaws.com/api/outwards";
       let inwards =
-        "http://localhost:8080/api/inwards";
+        "http://ec2-100-26-21-150.compute-1.amazonaws.com/api/inwards";
       let returns =
-        "http://localhost:8080/api/returns";
+        "http://ec2-100-26-21-150.compute-1.amazonaws.com/api/returns";
       if (user.role !== "superadmin") {
         returns = returns + `?godownId=${user.godown?.id}`;
         inwards = inwards + `?godownId=${user.godown?.id}`;
@@ -448,7 +448,7 @@ const Analytics = () => {
         }}
       >
         <strong>
-          <p style={{ marginLeft: "505px", color: '#777777', fontSize : '15px' }}>
+          <p style={{ marginLeft: "505px", color: '#777777', fontSize: '15px' }}>
             {" "}
             Returns (Cancelled vs Damaged)
           </p>
@@ -482,11 +482,11 @@ const Analytics = () => {
           marginBottom: "40px",
           border: "1px solid gray",
           padding: "20px",
-          justifyContent : 'center'
+          justifyContent: 'center'
         }}
       >
         <strong>
-          <p style={{ marginLeft: "520px", color: '#777777', fontSize : '15px' }}>
+          <p style={{ marginLeft: "520px", color: '#777777', fontSize: '15px' }}>
             {" "}
             Sales vs Service (Outwards)
           </p>
@@ -524,7 +524,7 @@ const Analytics = () => {
             }}
           >
             <strong>
-              <p style={{ marginLeft: "525px", color: '#777777', fontSize : '15px' }}> Products Stock by Godown</p>
+              <p style={{ marginLeft: "525px", color: '#777777', fontSize: '15px' }}> Products Stock by Godown</p>
             </strong>
             <ProductsChart godownId={3} />
           </div>

@@ -60,7 +60,7 @@ function Products() {
 
   const getData = () => {
     axios
-      .get("http://localhost:8080/api/products")
+      .get("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/products")
       .then((response) => {
         response.data.sort((p1, p2) => {
           if (p1.name < p2.name) {
@@ -97,7 +97,7 @@ function Products() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/api/products/${id}`)
+      .delete(`http://ec2-100-26-21-150.compute-1.amazonaws.com/api/products/${id}`)
       .then((response) => {
         setNotify({
           isOpen: true,
@@ -141,7 +141,7 @@ function Products() {
       console.log(formData);
 
       axios
-        .post("http://localhost:8080/api/products", formData)
+        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/products", formData)
         .then((response) => {
           resetForm();
           handleAddModalClose();
@@ -364,4 +364,4 @@ function Products() {
   );
 }
 
- export default Products;
+export default Products;

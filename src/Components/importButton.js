@@ -74,7 +74,7 @@ const ImportButton = (props) => {
                     };
 
                     axios
-                        .post("http://localhost:8080/api/inwards", formData)
+                        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/inwards", formData)
                         .then((response) => {
                             props.setNotify({
                                 isOpen: true,
@@ -135,7 +135,7 @@ const ImportButton = (props) => {
                     };
 
                     axios
-                        .post("http://localhost:8080/api/outwards", formData)
+                        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/outwards", formData)
                         .then((response) => {
                             props.setNotify({
                                 isOpen: true,
@@ -190,7 +190,7 @@ const ImportButton = (props) => {
                     };
 
                     axios
-                        .post("http://localhost:8080/api/returns", formData)
+                        .post("http://ec2-100-26-21-150.compute-1.amazonaws.com/api/returns", formData)
                         .then((response) => {
                             props.setNotify({
                                 isOpen: true,
@@ -255,7 +255,7 @@ const ImportButton = (props) => {
                         type="file"
                     />
                 </label>
-                <IconButton sx={{marginTop : '5px', marginLeft : ((user.role == "manager") ? '130px' : '240px' )}} color="success" onClick={handleSubmit}>
+                <IconButton sx={{ marginTop: '5px', marginLeft: ((user.role == "manager") ? '130px' : '240px') }} color="success" onClick={handleSubmit}>
                     <PublishIcon />
                 </IconButton>
             </Stack>
