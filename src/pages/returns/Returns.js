@@ -182,7 +182,7 @@ export default function Returns() {
     if (user.role === "manager") {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
-  }, [user]);
+  }, [user.role]);
 
   const classes = useStyles();
   const [returns, setReturns] = useState(null);

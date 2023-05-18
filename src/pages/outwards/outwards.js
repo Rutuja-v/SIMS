@@ -181,7 +181,7 @@ export default function Outwards() {
     if (user.role === "manager") {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
-  }, [user]);
+  }, [user.role]);
 
   const classes = useStyles();
   const [outwards, setOutwards] = useState(null);

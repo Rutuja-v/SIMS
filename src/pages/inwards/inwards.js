@@ -179,7 +179,7 @@ export default function Inwards() {
     if (user.role === "manager") {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
-  }, [user]);
+  }, [user.role]);
 
   const classes = useStyles();
   const [inwards, setInwards] = useState(null);
