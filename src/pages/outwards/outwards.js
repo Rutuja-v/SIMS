@@ -37,6 +37,7 @@ import ConfirmDialog from "../../Components/ConfirmDialog";
 import { Form, Formik, useFormik } from "formik";
 import moment from "moment";
 import UpdateOutwards from "./UpdateOutwards";
+import ImportButton from "../../Components/importButton";
 const Excel = require("exceljs");
 
 const useStyles = makeStyles((theme) => ({
@@ -178,7 +179,7 @@ export default function Outwards() {
   const [user] = useContext(Context);
 
   useEffect(() => {
-    if (user.role === "manager") {
+    if (user.role === "manager"  && headCells.length == 8) {
       headCells.push({ id: "actions", label: "Actions", disableSorting: true });
     }
   }, [user.role]);
@@ -432,7 +433,7 @@ export default function Outwards() {
                 disabled={recordsAfterPagingAndSorting()?.length === 0}
                 label="Search by customer (delivered to)"
                 className={classes.searchInput}
-                sx={{ width: "680px" }}
+                sx={{ width: "480px" }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -443,7 +444,9 @@ export default function Outwards() {
                 onChange={handleSearch}
               />
             </Grid>
-
+            <Grid item>
+              <ImportButton getData={getData} setNotify={setNotify} tableId='outwards' />
+            </Grid>
             <Grid
               item
               style={{
